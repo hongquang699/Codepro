@@ -1,5 +1,8 @@
-from django.test import TestCase, Client
+from unittest.mock import patch
+
 from django.contrib.auth.models import User
+from django.test import TestCase, Client
+
 from backend.judge.models import Profile, Problem, Language, Submission
 
 class CodeProOJAPITestCase(TestCase):
@@ -32,13 +35,20 @@ class CodeProOJAPITestCase(TestCase):
         data = {
             'problem': 'TEST_SUM',
             'language': 'CPP17',
-            'user': 'test_user',
+            'user': 'someone_else',
             'source': '#include <iostream>\\nint main() { return 0; }'
         }
-        res = self.client.post('/api/v2/submit', data, content_type='application/json')
+        anonymous = self.client.post('/api/v2/submit', data, content_type='application/json')
+        self.assertEqual(anonymous.status_code, 401)
+        self.client.force_login(self.user)
+        with patch('backend.api.v2.views.grade_submission'):
+            res = self.client.post('/api/v2/submit', data, content_type='application/json')
         self.assertEqual(res.status_code, 201)
         self.assertIn('submission_id', res.json()['data'])
-        self.assertEqual(res.json()['data']['result'], 'AC')
+        submission = Submission.objects.get(pk=res.json()['data']['submission_id'])
+        self.assertEqual(submission.user, self.profile)
+        self.assertEqual(submission.status, 'QU')
+        self.assertNotEqual(submission.result, 'AC')
 
     def test_get_users(self):
         res = self.client.get('/api/v2/users')
