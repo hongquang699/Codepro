@@ -12,6 +12,25 @@ from backend.community import site_runtime
 
 
 class SiteRuntimeTests(SimpleTestCase):
+    def test_restart_refuses_external_service_before_touching_others(self):
+        with patch.object(site_runtime, 'SERVICES', {'api': {}, 'web': {}}), \
+                patch.object(site_runtime, '_find', side_effect=[None, object()]), \
+                patch.object(site_runtime, '_owned', return_value=None), \
+                patch.object(site_runtime, 'start') as start:
+            with self.assertRaisesMessage(CommandError, 'outside site terminal'):
+                site_runtime.restart(('api', 'web'))
+            start.assert_not_called()
+
+    def test_restart_managed_service(self):
+        with patch.object(site_runtime, 'SERVICES', {'api': {}}), \
+                patch.object(site_runtime, '_find', return_value=object()), \
+                patch.object(site_runtime, '_owned', return_value=object()), \
+                patch.object(site_runtime, 'stop', return_value='api: stopped.') as stop, \
+                patch.object(site_runtime, 'start', return_value='api: started.') as start:
+            self.assertEqual(site_runtime.restart(('api',)), ['api: stopped.', 'api: started.'])
+            stop.assert_called_once_with('api')
+            start.assert_called_once_with('api')
+
     def test_start_status_and_stop_only_owned_process(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

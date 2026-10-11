@@ -19,13 +19,16 @@ from backend.community.services.notification_service import NotificationService
 from backend.judge.models import JudgeJob, JudgeWorker, Profile, Submission
 from backend.anti_cheat.models import ScanJob
 from backend.community import site_runtime
-from backend.community.terminal_ui import TerminalUI
+from backend.community import site_files
+from backend.community import site_git
+from backend.community.terminal_ui import TerminalUI, command_suggestions
 
 
 HELP = """HỆ THỐNG
   /status                         Dịch vụ, CPU/RAM và hàng đợi
   /server start [SERVICE|all]     Mở API + web, hoặc dịch vụ được chọn
   /server stop SERVICE            Dừng dịch vụ do terminal khởi chạy
+  /server restart [SERVICE|all]   Khởi động lại dịch vụ do terminal quản lý
   /server status                  Kiểm tra dịch vụ và tiến trình
   /server logs SERVICE [LINES]    Xem log đã ghi (tối đa 200 dòng)
   /monitor [SECONDS]              Theo dõi liên tục; Ctrl+C để trở lại
@@ -35,6 +38,19 @@ NỘI DUNG
   /posts                          Danh sách bài viết
   /show-post ID                   Xem bài viết
   /edit-post ID title|content FILE  Sửa bài viết từ tệp UTF-8
+  /file PATH [LINES]              Xem tệp UTF-8 trong project
+  /open PATH                      Mở tệp project bằng VS Code
+
+GIT / GITHUB
+  /git status                     Trạng thái nhánh và tệp thay đổi
+  /git log [COUNT]                Lịch sử commit
+  /git diff [PATH]                Xem thay đổi chưa stage
+  /git staged [PATH]              Xem thay đổi đã stage
+  /git branch                     Danh sách nhánh
+  /git add PATH                   Stage một tệp trong project
+  /git commit MESSAGE             Commit các tệp đã stage
+  /git pull                       Chỉ cập nhật fast-forward khi cây sạch
+  /git push                       Đẩy nhánh hiện tại lên origin
 
 TIN NHẮN
   /chats                          Các cuộc trò chuyện của bạn
@@ -43,6 +59,7 @@ TIN NHẮN
 
 PHIÊN LÀM VIỆC
   /help                           Hiện bảng lệnh
+  /suggest TEXT                   Gợi ý lệnh theo câu mô tả
   /clear                          Xóa màn hình
   /quit                           Thoát
 
@@ -76,6 +93,7 @@ class Command(BaseCommand):
             self.run_command([options['action'], *options['arguments']])
             return
         ui = TerminalUI(self.stdout, self.stderr, user.username)
+        self.interactive = True
         ui.banner()
         while True:
             try:
@@ -84,7 +102,7 @@ class Command(BaseCommand):
                 self.stdout.write('')
                 break
             try:
-                parts = shlex.split(line)
+                parts = self.split_input(line)
                 if not parts:
                     continue
                 action = parts[0].lstrip('/')
@@ -106,6 +124,7 @@ class Command(BaseCommand):
                 finally:
                     self.stdout = original
                 ui.response(captured.getvalue())
+                ui.followup('git' if action in ('git', 'github', 'gh') else action)
             except (CommandError, ValueError) as exc:
                 ui.error(exc)
 
@@ -132,6 +151,16 @@ class Command(BaseCommand):
         elif action == 'activity' and len(arguments) <= 1:
             count = self.bounded_number(arguments[0], 1, 50) if arguments else 10
             self.show_activity(count)
+        elif action == 'open' and len(arguments) == 1:
+            self.stdout.write(site_files.open_in_editor(arguments[0]))
+        elif action == 'file' and 1 <= len(arguments) <= 2:
+            lines = self.bounded_number(arguments[1], 1, 200) if len(arguments) == 2 else 60
+            self.stdout.write(site_files.preview(arguments[0], lines))
+        elif action == 'suggest':
+            for suggestion in command_suggestions(' '.join(arguments)):
+                self.stdout.write(suggestion)
+        elif action in ('git', 'github', 'gh'):
+            self.stdout.write(site_git.run_git(arguments))
         elif action == 'posts' and not arguments:
             for post in Post.objects.select_related('author__user').order_by('-created_at')[:20]:
                 self.stdout.write(f'{post.pk}\t{post.title}\t{post.author.user.username}')
@@ -152,7 +181,20 @@ class Command(BaseCommand):
         elif action == 'send' and len(arguments) >= 2:
             self.send(arguments[0], ' '.join(arguments[1:]))
         else:
-            raise CommandError('Invalid command or arguments. Type help for usage.')
+            if getattr(self, 'interactive', False):
+                self.stdout.write('Mình chưa nhận ra lệnh này. Bạn có thể thử:')
+                for suggestion in command_suggestions(' '.join(parts)):
+                    self.stdout.write(f'  {suggestion}')
+            else:
+                raise CommandError('Invalid command or arguments. Type help for usage.')
+
+    @staticmethod
+    def split_input(line):
+        lexer = shlex.shlex(line, posix=True)
+        lexer.whitespace_split = True
+        lexer.escape = ''  # Windows paths must keep backslashes.
+        lexer.commenters = ''
+        return list(lexer)
 
     @staticmethod
     def parse_id(value):
@@ -211,11 +253,17 @@ class Command(BaseCommand):
         if len(arguments) == 2 and arguments[0] == 'stop':
             self.stdout.write(site_runtime.stop(arguments[1]))
             return
+        if arguments and arguments[0] == 'restart' and len(arguments) <= 2:
+            target = arguments[1] if len(arguments) == 2 else 'default'
+            names = ('api', 'web') if target == 'default' else tuple(site_runtime.SERVICES) if target == 'all' else (target,)
+            for result in site_runtime.restart(names):
+                self.stdout.write(result)
+            return
         if 2 <= len(arguments) <= 3 and arguments[0] == 'logs':
             lines = self.bounded_number(arguments[2], 1, 200) if len(arguments) == 3 else 30
             self.stdout.write(site_runtime.log_tail(arguments[1], lines))
             return
-        raise CommandError('Usage: server start [api|web|judge|worker|all], server stop SERVICE, server status, or server logs SERVICE [LINES].')
+        raise CommandError('Usage: server start|restart [SERVICE|all], server stop SERVICE, server status, or server logs SERVICE [LINES].')
 
     def get_post(self, value):
         post = Post.objects.filter(pk=self.parse_id(value)).first()

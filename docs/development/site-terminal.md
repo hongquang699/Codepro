@@ -18,7 +18,7 @@ python manage.py site_terminal --user admin
 
 Gõ `help` để xem lệnh. Phiên tương tác hỗ trợ:
 
-Giao diện tương tác có khung chào, dấu nhắc `›` và phần phản hồi theo kiểu hội thoại. Gõ lệnh với dấu `/` như `/status`, `/server status`, `/chats`, `/help`; cách gõ cũ không có dấu `/` vẫn hoạt động. `/clear` dọn màn hình. Giao diện này chỉ điều khiển các chức năng quản trị đã cho phép, không kết nối AI và không nhận yêu cầu ngôn ngữ tự nhiên.
+Giao diện tương tác có khung chào, dấu nhắc `›` và phần phản hồi theo kiểu hội thoại. Gõ lệnh với dấu `/` như `/status`, `/server status`, `/chats`, `/help`; cách gõ cũ không có dấu `/` vẫn hoạt động. `/clear` dọn màn hình. Có thể gõ câu mô tả để nhận gợi ý lệnh, rồi tự chọn lệnh cần chạy. Giao diện này chỉ điều khiển các chức năng quản trị đã cho phép và không kết nối AI.
 
 ```text
 status
@@ -46,7 +46,30 @@ activity 10               # Bài nộp và job chấm gần đây
 monitor 3                 # Cập nhật trạng thái mỗi 3 giây; Ctrl+C để thoát
 server logs api 50        # 50 dòng log cuối của dịch vụ do terminal khởi chạy
 server stop api           # Chỉ dừng tiến trình do terminal khởi chạy
+server restart api        # Khởi động lại API do codepro quản lý
+server restart            # Khởi động lại API và web
 ```
+
+## Tệp, Git và gợi ý lệnh
+
+Tất cả đường dẫn của `file`, `open` và `git add` phải là tệp nằm trong project. Đặt đường dẫn có khoảng trắng trong dấu nháy kép. `open` mở tệp bằng VS Code; `file` chỉ xem tối đa 200 dòng UTF-8 trong terminal.
+
+```text
+file README.md 30
+open docs/development/site-terminal.md
+git status
+git diff
+git staged
+git log 5
+git branch
+git add README.md
+git commit "Cập nhật tài liệu"
+git pull
+git push
+suggest "khởi động lại server"
+```
+
+Có thể gõ `/github` hoặc `/gh` thay cho `/git`. `git pull` chỉ dùng fast-forward và yêu cầu cây làm việc sạch; `git push` đẩy nhánh hiện tại lên `origin`. Các lệnh Git được giới hạn trong danh sách trên, không thực thi lệnh shell tùy ý. Gõ một yêu cầu chưa nhận diện sẽ hiện gợi ý; gợi ý chỉ đề xuất lệnh, không tự chạy hoặc gửi nội dung lên dịch vụ AI.
 
 `server start` mặc định chỉ khởi động API và gateway. `server start all` chạy thêm máy chấm và worker chống gian lận khi môi trường cục bộ đã được cấu hình. Nếu dịch vụ đã chạy, lệnh báo PID và không mở thêm tiến trình. Dịch vụ có nhãn `external` là tiến trình được khởi chạy ngoài terminal này; lệnh `server stop` không dừng chúng. Log của tiến trình do terminal khởi chạy nằm tại `storage/temp/site-terminal/` và không được commit. Công cụ này quản lý dịch vụ phát triển cục bộ; bản Docker/production dùng cơ chế quản lý dịch vụ riêng.
 

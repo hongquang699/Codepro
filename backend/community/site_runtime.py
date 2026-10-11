@@ -173,6 +173,21 @@ def stop(name):
     return f'{name}: stopped.'
 
 
+def restart(names):
+    """Restart only services managed by this terminal; check all first."""
+    for name in names:
+        if name not in SERVICES:
+            raise CommandError('Unknown service. Choose api, web, judge, or worker.')
+        if _find(name) and _owned(name) is None:
+            raise CommandError(f'{name} was started outside site terminal; refusing to restart it.')
+    results = []
+    for name in names:
+        if _owned(name):
+            results.append(stop(name))
+        results.append(start(name))
+    return results
+
+
 def log_tail(name, lines=30):
     if name not in SERVICES:
         raise CommandError('Unknown service. Choose api, web, judge, or worker.')
