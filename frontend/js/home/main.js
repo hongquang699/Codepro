@@ -15,9 +15,10 @@ function getRankColor(rating) {
   if (r >= 1200) return '#06b6d4'; // Pupil
   return '#94a3b8'; // Newbie
 }
-
 async function initHomePage() {
-  const API_BASE = window.API_BASE || 'http://localhost:8000';
+  const API_BASE = (typeof window.API_BASE === 'string')
+    ? window.API_BASE
+    : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
 
   try {
     const res = await fetch(`${API_BASE}/api/v1/home/summary`);

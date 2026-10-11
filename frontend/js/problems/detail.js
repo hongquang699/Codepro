@@ -5,7 +5,9 @@
  */
 
 (() => {
-  const API = window.API_BASE || 'http://localhost:8000';
+  const API = (typeof window.API_BASE === 'string')
+    ? window.API_BASE
+    : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
   const urlParams = new URLSearchParams(window.location.search);
   const CODE = urlParams.get('code') || urlParams.get('problem') || 'SUMA';
   function getCurrentUser() {

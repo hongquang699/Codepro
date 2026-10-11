@@ -2,7 +2,9 @@
  * CodeProOJ - My Submissions Logic
  */
 
-const API = window.API_BASE || 'http://localhost:8000';
+const API = (typeof window.API_BASE === 'string')
+  ? window.API_BASE
+  : (window.location.origin && window.location.origin.startsWith('http') ? '' : 'http://localhost:8000');
 
     const verdictLabel = { 'AC':'✅ AC','WA':'❌ WA','TLE':'⏱ TLE','MLE':'💾 MLE','RTE':'💥 RE','CE':'🔧 CE','G':'⏳','QU':'📥' };
     const verdictClass = { 'AC':'verdict-AC','WA':'verdict-WA','TLE':'verdict-TLE','MLE':'verdict-MLE','RTE':'verdict-RE','CE':'verdict-CE','G':'verdict-G','QU':'verdict-G' };

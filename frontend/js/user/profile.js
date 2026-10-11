@@ -7,7 +7,7 @@
  */
 
 (() => {
-  const API = window.API_BASE || 'http://localhost:8000';
+  const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
   const urlParams = new URLSearchParams(window.location.search);
   function getTargetUser() {
     const fromUrl = urlParams.get('u') || urlParams.get('user');

@@ -106,7 +106,7 @@
       try {
         const user = ContestAPI.getCurrentUser();
         const query = user?.username ? `?user=${encodeURIComponent(user.username)}` : '';
-        const res = await fetch(`http://localhost:8000/api/v1/contests/${query}`);
+        const res = await fetch(`/api/v1/contests/${query}`);
         const json = await res.json();
         const contests = json.data || [];
 
