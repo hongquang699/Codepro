@@ -1,3 +1,8 @@
+LƯU Ý: Hướng dẫn bên dưới là bản cũ. Với Docker Compose hiện tại, dùng
+docs/deployment/README.md làm hướng dẫn deploy chính (HTTPS, cổng 8080
+chỉ nghe loopback, migrate và staticfiles). Không dùng lệnh runserver
+trong tài liệu cũ để chạy production.
+
 ================================================================================
           HƯỚNG DẪN CHI TIẾT DEPLOY HỆ THỐNG CHẤM CODING_OJ LÊN VPS
                (CODEPROOJ - COMPETITIVE PROGRAMMING PLATFORM)

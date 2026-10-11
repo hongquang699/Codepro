@@ -6,6 +6,7 @@ const { securityDefense } = require('./security');
 const PORT = process.env.PORT || 8888;
 const BACKEND_HOST = process.env.DJANGO_BACKEND_HOST || '127.0.0.1';
 const BACKEND_PORT = Number(process.env.DJANGO_BACKEND_PORT || 8000);
+const BACKEND_PROXY_SCHEME = process.env.DJANGO_PROXY_SCHEME === 'https' ? 'https' : null;
 const ROOT_DIR = path.resolve(__dirname, '../../');
 const ADMIN_SECURITY_PATHS = new Set([
   '/api/v2/admin/security/stats',
@@ -66,7 +67,10 @@ function hasVerifiedAdminSession(req) {
       port: BACKEND_PORT,
       path: '/api/v1/auth/me',
       method: 'GET',
-      headers: { cookie: req.headers.cookie || '', host: `${BACKEND_HOST}:${BACKEND_PORT}` },
+      headers: {
+        cookie: req.headers.cookie || '', host: `${BACKEND_HOST}:${BACKEND_PORT}`,
+        ...(BACKEND_PROXY_SCHEME ? { 'x-forwarded-proto': BACKEND_PROXY_SCHEME } : {})
+      },
       timeout: 3000
     }, authRes => {
       let body = '';
@@ -402,7 +406,10 @@ const server = http.createServer(async (req, res) => {
     }
     const pageReq = http.request({
       hostname: BACKEND_HOST, port: BACKEND_PORT, path: '/internal/judge-admin-page', method: 'GET',
-      headers: { cookie: req.headers.cookie || '', host: `${BACKEND_HOST}:${BACKEND_PORT}`, accept: 'text/html' }
+      headers: {
+        cookie: req.headers.cookie || '', host: `${BACKEND_HOST}:${BACKEND_PORT}`, accept: 'text/html',
+        ...(BACKEND_PROXY_SCHEME ? { 'x-forwarded-proto': BACKEND_PROXY_SCHEME } : {})
+      }
     }, pageRes => {
       res.writeHead(pageRes.statusCode, pageRes.headers);
       pageRes.pipe(res);
@@ -441,16 +448,19 @@ const server = http.createServer(async (req, res) => {
     // caller supplied forwarding headers to Django's authentication endpoints.
     const forwardedFor = clientIp;
 
+    const proxyHeaders = { ...req.headers };
+    delete proxyHeaders['x-forwarded-proto'];
     const proxyReq = http.request({
       hostname: BACKEND_HOST,
       port: BACKEND_PORT,
       path: req.url,
       method: req.method,
       headers: { 
-        ...req.headers, 
+        ...proxyHeaders,
         'x-forwarded-for': forwardedFor,
         'x-real-ip': clientIp,
-        host: `${BACKEND_HOST}:${BACKEND_PORT}` 
+        host: `${BACKEND_HOST}:${BACKEND_PORT}`,
+        ...(BACKEND_PROXY_SCHEME ? { 'x-forwarded-proto': BACKEND_PROXY_SCHEME } : {})
       }
     }, (proxyRes) => {
       res.writeHead(proxyRes.statusCode, proxyRes.headers);

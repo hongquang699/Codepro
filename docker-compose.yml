@@ -9,9 +9,13 @@ services:
       POSTGRES_DB: ${DB_NAME:-coding_platform}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./database/schemas:/docker-entrypoint-initdb.d
     networks:
       - codeprooj_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   redis:
     image: redis:7-alpine
@@ -22,6 +26,11 @@ services:
       - redisdata:/data
     networks:
       - codeprooj_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   backend:
     build:
@@ -35,7 +44,9 @@ services:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       JUDGE_SECRET_TOKEN: ${JUDGE_SECRET_TOKEN:?Set JUDGE_SECRET_TOKEN in .env}
-      ALLOWED_HOSTS: localhost,127.0.0.1,backend,codeprooj.com,www.codeprooj.com
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,codeprooj.com,www.codeprooj.com}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-coding_app}
@@ -45,16 +56,20 @@ services:
       JUDGE_SERVER_URL: http://judge-server:9999
       JUDGE_AUTH_TOKEN: ${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
       TRUSTED_PROXY_IPS: 172.16.0.0/12
+      TRUST_PROXY_SSL_HEADER: "true"
       DMOJ_PROBLEM_DATA_ROOT: /var/coding-platform/problem-data/problems
       DMOJ_CONTEST_DATA_ROOT: /var/coding-platform/contest-data/contests
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./config/admin_ip_whitelist.json:/app/config/admin_ip_whitelist.json:ro
       - ./problem-data:/var/coding-platform/problem-data
       - ./contest-data:/var/coding-platform/contest-data
       - ./storage:/var/coding-platform/storage
+      - staticfiles:/app/staticfiles
     networks:
       - codeprooj_network
 
@@ -68,7 +83,7 @@ services:
     environment:
       DEBUG: "False"
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
-      ALLOWED_HOSTS: localhost,127.0.0.1,backend,codeprooj.com,www.codeprooj.com
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,codeprooj.com,www.codeprooj.com}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: ${DB_USER:-coding_app}
@@ -126,6 +141,7 @@ services:
     environment:
       DJANGO_BACKEND_HOST: backend
       DJANGO_BACKEND_PORT: 8000
+      DJANGO_PROXY_SCHEME: https
       TRUSTED_PROXY_IPS: 172.16.0.0/12
     depends_on:
       - backend
@@ -141,16 +157,19 @@ services:
     container_name: codeprooj_gateway
     restart: always
     ports:
-      - "80:80"
+      - "127.0.0.1:${CODEPRO_HTTP_PORT:-8080}:80"
     depends_on:
       - frontend
       - backend
+    volumes:
+      - staticfiles:/srv/staticfiles:ro
     networks:
       - codeprooj_network
 
 volumes:
   pgdata:
   redisdata:
+  staticfiles:
 
 networks:
   codeprooj_network:

@@ -165,7 +165,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend')] if DEBUG else []
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'storage'
@@ -245,6 +245,8 @@ X_FRAME_OPTIONS = 'DENY'
 
 # Production HTTPS & HSTS Settings (Activated when DEBUG is False)
 if not DEBUG:
+    if _env_bool('TRUST_PROXY_SSL_HEADER'):
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT', True)
     SESSION_COOKIE_SECURE = _env_bool('SESSION_COOKIE_SECURE', True)
     CSRF_COOKIE_SECURE = _env_bool('CSRF_COOKIE_SECURE', True)
