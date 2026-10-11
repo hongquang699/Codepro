@@ -1,5 +1,7 @@
 import tempfile
+from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.admin.models import LogEntry
@@ -25,6 +27,19 @@ class SiteTerminalTests(TestCase):
     def test_requires_active_staff_user(self):
         with self.assertRaises(CommandError):
             call_command('site_terminal', '--user', 'member', 'status')
+
+    def test_unique_staff_opens_without_username(self):
+        output = StringIO()
+        call_command('site_terminal', 'server', 'status', stdout=output)
+        self.assertIn('api:', output.getvalue())
+
+    def test_interactive_slash_commands_keep_separate_output_lines(self):
+        output = StringIO()
+        with patch('builtins.input', side_effect=['/status', '/quit']), \
+                patch('backend.community.site_runtime.service_status', side_effect=lambda name: f'{name}: stopped'):
+            call_command('site_terminal', '--user', 'operator', stdout=output)
+        self.assertIn('CodePro Terminal', output.getvalue())
+        self.assertIn('  api: stopped\n  web: stopped', output.getvalue())
 
     def test_edit_post_from_file(self):
         with tempfile.TemporaryDirectory() as folder:

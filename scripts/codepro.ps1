@@ -18,27 +18,15 @@ if (-not $pythonExe) {
     exit 1
 }
 
-$hasUser = $false
-foreach ($arg in $CommandArgs) {
-    if ($arg -eq '--user' -or $arg.StartsWith('--user=')) {
-        $hasUser = $true
-        break
-    }
-}
-if (-not $hasUser -and '--help' -notin $CommandArgs -and '-h' -notin $CommandArgs) {
-    $username = Read-Host 'Tên tài khoản quản trị Django'
-    if ([string]::IsNullOrWhiteSpace($username)) {
-        Write-Error 'Cần tên tài khoản quản trị.'
-        exit 1
-    }
-    $CommandArgs = @('--user', $username) + $CommandArgs
-}
-
 Push-Location -LiteralPath $projectRoot
+$previousPythonEncoding = $env:PYTHONIOENCODING
+$env:PYTHONIOENCODING = 'utf-8'
 try {
     & $pythonExe (Join-Path $projectRoot 'manage.py') site_terminal @CommandArgs
-    exit $LASTEXITCODE
+    $exitCode = $LASTEXITCODE
 }
 finally {
+    $env:PYTHONIOENCODING = $previousPythonEncoding
     Pop-Location
 }
+exit $exitCode

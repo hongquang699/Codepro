@@ -3,13 +3,14 @@
 import shlex
 import time
 from datetime import timedelta
+from io import StringIO
 from pathlib import Path
 
 import psutil
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, OutputWrapper
 from django.db import DatabaseError, close_old_connections, connection, transaction
 from django.utils import timezone
 
@@ -18,36 +19,55 @@ from backend.community.services.notification_service import NotificationService
 from backend.judge.models import JudgeJob, JudgeWorker, Profile, Submission
 from backend.anti_cheat.models import ScanJob
 from backend.community import site_runtime
+from backend.community.terminal_ui import TerminalUI
 
 
-HELP = """Commands:
-  status                         Show services and system activity
-  server start [api|web|judge|worker|all]  Start local services (default: api + web)
-  server stop api|web|judge|worker          Stop a service started here
-  server status                  Show local service health and process info
-  server logs SERVICE [LINES]    Show captured service log (max 200 lines)
-  monitor [SECONDS]              Refresh status until Ctrl+C (default: 3 seconds)
-  activity [COUNT]               Show recent submissions and judge jobs
-  posts                          List recent posts
-  show-post ID                   Show a post
-  edit-post ID title|content FILE  Replace a post field with UTF-8 file contents
-  chats                          List your conversations
-  read ID                        Read a conversation
-  send USERNAME TEXT             Send a direct message
-  help                           Show this help
-  quit                           Exit interactive mode"""
+HELP = """HỆ THỐNG
+  /status                         Dịch vụ, CPU/RAM và hàng đợi
+  /server start [SERVICE|all]     Mở API + web, hoặc dịch vụ được chọn
+  /server stop SERVICE            Dừng dịch vụ do terminal khởi chạy
+  /server status                  Kiểm tra dịch vụ và tiến trình
+  /server logs SERVICE [LINES]    Xem log đã ghi (tối đa 200 dòng)
+  /monitor [SECONDS]              Theo dõi liên tục; Ctrl+C để trở lại
+  /activity [COUNT]               Bài nộp và job chấm gần đây
+
+NỘI DUNG
+  /posts                          Danh sách bài viết
+  /show-post ID                   Xem bài viết
+  /edit-post ID title|content FILE  Sửa bài viết từ tệp UTF-8
+
+TIN NHẮN
+  /chats                          Các cuộc trò chuyện của bạn
+  /read ID                        Đọc cuộc trò chuyện
+  /send USERNAME TEXT             Gửi tin nhắn
+
+PHIÊN LÀM VIỆC
+  /help                           Hiện bảng lệnh
+  /clear                          Xóa màn hình
+  /quit                           Thoát
+
+Có thể bỏ dấu / khi gõ lệnh. Đây là terminal quản trị, không tự xử lý câu hỏi ngôn ngữ tự nhiên."""
 
 
 class Command(BaseCommand):
     help = 'Admin terminal for editing community posts and chatting with users.'
 
     def add_arguments(self, parser):
-        parser.add_argument('--user', required=True, help='Active staff username used for chat')
+        parser.add_argument('--user', help='Active staff username (required when there is more than one)')
         parser.add_argument('action', nargs='?', help='Command to run once; omit for interactive mode')
         parser.add_argument('arguments', nargs='*', help='Arguments for the command')
 
     def handle(self, *args, **options):
-        user = get_user_model().objects.filter(username=options['user'], is_active=True, is_staff=True).first()
+        username = options['user']
+        if not username:
+            staff = list(get_user_model().objects.filter(is_active=True, is_staff=True).order_by('pk')[:2])
+            if len(staff) == 1:
+                username = staff[0].username
+            elif options['action']:
+                raise CommandError('Specify --user when there are zero or multiple active staff accounts.')
+            else:
+                username = input('Tên tài khoản quản trị › ').strip()
+        user = get_user_model().objects.filter(username=username, is_active=True, is_staff=True).first()
         if user is None:
             raise CommandError('An active staff user is required.')
         self.profile, _ = Profile.objects.get_or_create(user=user)
@@ -55,26 +75,46 @@ class Command(BaseCommand):
         if options['action']:
             self.run_command([options['action'], *options['arguments']])
             return
-        self.stdout.write('Site terminal. Type help for commands.')
+        ui = TerminalUI(self.stdout, self.stderr, user.username)
+        ui.banner()
         while True:
             try:
-                line = input('site> ')
+                line = input(ui.prompt())
             except (EOFError, KeyboardInterrupt):
                 self.stdout.write('')
                 break
             try:
                 parts = shlex.split(line)
-                if parts and parts[0] in ('quit', 'exit'):
+                if not parts:
+                    continue
+                action = parts[0].lstrip('/')
+                if action in ('quit', 'exit'):
                     break
-                self.run_command(parts)
+                if action == 'clear':
+                    ui.clear()
+                    ui.banner()
+                    continue
+                if action == 'monitor':
+                    ui.response('Đang theo dõi. Nhấn Ctrl+C để trở lại.')
+                    self.run_command(parts)
+                    continue
+                captured = StringIO()
+                original = self.stdout
+                try:
+                    self.stdout = OutputWrapper(captured)
+                    self.run_command(parts)
+                finally:
+                    self.stdout = original
+                ui.response(captured.getvalue())
             except (CommandError, ValueError) as exc:
-                self.stderr.write(str(exc))
+                ui.error(exc)
 
     def run_command(self, parts):
         if not parts:
             return
         action, *arguments = parts
-        if action == 'help':
+        action = action.lstrip('/')
+        if action in ('help', '?') and not arguments:
             self.stdout.write(HELP)
         elif action == 'status' and not arguments:
             self.show_status()

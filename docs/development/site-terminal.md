@@ -10,13 +10,15 @@ Trong PowerShell, cài lệnh ngắn một lần:
 codepro
 ```
 
-Gõ `codepro` từ bất kỳ thư mục nào; công cụ tự chạy trong project và trả terminal về thư mục ban đầu khi thoát. Khi gọi không có `--user`, lệnh hỏi tên tài khoản quản trị. Có thể chạy trực tiếp `codepro --user admin status`. Script cài lệnh cho PowerShell, PowerShell trong VS Code và CMD của tài khoản Windows hiện tại. Sau khi cài, hãy mở terminal mới để PATH trong CMD được cập nhật. Sau khi clone project ở chỗ khác, chạy lại script cài đặt để cập nhật đường dẫn.
+Gõ `codepro` từ bất kỳ thư mục nào; công cụ tự chạy trong project và trả terminal về thư mục ban đầu khi thoát. Nếu chỉ có một tài khoản staff đang hoạt động, giao diện mở ngay; nếu có nhiều tài khoản, nhập tên tài khoản hoặc dùng `codepro --user admin`. Có thể chạy một lệnh như `codepro status`. Script cài lệnh cho PowerShell, PowerShell trong VS Code và CMD của tài khoản Windows hiện tại. Sau khi cài, hãy mở terminal mới để PATH trong CMD được cập nhật. Sau khi clone project ở chỗ khác, chạy lại script cài đặt để cập nhật đường dẫn.
 
 ```powershell
 python manage.py site_terminal --user admin
 ```
 
 Gõ `help` để xem lệnh. Phiên tương tác hỗ trợ:
+
+Giao diện tương tác có khung chào, dấu nhắc `›` và phần phản hồi theo kiểu hội thoại. Gõ lệnh với dấu `/` như `/status`, `/server status`, `/chats`, `/help`; cách gõ cũ không có dấu `/` vẫn hoạt động. `/clear` dọn màn hình. Giao diện này chỉ điều khiển các chức năng quản trị đã cho phép, không kết nối AI và không nhận yêu cầu ngôn ngữ tự nhiên.
 
 ```text
 status
