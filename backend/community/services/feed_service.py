@@ -13,7 +13,8 @@ class FeedService:
 
         # 3. Upcoming contests
         now = timezone.now()
-        upcoming_contests = Contest.objects.filter(end_time__gt=now, is_visible=True).order_by('start_time')[:3]
+        from backend.judge.contest_visibility import visible_contests
+        upcoming_contests = Contest.objects.filter(visible_contests('web'), end_time__gt=now).order_by('start_time')[:3]
 
         # 4. Top community coders
         top_coders = Profile.objects.select_related('user').order_by('-rating', '-problem_count')[:5]

@@ -10,6 +10,7 @@ from backend.auth.security.ip_whitelist import is_user_admin, is_admin_ip_allowe
 from backend.auth.security.brute_force import is_ip_or_user_locked, record_login_attempt
 from backend.auth.services.authentication import authenticate_user
 from backend.auth.services.session import create_auth_session
+from backend.auth.security.token_auth import get_or_rotate_token
 from backend.auth.services.two_factor import verify_totp_code
 from backend.auth.models.two_factor import TwoFactorAuth
 
@@ -67,13 +68,7 @@ def login_view(request):
     is_admin = bool(user.is_active and (user.is_staff or user.is_superuser))
     user_role = 'admin' if is_admin else 'user'
 
-    drf_token_key = raw_token
-    try:
-        from rest_framework.authtoken.models import Token
-        drf_token, _ = Token.objects.get_or_create(user=user)
-        drf_token_key = drf_token.key
-    except Exception:
-        pass
+    drf_token_key = get_or_rotate_token(user).key
 
     user_rating = 0
     rank_title = 'Unrated'
@@ -117,7 +112,7 @@ def login_view(request):
     if is_admin:
         response.set_cookie(key='role', value='admin', max_age=max_age, path='/', samesite='Lax')
         response.set_cookie(key='is_admin', value='true', max_age=max_age, path='/', samesite='Lax')
-        response.set_cookie(key='admin_token', value=drf_token_key, max_age=max_age, path='/', samesite='Lax')
+        response.delete_cookie(key='admin_token')
     else:
         response.set_cookie(key='role', value='user', max_age=max_age, path='/', samesite='Lax')
         response.delete_cookie(key='is_admin')
@@ -205,13 +200,7 @@ def verify_2fa_login_view(request):
     is_admin = bool(user.is_active and (user.is_staff or user.is_superuser))
     user_role = 'admin' if is_admin else 'user'
 
-    drf_token_key = raw_token
-    try:
-        from rest_framework.authtoken.models import Token
-        drf_token, _ = Token.objects.get_or_create(user=user)
-        drf_token_key = drf_token.key
-    except Exception:
-        pass
+    drf_token_key = get_or_rotate_token(user).key
 
     user_rating = 0
     rank_title = 'Unrated'
@@ -254,7 +243,7 @@ def verify_2fa_login_view(request):
     if is_admin:
         response.set_cookie(key='role', value='admin', max_age=max_age, path='/', samesite='Lax')
         response.set_cookie(key='is_admin', value='true', max_age=max_age, path='/', samesite='Lax')
-        response.set_cookie(key='admin_token', value=drf_token_key, max_age=max_age, path='/', samesite='Lax')
+        response.delete_cookie(key='admin_token')
     else:
         response.set_cookie(key='role', value='user', max_age=max_age, path='/', samesite='Lax')
         response.delete_cookie(key='is_admin')

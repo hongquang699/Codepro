@@ -208,5 +208,8 @@
     }).join('');
   }
 
+  window.addEventListener('codeprooj:invalidate', event => {
+    if (event.detail?.topics?.includes('problems') || event.detail?.topics?.includes('submissions')) init();
+  });
   document.addEventListener('DOMContentLoaded', init);
 })();

@@ -31,6 +31,14 @@ PostgreSQL (`pgdata`) và Redis (`redisdata`) dùng Docker volumes. Django stati
 
 ## Khởi động
 
+### Mã hóa khi truyền và khi lưu testcase
+
+Reverse proxy ở `infrastructure/nginx/host.example.conf` chuyển HTTP sang HTTPS, chỉ cho phép TLS 1.2/1.3 và gửi HSTS trên phản hồi HTTPS. Cài chứng chỉ hợp lệ trước khi đưa dịch vụ ra Internet. Cổng HTTP nội bộ `127.0.0.1:8080` chỉ dành cho reverse proxy; không công bố cổng này ra ngoài.
+
+Đặt `TESTCASE_ENCRYPTION_KEY` trong `.env` thành 32 byte ngẫu nhiên mã hóa base64, ví dụ tạo bằng `python -c "import base64,secrets; print(base64.b64encode(secrets.token_bytes(32)).decode())"`. Giữ khóa ở nơi lưu bí mật và sao lưu riêng; mất khóa sẽ không đọc được testcase đã mã hóa. Backend và máy chấm phải dùng cùng khóa. File testcase mới (`.in`, `.out`, `.ans`) được mã hóa AES-256-GCM khi ghi; máy chấm giải mã trong bộ nhớ. File cũ vẫn đọc được cho đến khi chuyển đổi.
+
+Sau khi sao lưu `problem-data/` và `storage/contests/`, chạy thử `python scripts/encrypt_testcases.py problem-data/problems` và `python scripts/encrypt_testcases.py storage/contests`, rồi chạy lại cả hai lệnh với `--apply` và cùng biến môi trường khóa. Chạy lệnh chuyển đổi khi đã dừng thao tác soạn đề để tránh ghi đồng thời. Khôi phục dữ liệu phải đi kèm đúng khóa. Mã hóa tập tin không thay thế việc phân quyền thư mục, sao lưu và giới hạn quyền API. Testcase từng được commit vào Git vẫn tồn tại ở lịch sử Git sau chuyển đổi; cần xử lý riêng lịch sử và bản sao lưu nếu chúng chứa dữ liệu bí mật.
+
 Chạy tại `/srv/codeprooj`:
 
 ```sh
@@ -43,6 +51,8 @@ docker compose ps
 ```
 
 Backend tự chạy `collectstatic` khi khởi động. Chỉ chạy `createsuperuser` khi cần tạo tài khoản quản trị mới. Kiểm tra `https://codeprooj.com/`, `/problems`, `/api/v2/problems` và tệp `/static/admin/css/base.css`. Với tên miền khác, thay `codeprooj.com` trong `.env` và cấu hình Nginx máy chủ.
+
+Gateway cung cấp WebSocket `/ws/live` để báo thay đổi cuộc thi, bài tập và bài nộp giữa web và client. Cả Nginx trong Compose và Nginx máy chủ phải chuyển tiếp `Upgrade`/`Connection`; các mẫu cấu hình trong repository đã có phần này. Kênh chỉ gửi tín hiệu làm mới, không gửi dữ liệu tài khoản hoặc mã nguồn. Trạng thái chấm bài do worker cập nhật trực tiếp vẫn dùng API polling hiện có. Bộ phát sự kiện nằm trong một tiến trình gateway; nếu chạy nhiều gateway, cần thêm Redis pub/sub trước khi cân bằng tải.
 
 `docker compose down` giữ các named volumes; **không dùng `down -v`** khi cần giữ database và Redis. Khi cập nhật mã, kéo commit mới rồi chạy lại `docker compose up -d --build` và `migrate`. Kiểm tra health và log trước khi mở lưu lượng công khai.
 

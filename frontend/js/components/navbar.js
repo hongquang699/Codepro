@@ -52,6 +52,7 @@ function initNavbar() {
     { label: 'Trang chủ', key: 'nav.home', icon: 'home', href: '/', exactMatch: true },
     { label: 'Bài tập', key: 'nav.problems', icon: 'code', href: '/problems', match: ['/problems', '/frontend/html/problem', '/frontend/html/problems'] },
     { label: 'Cuộc thi', key: 'nav.contests', icon: 'trophy', href: '/contests', match: ['/contests', '/frontend/html/contest'] },
+    { label: 'Tải Client', key: 'nav.client', icon: 'download', href: '/client', match: ['/client'] },
     { label: 'Xếp hạng', key: 'nav.rankings', icon: 'award', href: '/ranking', match: ['/ranking', '/frontend/html/ranking'] },
     { label: 'Tổ chức', key: 'nav.organizations', icon: 'shield', href: '/organizations', match: ['/organizations', '/frontend/html/organization'] },
     { label: 'Bài nộp', key: 'nav.submissions', icon: 'send', href: '/submissions', match: ['/submissions', '/frontend/html/submissions'] }
@@ -69,7 +70,7 @@ function initNavbar() {
       ? CPIcons.get(item.icon, { size: 16 }) 
       : '';
     const translatedText = (typeof CPI18n !== 'undefined') ? CPI18n.t(item.key, item.label) : item.label;
-    return `<li><a href="${item.href}" class="${isActive ? 'active' : ''}" style="white-space: nowrap !important;">${iconSvg}<span data-i18n="${item.key}" class="nav-text" style="white-space: nowrap !important;">${translatedText}</span></a></li>`;
+    return `<li><a href="${item.href}" class="${isActive ? 'active' : ''}${item.key === 'nav.client' ? ' nav-client-link' : ''}" style="white-space: nowrap !important;">${iconSvg}<span data-i18n="${item.key}" class="nav-text" style="white-space: nowrap !important;">${translatedText}</span></a></li>`;
   }).join('');
 
   // Switchers (Theme and Language)

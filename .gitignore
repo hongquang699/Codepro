@@ -31,6 +31,7 @@ storage/uploads/
 storage/temp/
 judge-system/storage/
 storage/backups/
+backups/
 *.sqlite3-journal
 *.sqlite3-wal
 *.sqlite3-shm
@@ -40,6 +41,10 @@ config/admin_ip_whitelist.json
 
 # Node dependencies & caches
 node_modules/
+apps/client/dist/
+frontend/downloads/*.exe
+frontend/downloads/*.blockmap
+frontend/downloads/client-manifest.json
 staticfiles/
 npm-debug.log*
 yarn-debug.log*

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.utils import timezone
 from backend.judge.models import Problem, Contest, Submission, Profile
+from backend.judge.contest_visibility import visible_contests
 from backend.users.models import UserRating
 
 class HomeSummaryAPIView(APIView):
@@ -16,12 +17,12 @@ class HomeSummaryAPIView(APIView):
         total_users = User.objects.count()
         total_problems = Problem.objects.count()
         total_subs = Submission.objects.count()
-        total_contests = Contest.objects.count()
+        total_contests = Contest.objects.filter(visible_contests('web')).count()
         total_ac = Submission.objects.filter(result='AC').count()
 
         # Featured Contest (active or upcoming or most recent)
         featured_contest = None
-        c = Contest.objects.order_by('-start_time').first()
+        c = Contest.objects.filter(visible_contests('web')).order_by('-start_time').first()
         if c:
             is_running = c.start_time <= now <= c.end_time
             is_upcoming = c.start_time > now

@@ -101,8 +101,11 @@
   <script src="/frontend/js/core/auth.js"></script>
   <script src="/frontend/js/components/navbar.js"></script>
   <script src="/frontend/js/contest/contest-api.js"></script>
+  <script src="/frontend/js/core/live-sync.js"></script>
   <script>
-    (async () => {
+    let featuredTimerId = null;
+    async function loadContestIndex() {
+      clearInterval(featuredTimerId);
       try {
         const user = ContestAPI.getCurrentUser();
         const query = user?.username ? `?user=${encodeURIComponent(user.username)}` : '';
@@ -129,7 +132,7 @@
             document.getElementById('featuredTimer').textContent = `${hours}:${mins}:${secs}`;
           }
           updateTimer();
-          setInterval(updateTimer, 1000);
+          featuredTimerId = setInterval(updateTimer, 1000);
 
           const btnEnterText = document.getElementById('btnEnterFeaturedText');
           const btnLeaveFeatured = document.getElementById('btnLeaveFeatured');
@@ -229,7 +232,11 @@
       } catch (err) {
         console.error('Error loading contests:', err);
       }
-    })();
+    }
+    loadContestIndex();
+    window.addEventListener('codeprooj:invalidate', event => {
+      if (event.detail?.topics?.includes('contests')) loadContestIndex();
+    });
   </script>
   <script src="/frontend/js/core/theme.js"></script>
   <script src="/frontend/js/core/i18n.js"></script>

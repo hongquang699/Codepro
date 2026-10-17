@@ -156,6 +156,18 @@
   text-decoration: none !important;
 }
 
+.nav-links a.nav-client-link {
+  color: #b9d4ff;
+  border: 1px solid rgba(115, 157, 238, 0.45);
+  background: rgba(60, 100, 180, 0.18);
+}
+
+.nav-links a.nav-client-link:hover,
+.nav-links a.nav-client-link.active {
+  color: #fff;
+  background: rgba(68, 115, 216, 0.35);
+}
+
 .nav-actions {
   display: flex;
   gap: 0.6rem;

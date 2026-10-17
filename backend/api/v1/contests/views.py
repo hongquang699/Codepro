@@ -5,8 +5,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.utils import timezone
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from django.db.models import Q, Max, Sum
 
 from backend.judge.models import (
@@ -14,6 +16,7 @@ from backend.judge.models import (
     Submission, Language, Profile, Clarification
 )
 from backend.judge.bridge import grade_submission
+from backend.judge.contest_visibility import contest_visible, visible_contests
 from backend.judge.permissions.submissions import can_view_submission_details
 from backend.submissions.validators.source import SourceCodeValidator
 from backend.submissions.validators.language import LanguageValidator
@@ -49,17 +52,20 @@ def check_org_contest_access(contest, user):
         return False, f'Cuộc thi này là kỳ thi nội bộ của tổ chức "{org_info["name"]}". Bạn phải là thành viên của tổ chức để truy cập và tham gia.', org_info
     return True, '', org_info
 
-def get_contest_or_404(contest_id):
+def get_contest_or_404(contest_id, request):
     """Retrieve contest by ID or Key."""
     if str(contest_id).isdigit():
-        return get_object_or_404(Contest, id=int(contest_id))
-    c = Contest.objects.filter(key__iexact=contest_id).first()
-    if not c:
-        c = Contest.objects.filter(key__iexact=contest_id.replace('-', '_')).first()
-    if not c:
-        c = Contest.objects.filter(key__iexact=contest_id.replace('_', '-')).first()
-    if not c:
-        return get_object_or_404(Contest, key=contest_id)
+        c = get_object_or_404(Contest, id=int(contest_id))
+    else:
+        c = Contest.objects.filter(key__iexact=contest_id).first()
+        if not c:
+            c = Contest.objects.filter(key__iexact=contest_id.replace('-', '_')).first()
+        if not c:
+            c = Contest.objects.filter(key__iexact=contest_id.replace('_', '-')).first()
+        if not c:
+            c = get_object_or_404(Contest, key=contest_id)
+    if not contest_visible(c, 'web') and not request.user.is_staff:
+        raise Http404('Cuộc thi không hiển thị trên web')
     return c
 
 def get_problem_in_contest(contest, problem_id):
@@ -90,7 +96,7 @@ def get_problem_user_status(user, problem, contest=None):
 # ── CONTEST LIST & LANDING ──────────────────────────────────────────────────
 class ContestListAPIView(ContestAPIView):
     def get(self, request):
-        contests = Contest.objects.filter(is_visible=True).order_by('-start_time')
+        contests = Contest.objects.filter(visible_contests('web')).order_by('-start_time')
         now = timezone.now()
 
         user = get_current_user(request)
@@ -136,7 +142,7 @@ class ContestListAPIView(ContestAPIView):
 
 class ContestDetailAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         now = timezone.now()
         if now < c.start_time:
             c_status = 'UPCOMING'
@@ -193,7 +199,7 @@ class ContestDetailAPIView(ContestAPIView):
 
 class ContestRegisterAPIView(ContestAPIView):
     def post(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user:
             return Response({'status': 401, 'error': {'message': 'Vui lòng đăng nhập để tham gia cuộc thi.'}}, status=401)
@@ -252,7 +258,7 @@ class ContestRegisterAPIView(ContestAPIView):
 
 class ContestLeaveAPIView(ContestAPIView):
     def post(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user:
             return Response({'status': 401, 'error': {'message': 'Vui lòng đăng nhập để rời cuộc thi.'}}, status=401)
@@ -279,7 +285,7 @@ class ContestLeaveAPIView(ContestAPIView):
 # ── CONTEST DASHBOARD ────────────────────────────────────────────────────────
 class ContestDashboardAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         now = timezone.now()
 
@@ -370,7 +376,7 @@ class ContestDashboardAPIView(ContestAPIView):
 # ── CONTEST PROBLEMS ────────────────────────────────────────────────────────
 class ContestProblemsListAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user or not c.is_visible or timezone.now() < c.start_time:
             return Response({'status': 403, 'error': {'message': 'Bài thi chưa được mở.'}}, status=403)
@@ -402,7 +408,7 @@ class ContestProblemsListAPIView(ContestAPIView):
 
 class ContestProblemDetailAPIView(ContestAPIView):
     def get(self, request, contest_id, problem_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user or not c.is_visible or timezone.now() < c.start_time:
             return Response({'status': 403, 'error': {'message': 'Bài thi chưa được mở.'}}, status=403)
@@ -456,7 +462,7 @@ class ContestProblemDetailAPIView(ContestAPIView):
 # ── CONTEST SUBMIT & SUBMISSIONS ─────────────────────────────────────────────
 class ContestProblemSubmitAPIView(ContestAPIView):
     def post(self, request, contest_id, problem_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user or not user.is_active:
             return Response({'status': 401, 'error': {'message': 'Vui lòng đăng nhập để nộp bài.'}}, status=401)
@@ -528,7 +534,7 @@ class ContestProblemSubmitAPIView(ContestAPIView):
 
 class ContestSubmissionsListAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         qs = Submission.objects.filter(contest=c).select_related('problem', 'user__user', 'language').order_by('-date')
 
         user_filter = request.GET.get('user') or request.GET.get('username')
@@ -646,7 +652,7 @@ class SubmissionStatusPollAPIView(ContestAPIView):
 # ── CONTEST REALTIME SCOREBOARD / RANKING ────────────────────────────────────
 class ContestRankingAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         cps = ContestProblem.objects.filter(contest=c).select_related('problem').order_by('order')
         problems_meta = [
             {'letter': cp.output_prefix or chr(64 + cp.order), 'code': cp.problem.code, 'points': cp.points}
@@ -725,7 +731,7 @@ class ContestRankingAPIView(ContestAPIView):
 # ── ANNOUNCEMENTS & CLARIFICATIONS ──────────────────────────────────────────
 class ContestAnnouncementsAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         # Standard contest notices
         notices = [
             {
@@ -748,7 +754,7 @@ class ContestAnnouncementsAPIView(ContestAPIView):
 
 class ContestClarificationsAPIView(ContestAPIView):
     def get(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         clars = Clarification.objects.filter(is_public=True).select_related('asked_by__user', 'problem').order_by('-asked_at')
         res = []
         for cl in clars:
@@ -763,7 +769,7 @@ class ContestClarificationsAPIView(ContestAPIView):
         return Response({'status': 200, 'data': res})
 
     def post(self, request, contest_id):
-        c = get_contest_or_404(contest_id)
+        c = get_contest_or_404(contest_id, request)
         user = get_current_user(request)
         if not user:
             return Response({'status': 401, 'error': {'message': 'Vui lòng đăng nhập để gửi thắc mắc.'}}, status=401)

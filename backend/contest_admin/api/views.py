@@ -2,9 +2,11 @@ import os
 import json
 import csv
 import io
+import re
 import time
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,12 +16,14 @@ from django.utils import timezone
 from django.db.models import Q, Count
 from django.conf import settings
 from django.http import HttpResponse
+from security.encryption import file_cipher
 
 from backend.judge.models import (
     Contest, ContestProblem, ContestParticipation, Problem,
     Submission, SubmissionTestCase, Language, Profile, Clarification
 )
 from backend.judge.bridge import grade_submission, _judge_server_online, JUDGE_SERVER_URL
+from backend.judge.contest_visibility import valid_display_target
 from backend.judge.permissions.authentication import BearerTokenAuthentication, JudgeCookieAuthentication
 from ..models.models import ContestAuditLog, ContestAdminRole, ContestAnnouncement, ContestBan
 from ..permissions.permissions import resolve_admin_user, has_contest_permission, get_user_contest_role
@@ -73,6 +77,7 @@ class ContestAdminListView(ContestAdminAPIView):
                 'end_time': c.end_time.isoformat(),
                 'is_rated': c.is_rated,
                 'is_visible': c.is_visible,
+                'display_target': c.display_target,
                 'hide_scoreboard': c.hide_scoreboard,
                 'problems_count': c.contest_problems.count(),
                 'participants_count': c.participants.count(),
@@ -93,6 +98,9 @@ class ContestAdminListView(ContestAdminAPIView):
 
         if Contest.objects.filter(key=key).exists():
             return Response({'status': 400, 'error': f'Kỳ thi mã {key} đã tồn tại.'}, status=400)
+        display_target = d.get('display_target', 'both')
+        if not valid_display_target(display_target):
+            return Response({'status': 400, 'error': 'Nơi hiển thị không hợp lệ.'}, status=400)
 
         start = d.get('start_time') or timezone.now()
         duration = int(d.get('time_limit', 10800))
@@ -107,7 +115,8 @@ class ContestAdminListView(ContestAdminAPIView):
             end_time=end,
             time_limit=duration,
             is_rated=bool(d.get('is_rated', True)),
-            is_visible=bool(d.get('is_visible', True))
+            is_visible=bool(d.get('is_visible', True)),
+            display_target=display_target
         )
         ContestAdminRole.objects.create(contest=c, user=user, role='owner')
         log_contest_audit(c, user, 'CREATE_CONTEST', details=f"Tạo kỳ thi mới {c.key} - {c.name}")
@@ -203,6 +212,7 @@ class ContestAdminSettingsView(ContestAdminAPIView):
                 'is_rated': c.is_rated,
                 'rate_all': c.rate_all,
                 'is_visible': c.is_visible,
+                'display_target': c.display_target,
                 'hide_scoreboard': c.hide_scoreboard,
                 'scoreboard_freeze': c.scoreboard_freeze.isoformat() if c.scoreboard_freeze else '',
                 'access_code': c.access_code
@@ -223,6 +233,10 @@ class ContestAdminSettingsView(ContestAdminAPIView):
         if 'is_rated' in d: c.is_rated = bool(d['is_rated'])
         if 'rate_all' in d: c.rate_all = bool(d['rate_all'])
         if 'is_visible' in d: c.is_visible = bool(d['is_visible'])
+        if 'display_target' in d:
+            if not valid_display_target(d['display_target']):
+                return Response({'status': 400, 'error': 'Nơi hiển thị không hợp lệ.'}, status=400)
+            c.display_target = d['display_target']
         if 'hide_scoreboard' in d: c.hide_scoreboard = bool(d['hide_scoreboard'])
         if 'access_code' in d: c.access_code = d['access_code'].strip()
 
@@ -435,8 +449,8 @@ class ContestAdminProblemTestcasesView(ContestAdminAPIView):
                         'id': base,
                         'input_file': f,
                         'output_file': out_f if os.path.exists(out_path) else None,
-                        'input_size': os.path.getsize(in_path),
-                        'output_size': os.path.getsize(out_path) if os.path.exists(out_path) else 0,
+                        'input_size': len(file_cipher.read_file(in_path)),
+                        'output_size': len(file_cipher.read_file(out_path)) if os.path.exists(out_path) else 0,
                         'status': 'Valid' if os.path.exists(out_path) else 'Missing Output'
                     })
         return Response({'status': 200, 'data': testcases, 'count': len(testcases)})
@@ -453,13 +467,13 @@ class ContestAdminProblemTestcasesView(ContestAdminAPIView):
 
         existing_count = len([f for f in os.listdir(cases_dir) if f.endswith('.in')])
         test_id = request.data.get('id') or f"{existing_count + 1:02d}"
+        if not isinstance(test_id, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', test_id):
+            return Response({'status': 400, 'error': 'Mã testcase không hợp lệ.'}, status=400)
         inp = request.data.get('input', '')
         outp = request.data.get('output', '')
 
-        with open(os.path.join(cases_dir, f"{test_id}.in"), 'w', encoding='utf-8') as f:
-            f.write(inp)
-        with open(os.path.join(cases_dir, f"{test_id}.out"), 'w', encoding='utf-8') as f:
-            f.write(outp)
+        file_cipher.write_file(os.path.join(cases_dir, f"{test_id}.in"), inp.encode('utf-8'))
+        file_cipher.write_file(os.path.join(cases_dir, f"{test_id}.out"), outp.encode('utf-8'))
 
         # Sync storage
         cp = ContestProblem.objects.filter(contest=c, problem=prob).first()
@@ -477,6 +491,8 @@ class ContestAdminProblemTestcasesView(ContestAdminAPIView):
 
         prob = get_object_or_404(Problem, code=problem_code)
         test_id = request.data.get('id') or request.GET.get('id')
+        if not isinstance(test_id, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', test_id):
+            return Response({'status': 400, 'error': 'Mã testcase không hợp lệ.'}, status=400)
         cases_dir = os.path.join(settings.DMOJ_PROBLEM_DATA_ROOT, prob.code, 'cases')
         in_p = os.path.join(cases_dir, f"{test_id}.in")
         out_p = os.path.join(cases_dir, f"{test_id}.out")

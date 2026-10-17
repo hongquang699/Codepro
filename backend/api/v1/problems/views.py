@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import BasePermission
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from backend.judge.permissions.authentication import BearerTokenAuthentication, JudgeCookieAuthentication
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -251,14 +252,14 @@ class ProblemTestcasesUploadAPI(ProblemAuthoringAPIView):
         uploaded_file = request.FILES.get('file')
         if not uploaded_file:
             return api_response(error={'message': 'Chưa chọn file zip để upload'}, status_code=400)
-        if uploaded_file.size > 20 * 1024 * 1024:
+        if not uploaded_file.name.lower().endswith('.zip') or uploaded_file.size > 20 * 1024 * 1024:
             return api_response(error={'message': 'ZIP vượt giới hạn 20 MiB'}, status_code=400)
 
         try:
             count = pkg.import_zip_testcases(p.code, uploaded_file.read())
             return api_response({'imported': count, 'message': f'Đã giải nén và nhập {count} file test'})
-        except Exception as e:
-            return api_response(error={'message': f'Lỗi giải nén ZIP: {str(e)}'}, status_code=400)
+        except (ValueError, zipfile.BadZipFile):
+            return api_response(error={'message': 'Tệp ZIP testcase không hợp lệ'}, status_code=400)
 
 class ProblemCheckerAPI(ProblemAuthoringAPIView):
     permission_classes = [IsStaff]

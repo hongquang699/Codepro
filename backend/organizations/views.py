@@ -1,6 +1,7 @@
 import json
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
@@ -330,7 +331,11 @@ class OrganizationContestsAPIView(OrganizationAPIView):
                 is_member = True
                 member_role = 'Administrator'
 
-        org_contests = OrganizationContest.objects.filter(organization=org).select_related('contest')
+        org_contests = OrganizationContest.objects.filter(
+            organization=org,
+            contest__is_visible=True,
+            contest__display_target__in=['both', 'web'],
+        ).select_related('contest')
         total_org_contests = org_contests.count()
 
         # Cuộc thi tổ chức chỉ hiển thị khi bạn là member trong tổ chức

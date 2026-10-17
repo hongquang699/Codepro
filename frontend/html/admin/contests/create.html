@@ -170,6 +170,14 @@
                   <strong>Công khai kỳ thi cho mọi người</strong>
                 </label>
               </div>
+              <div class="form-group" style="margin-top:1rem;">
+                <label for="contestDisplayTarget">Nơi hiển thị cuộc thi</label>
+                <select id="contestDisplayTarget" class="form-input">
+                  <option value="both">Hiện trên web và client</option>
+                  <option value="web">Chỉ hiện trên web</option>
+                  <option value="client">Chỉ hiện trên client</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -252,7 +260,7 @@
         document.getElementById('contestKey').disabled = true;
 
         try {
-          const cResp = await fetch(`${API}/api/v2/contest/${editKey}`);
+          const cResp = await fetch(`${API}/api/v2/contest/${editKey}`, { headers: window.adminApiHeaders('application/json') });
           const cJson = await cResp.json();
           const c = cJson?.data?.object || {};
 
@@ -261,6 +269,7 @@
           document.getElementById('contestFormat').value = c.format_name || 'icpc';
           document.getElementById('contestRated').checked = c.is_rated !== false;
           document.getElementById('contestVisible').checked = c.is_visible !== false;
+          document.getElementById('contestDisplayTarget').value = c.display_target || 'both';
 
           if (c.time_limit) {
             document.getElementById('contestDurationMin').value = Math.round(c.time_limit / 60);
@@ -364,6 +373,7 @@
         end_time: endTime ? new Date(endTime).toISOString() : null,
         is_rated: isRated,
         is_visible: isVisible,
+        display_target: document.getElementById('contestDisplayTarget').value,
         problems: selectedProblems
       };
 

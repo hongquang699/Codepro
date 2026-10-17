@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from backend.judge.permissions.authentication import BearerTokenAuthentication, JudgeCookieAuthentication
 from ...models import UserSettings
 

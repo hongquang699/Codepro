@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (params.get('page')) currentPage = parseInt(params.get('page'), 10) || 1;
 
   loadSubmissions();
+  window.addEventListener('codeprooj:invalidate', event => {
+    if (event.detail?.topics?.includes('submissions')) loadSubmissions();
+  });
 
   if (btnApplyFilter) {
     btnApplyFilter.addEventListener('click', () => {

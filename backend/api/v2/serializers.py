@@ -156,7 +156,7 @@ class ContestListSerializer(serializers.ModelSerializer):
         model = Contest
         fields = [
             'key', 'name', 'start_time', 'end_time', 'time_limit',
-            'is_rated', 'format_name', 'is_visible'
+            'is_rated', 'format_name', 'is_visible', 'display_target'
         ]
 
 class ContestDetailSerializer(serializers.ModelSerializer):
@@ -166,7 +166,7 @@ class ContestDetailSerializer(serializers.ModelSerializer):
         model = Contest
         fields = [
             'key', 'name', 'description', 'start_time', 'end_time',
-            'time_limit', 'is_rated', 'format_name', 'is_visible',
+            'time_limit', 'is_rated', 'format_name', 'is_visible', 'display_target',
             'hide_scoreboard', 'problems'
         ]
 

@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from backend.judge.permissions.authentication import BearerTokenAuthentication, JudgeCookieAuthentication
 from ..services.submit import SubmitService

@@ -24,7 +24,7 @@ def send_verification_otp_email(email: str, username: str, otp: str) -> bool:
     """
     Send OTP email for account registration verification.
     """
-    subject = f"[CodeProOJ] Mã xác nhận đăng ký tài khoản của bạn: {otp}"
+    subject = "[CodeProOJ] Mã xác nhận đăng ký tài khoản"
     context = {
         'username': username,
         'otp': otp,
@@ -43,14 +43,11 @@ def send_verification_otp_email(email: str, username: str, otp: str) -> bool:
             html_message=html_content,
             fail_silently=False
         )
-        logger.info(f"Verification email sent to {email}")
+        logger.info("Verification email sent")
         return True
-    except Exception as e:
-        logger.warning(f"Could not send email via SMTP ({e}). Fallback to local log.")
-        print(f"\n=======================================================")
-        print(f"[AUTH EMAIL SIMULATION] Verification OTP for {email}: {otp}")
-        print(f"=======================================================\n")
-        return True
+    except Exception:
+        logger.exception("Verification email delivery failed")
+        return False
 
 
 def send_password_reset_email(email: str, username: str, reset_url: str) -> bool:
@@ -76,14 +73,11 @@ def send_password_reset_email(email: str, username: str, reset_url: str) -> bool
             html_message=html_content,
             fail_silently=False
         )
-        logger.info(f"Password reset email sent to {email}")
+        logger.info("Password reset email sent")
         return True
-    except Exception as e:
-        logger.warning(f"Could not send password reset email via SMTP ({e}). Fallback to local log.")
-        print(f"\n=======================================================")
-        print(f"[AUTH EMAIL SIMULATION] Password Reset for {email}: {reset_url}")
-        print(f"=======================================================\n")
-        return True
+    except Exception:
+        logger.exception("Password reset email delivery failed")
+        return False
 
 
 def send_login_alert_email(email: str, username: str, ip_address: str, device_os: str, browser: str, timestamp: str) -> bool:

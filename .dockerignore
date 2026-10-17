@@ -9,6 +9,9 @@
 **/*.db
 **/*.log
 node_modules/
+**/node_modules/
+apps/client/dist/
+frontend/downloads/*.exe
 venv/
 .venv/
 database/

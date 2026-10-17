@@ -10,6 +10,7 @@ import io
 import re
 import json
 from django.conf import settings
+from security.encryption import file_cipher
 
 def _safe_component(value):
     if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}', value) or '..' in value:
@@ -140,20 +141,18 @@ def get_testcases(code):
         in_f = os.path.join(cases_dir, f"{tid}.in")
         out_f = os.path.join(cases_dir, f"{tid}.out")
 
-        in_size = os.path.getsize(in_f) if os.path.exists(in_f) else 0
+        in_size = len(file_cipher.read_file(in_f)) if os.path.exists(in_f) else 0
         has_out = os.path.exists(out_f)
-        out_size = os.path.getsize(out_f) if has_out else 0
+        out_size = len(file_cipher.read_file(out_f)) if has_out else 0
 
         # Sample snippet
         in_preview = ''
         out_preview = ''
         try:
-            with open(in_f, 'r', encoding='utf-8', errors='ignore') as fi:
-                in_preview = fi.read(200)
+            in_preview = file_cipher.read_file(in_f).decode('utf-8', errors='ignore')[:200]
             if has_out:
-                with open(out_f, 'r', encoding='utf-8', errors='ignore') as fo:
-                    out_preview = fo.read(200)
-        except Exception:
+                out_preview = file_cipher.read_file(out_f).decode('utf-8', errors='ignore')[:200]
+        except OSError:
             pass
 
         tests.append({
@@ -201,10 +200,8 @@ def save_testcase(code, tid, input_data, output_data, points=10, subtask=1, samp
     in_path = os.path.join(cases_dir, f"{tid}.in")
     out_path = os.path.join(cases_dir, f"{tid}.out")
 
-    with open(in_path, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(input_data)
-    with open(out_path, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(output_data)
+    file_cipher.write_file(in_path, input_data.encode('utf-8'))
+    file_cipher.write_file(out_path, output_data.encode('utf-8'))
 
     manifest = _read_testcase_manifest(base_dir)
     cases = [item for item in manifest.get('cases', []) if str(item.get('id')) != tid]
@@ -236,6 +233,8 @@ def delete_testcase(code, tid):
     return deleted
 
 def import_zip_testcases(code, zip_file_bytes):
+    if len(zip_file_bytes) > 20 * 1024 * 1024 or not zip_file_bytes.startswith(b'PK\x03\x04'):
+        raise ValueError('Tệp ZIP không hợp lệ hoặc vượt giới hạn 20 MiB')
     base_dir = get_problem_dir(code)
     cases_dir = os.path.join(base_dir, 'cases')
     os.makedirs(cases_dir, exist_ok=True)
@@ -246,14 +245,25 @@ def import_zip_testcases(code, zip_file_bytes):
         members = zf.infolist()
         if len(members) > 1000 or sum(item.file_size for item in members) > 100 * 1024 * 1024:
             raise ValueError('ZIP vượt giới hạn 1.000 file hoặc 100 MiB')
+        target_names = set()
         for item in members:
             if item.is_dir() or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\.(in|out|ans)', item.filename):
                 raise ValueError('ZIP chỉ được chứa file testcase ở thư mục gốc')
+            if item.flag_bits & 1 or item.file_size > 20 * 1024 * 1024:
+                raise ValueError('Testcase trong ZIP không hợp lệ hoặc vượt giới hạn 20 MiB')
+            target_name = item.filename[:-4] + '.out' if item.filename.endswith('.ans') else item.filename
+            if target_name in target_names:
+                raise ValueError('ZIP chứa testcase trùng tên')
+            target_names.add(target_name)
+        payloads = []
         for item in members:
             target_name = item.filename[:-4] + '.out' if item.filename.endswith('.ans') else item.filename
-            target_path = os.path.join(cases_dir, target_name)
-            with open(target_path, 'wb') as f:
-                f.write(zf.read(item))
+            payload = zf.read(item)
+            if len(payload) != item.file_size:
+                raise ValueError('Testcase trong ZIP không hợp lệ')
+            payloads.append((target_name, payload))
+        for target_name, payload in payloads:
+            file_cipher.write_file(os.path.join(cases_dir, target_name), payload)
             imported_count += 1
             imported_ids.add(os.path.splitext(target_name)[0])
 

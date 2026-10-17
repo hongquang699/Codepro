@@ -120,6 +120,11 @@ class Problem(models.Model):
         return f"{self.code} - {self.name}"
 
 class Contest(models.Model):
+    DISPLAY_TARGET_CHOICES = (
+        ('both', 'Web và client'),
+        ('web', 'Chỉ web'),
+        ('client', 'Chỉ client'),
+    )
     FORMAT_CHOICES = (
         ('icpc', 'ICPC Format'),
         ('ioi', 'IOI Partial Format'),
@@ -135,6 +140,7 @@ class Contest(models.Model):
     rate_all = models.BooleanField(default=False)
     format_name = models.CharField(max_length=20, choices=FORMAT_CHOICES, default='icpc')
     is_visible = models.BooleanField(default=True)
+    display_target = models.CharField(max_length=6, choices=DISPLAY_TARGET_CHOICES, default='both')
     hide_scoreboard = models.BooleanField(default=False)
     scoreboard_freeze = models.DateTimeField(null=True, blank=True)
     access_code = models.CharField(max_length=50, blank=True, default='')

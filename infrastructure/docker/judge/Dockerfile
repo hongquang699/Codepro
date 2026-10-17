@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app:/app/judge-system
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -14,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir psutil pyyaml requests
+RUN pip3 install --no-cache-dir psutil pyyaml requests 'cryptography>=43.0.0'
 
 WORKDIR /app
 

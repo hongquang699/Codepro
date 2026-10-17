@@ -114,6 +114,14 @@
             </select>
           </div>
         </div>
+        <div class="ca-form-group" style="margin-top:1rem;">
+          <label class="ca-form-label" for="new_c_display_target">Nơi hiển thị cuộc thi</label>
+          <select id="new_c_display_target" class="ca-select">
+            <option value="both">Trên web và client</option>
+            <option value="web">Chỉ trên web</option>
+            <option value="client">Chỉ trên client</option>
+          </select>
+        </div>
         <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
           <button type="button" onclick="closeCreateContestModal()" class="ca-btn ca-btn-secondary">Hủy</button>
           <button type="submit" class="ca-btn ca-btn-primary">Tạo kỳ thi</button>
@@ -154,6 +162,7 @@
             <div style="font-size:.74rem;color:#94a3b8;margin-top:2px;">
               Bắt đầu: ${new Date(c.start_time).toLocaleString('vi-VN')}
             </div>
+            <div style="font-size:.74rem;color:#94a3b8;margin-top:2px;">${{both:'Web + client',web:'Chỉ web',client:'Chỉ client'}[c.display_target] || 'Web + client'}${c.is_visible ? '' : ' · Bản nháp'}</div>
           </td>
           <td style="text-align:center;text-transform:uppercase;font-weight:700;color:#c084fc;font-size:.78rem;">
             ${c.format}
@@ -182,9 +191,10 @@
       const description = document.getElementById('new_c_desc').value.trim();
       const time_limit = parseInt(document.getElementById('new_c_duration').value) || 10800;
       const is_rated = document.getElementById('new_c_rated').value === 'true';
+      const display_target = document.getElementById('new_c_display_target').value;
 
       const res = await ContestAdminAPI.createContest({
-        key, name, format, description, time_limit, is_rated
+        key, name, format, description, time_limit, is_rated, display_target
       });
 
       alert(res.message || res.error);

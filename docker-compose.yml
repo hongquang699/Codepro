@@ -52,11 +52,19 @@ services:
       DB_USER: ${DB_USER:-coding_app}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       DB_NAME: ${DB_NAME:-coding_platform}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-True}
+      EMAIL_USE_SSL: ${EMAIL_USE_SSL:-False}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@codeprooj.com}
       REDIS_URL: redis://redis:6379/0
       JUDGE_SERVER_URL: http://judge-server:9999
       JUDGE_AUTH_TOKEN: ${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
       TRUSTED_PROXY_IPS: 172.16.0.0/12
       TRUST_PROXY_SSL_HEADER: "true"
+      TESTCASE_ENCRYPTION_KEY: ${TESTCASE_ENCRYPTION_KEY:?Set TESTCASE_ENCRYPTION_KEY in .env}
       DMOJ_PROBLEM_DATA_ROOT: /var/coding-platform/problem-data/problems
       DMOJ_CONTEST_DATA_ROOT: /var/coding-platform/contest-data/contests
     depends_on:
@@ -120,6 +128,7 @@ services:
       BACKEND_PORT: 8000
       JUDGE_AUTH_TOKEN: ${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
       JUDGE_PROBLEM_DATA_DIR: /var/coding-platform/problem-data/problems
+      TESTCASE_ENCRYPTION_KEY: ${TESTCASE_ENCRYPTION_KEY:?Set TESTCASE_ENCRYPTION_KEY in .env}
       JUDGE_STORAGE_DIR: /var/coding-platform/storage
       JUDGE_LOG_DIR: /app/judge-system/logs
     depends_on:
@@ -147,6 +156,7 @@ services:
       - backend
     volumes:
       - ./config/admin_ip_whitelist.json:/app/config/admin_ip_whitelist.json:ro
+      - ./frontend/downloads:/app/frontend/downloads:ro
     networks:
       - codeprooj_network
 

@@ -9,6 +9,7 @@ import re
 import json
 from typing import List
 from .subtask import TestCaseInfo
+from security.encryption import file_cipher
 
 class TestcaseLoader:
     @staticmethod
@@ -65,11 +66,9 @@ class TestcaseLoader:
                 continue
 
             try:
-                with open(in_path, "r", encoding="utf-8", errors="replace") as f:
-                    in_data = f.read()
-                with open(out_path, "r", encoding="utf-8", errors="replace") as f:
-                    out_data = f.read()
-            except Exception:
+                in_data = file_cipher.read_file(in_path).decode('utf-8', errors='replace')
+                out_data = file_cipher.read_file(out_path).decode('utf-8', errors='replace')
+            except OSError:
                 continue
 
             case_name = os.path.basename(base_name)

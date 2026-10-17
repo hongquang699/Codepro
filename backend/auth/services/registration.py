@@ -57,7 +57,9 @@ def initiate_registration(data: dict, ip_address: str = "127.0.0.1") -> tuple[bo
     )
 
     # Dispatch email
-    send_verification_otp_email(email, username, otp)
+    if not send_verification_otp_email(email, username, otp):
+        verification.delete()
+        return False, "Không thể gửi email xác thực. Vui lòng thử lại sau.", {}
 
     return True, "Mã xác thực OTP đã được gửi đến email của bạn.", {
         'email': email,

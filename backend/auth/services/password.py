@@ -45,7 +45,7 @@ def initiate_password_reset(
     token_hash = hash_token(raw_token)
     expires_at = timezone.now() + timedelta(minutes=RESET_TOKEN_EXPIRY_MINUTES)
 
-    PasswordReset.objects.create(
+    reset_request = PasswordReset.objects.create(
         user=user,
         email=user.email,
         token_hash=token_hash,
@@ -56,7 +56,8 @@ def initiate_password_reset(
     clean_base = base_url.rstrip('/')
     reset_url = f"{clean_base}/reset-password?token={raw_token}"
 
-    send_password_reset_email(user.email, user.username, reset_url)
+    if not send_password_reset_email(user.email, user.username, reset_url):
+        reset_request.delete()
 
     return True, generic_message
 

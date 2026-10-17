@@ -102,6 +102,15 @@
               </div>
             </div>
 
+            <div class="ca-form-group" style="margin-top:1rem;">
+              <label class="ca-form-label" for="set_display_target">Nơi hiển thị cuộc thi</label>
+              <select id="set_display_target" class="ca-input">
+                <option value="both">Trên web và client</option>
+                <option value="web">Chỉ trên web</option>
+                <option value="client">Chỉ trên client</option>
+              </select>
+            </div>
+
             <div style="display:flex;justify-content:flex-end;margin-top:1.5rem;gap:.75rem;">
               <button type="submit" class="ca-btn ca-btn-primary" style="padding:.6rem 1.5rem;">
                 💾 Lưu Cấu Hình Kỳ Thi
@@ -146,6 +155,7 @@
       document.getElementById('set_access_code').value = c.access_code || '';
       document.getElementById('set_is_rated').checked = Boolean(c.is_rated);
       document.getElementById('set_is_visible').checked = Boolean(c.is_visible);
+      document.getElementById('set_display_target').value = c.display_target || 'both';
     }
 
     async function submitSettings() {
@@ -159,7 +169,8 @@
         scoreboard_freeze: document.getElementById('set_freeze_time').value || null,
         access_code: document.getElementById('set_access_code').value.trim(),
         is_rated: document.getElementById('set_is_rated').checked,
-        is_visible: document.getElementById('set_is_visible').checked
+        is_visible: document.getElementById('set_is_visible').checked,
+        display_target: document.getElementById('set_display_target').value
       };
 
       const res = await ContestAdminAPI.updateSettings(contestKey, payload);

@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { securityDefense } = require('./security');
+const { createLiveSync } = require('./live-sync');
 
 const PORT = process.env.PORT || 8888;
 const BACKEND_HOST = process.env.DJANGO_BACKEND_HOST || '127.0.0.1';
@@ -97,6 +98,7 @@ function hasVerifiedAdminSession(req) {
 const ROUTE_ALIASES = {
   '/': '/frontend/html/home/index.html',
   '/home': '/frontend/html/home/index.html',
+  '/client': '/frontend/html/client/index.html',
   '/problems': '/frontend/html/problems/index.html',
   '/problem': '/frontend/html/problems/problem.html',
   '/submit': '/frontend/html/problem/submit.html',
@@ -226,6 +228,33 @@ const server = http.createServer(async (req, res) => {
       message: secCheck.message,
       client_ip: secCheck.ip
     }));
+  }
+
+  if (reqUrl === '/client/download/windows') {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      res.writeHead(405, { Allow: 'GET, HEAD' });
+      return res.end();
+    }
+    const downloadsDir = path.join(ROOT_DIR, 'frontend', 'downloads');
+    try {
+      const manifest = JSON.parse(await fs.promises.readFile(path.join(downloadsDir, 'client-manifest.json'), 'utf8'));
+      if (!/^CodeProOJ-Client-\d+\.\d+\.\d+\.exe$/.test(manifest.file)) throw new Error('Invalid installer name');
+      const installer = path.join(downloadsDir, manifest.file);
+      const stat = await fs.promises.stat(installer);
+      if (!stat.isFile() || stat.size !== manifest.bytes) throw new Error('Installer unavailable');
+      res.writeHead(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${manifest.file}"`,
+        'Content-Length': stat.size,
+        'Cache-Control': 'public, max-age=3600',
+        'X-Content-Type-Options': 'nosniff'
+      });
+      if (req.method === 'HEAD') return res.end();
+      return fs.createReadStream(installer).pipe(res);
+    } catch {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('Bản cài chưa được phát hành trên máy chủ.');
+    }
   }
 
   // The administrative security controls live on the gateway and never pass
@@ -463,6 +492,7 @@ const server = http.createServer(async (req, res) => {
         ...(BACKEND_PROXY_SCHEME ? { 'x-forwarded-proto': BACKEND_PROXY_SCHEME } : {})
       }
     }, (proxyRes) => {
+      proxyRes.on('end', () => liveSync.publish(req.method, reqUrl, proxyRes.statusCode));
       res.writeHead(proxyRes.statusCode, proxyRes.headers);
       proxyRes.pipe(res);
     });
@@ -1073,6 +1103,8 @@ const server = http.createServer(async (req, res) => {
   tryServe(0);
 });
 
+const liveSync = createLiveSync(server, getClientIp);
+
 server.headersTimeout = 15000;
 server.requestTimeout = 120000;
 server.timeout = 120000;
@@ -1082,7 +1114,11 @@ server.on('error', (err) => {
 });
 
 process.on('uncaughtException', (err) => {
-  console.error('[UNCAUGHT EXCEPTION]', err.message);
+  console.error('[UNCAUGHT EXCEPTION]', err && err.stack ? err.stack : err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[UNHANDLED REJECTION]', reason && reason.stack ? reason.stack : reason);
 });
 
 server.listen(PORT, () => {

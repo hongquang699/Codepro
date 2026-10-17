@@ -7,7 +7,8 @@ import secrets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication, get_or_rotate_token, token_is_expired
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from django.db.models import Q, Count
 from django.conf import settings
+from security.encryption import file_cipher
 
 from backend.judge.models import (
     Profile, Organization, Language, Problem, ProblemType, Contest,
@@ -22,6 +24,8 @@ from backend.judge.models import (
     ContestParticipation, RatingHistory, BlogPost, Comment, Clarification
 )
 from backend.judge.bridge import grade_submission
+from backend.judge.contest_visibility import contest_visible, request_surface, valid_display_target, visible_contests
+from backend.judge import problem_package
 from backend.judge.api.admin_views import JudgeAdminView
 from backend.judge.permissions.authentication import BearerTokenAuthentication, JudgeCookieAuthentication
 from backend.submissions.validators.source import SourceCodeValidator
@@ -219,7 +223,8 @@ class APIProblemList(V2APIView):
     permission_classes = [IsPlatformAdminOrReadOnly]
 
     def get(self, request):
-        qs = Problem.objects.prefetch_related('types').filter(is_public=True)
+        is_admin = IsPlatformAdmin().has_permission(request, self)
+        qs = Problem.objects.prefetch_related('types').all() if is_admin and request.GET.get('all') == '1' else Problem.objects.prefetch_related('types').filter(is_public=True)
         q = request.GET.get('q', '').strip()
         if q:
             qs = qs.filter(Q(name__icontains=q) | Q(code__icontains=q))
@@ -321,6 +326,11 @@ class APIProblemDetail(V2APIView):
 
         serializer = ProblemDetailSerializer(prob)
         data = serializer.data
+        # The package Markdown is the authoring source of truth. Older database
+        # descriptions may contain damaged LaTeX from a previous HTML import.
+        statement = problem_package.get_statement(prob.code).get('markdown', '')
+        if statement.strip():
+            data['description'] = statement
 
         # Calculate AC rate and submission count
         total_subs = Submission.objects.filter(problem=prob).count()
@@ -375,8 +385,8 @@ class APIProblemTestcases(V2APIView):
                     base = f[:-3]
                     out_f = os.path.join(cases_dir, f'{base}.out')
                     in_f = os.path.join(cases_dir, f)
-                    in_size = os.path.getsize(in_f)
-                    out_size = os.path.getsize(out_f) if os.path.exists(out_f) else 0
+                    in_size = len(file_cipher.read_file(in_f))
+                    out_size = len(file_cipher.read_file(out_f)) if os.path.exists(out_f) else 0
                     testcases.append({
                         'id': base,
                         'input_file': f,
@@ -400,10 +410,8 @@ class APIProblemTestcases(V2APIView):
         in_path = os.path.join(cases_dir, f"{case_id}.in")
         out_path = os.path.join(cases_dir, f"{case_id}.out")
 
-        with open(in_path, 'w', encoding='utf-8') as f:
-            f.write(in_content)
-        with open(out_path, 'w', encoding='utf-8') as f:
-            f.write(out_content)
+        file_cipher.write_file(in_path, in_content.encode('utf-8'))
+        file_cipher.write_file(out_path, out_content.encode('utf-8'))
 
         return dmoj_response({
             'message': f'Testcase {case_id} added successfully',
@@ -418,22 +426,13 @@ class APIProblemTestcasesUpload(V2APIView):
         file_obj = request.FILES.get('file') or request.FILES.get('tests')
         if not file_obj:
             return dmoj_response(error={'message': 'Vui lòng chọn file zip testcases'}, status_code=400)
-
-        cases_dir = os.path.join(settings.DMOJ_PROBLEM_DATA_ROOT, prob.code, 'cases')
-        os.makedirs(cases_dir, exist_ok=True)
-
+        if not file_obj.name.lower().endswith('.zip') or file_obj.size > 20 * 1024 * 1024:
+            return dmoj_response(error={'message': 'Tệp ZIP không hợp lệ hoặc vượt giới hạn 20 MiB'}, status_code=400)
         try:
-            with zipfile.ZipFile(file_obj, 'r') as zip_ref:
-                members = zip_ref.infolist()
-                if len(members) > 1000 or sum(item.file_size for item in members) > 100 * 1024 * 1024:
-                    return dmoj_response(error={'message': 'File ZIP vượt giới hạn'}, status_code=400)
-                for item in members:
-                    if item.is_dir() or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\.(in|out)', item.filename):
-                        return dmoj_response(error={'message': 'ZIP chỉ được chứa file .in và .out tại thư mục gốc'}, status_code=400)
-                zip_ref.extractall(cases_dir)
+            problem_package.import_zip_testcases(prob.code, file_obj.read())
             return dmoj_response({'message': 'Giải nén và nạp testcase thành công!'})
-        except Exception as e:
-            return dmoj_response(error={'message': f'Lỗi giải nén: {str(e)}'}, status_code=400)
+        except (ValueError, zipfile.BadZipFile):
+            return dmoj_response(error={'message': 'Tệp ZIP testcase không hợp lệ'}, status_code=400)
 
 class APIProblemPublish(V2APIView):
     permission_classes = [IsPlatformAdmin]
@@ -616,7 +615,7 @@ class APIContestList(V2APIView):
     def get(self, request):
         now = timezone.now()
         is_all = (request.GET.get('all') == '1' or request.GET.get('admin') == '1') and IsPlatformAdmin().has_permission(request, self)
-        qs = Contest.objects.all().order_by('-start_time') if is_all else Contest.objects.filter(is_visible=True).order_by('-start_time')
+        qs = Contest.objects.all().order_by('-start_time') if is_all else Contest.objects.filter(visible_contests(request_surface(request))).order_by('-start_time')
         items = []
         for ct in qs:
             c_status = 'ongoing' if ct.start_time <= now <= ct.end_time else ('upcoming' if now < ct.start_time else 'ended')
@@ -628,6 +627,8 @@ class APIContestList(V2APIView):
                 'time_limit': ct.time_limit,
                 'format_name': ct.format_name,
                 'is_rated': ct.is_rated,
+                'is_visible': ct.is_visible,
+                'display_target': ct.display_target,
                 'status': c_status,
                 'participant_count': ct.participants.count()
             })
@@ -641,6 +642,9 @@ class APIContestList(V2APIView):
 
         if Contest.objects.filter(key=key).exists():
             return dmoj_response(error={'message': f'Kỳ thi {key} đã tồn tại'}, status_code=400)
+        display_target = request.data.get('display_target', 'both')
+        if not valid_display_target(display_target):
+            return dmoj_response(error={'message': 'Nơi hiển thị không hợp lệ'}, status_code=400)
 
         start = request.data.get('start_time') or timezone.now()
         duration = int(request.data.get('duration_seconds', 7200))
@@ -655,7 +659,8 @@ class APIContestList(V2APIView):
             time_limit=duration,
             format_name=request.data.get('format_name', 'icpc'),
             is_rated=bool(request.data.get('is_rated', True)),
-            is_visible=bool(request.data.get('is_visible', True))
+            is_visible=bool(request.data.get('is_visible', True)),
+            display_target=display_target
         )
 
         prob_codes = request.data.get('problems', [])
@@ -685,7 +690,7 @@ class APIContestDetail(V2APIView):
 
     def get(self, request, contest):
         ct = resolve_contest(contest)
-        if not ct.is_visible and not IsPlatformAdmin().has_permission(request, self):
+        if not contest_visible(ct, request_surface(request)) and not IsPlatformAdmin().has_permission(request, self):
             return dmoj_response(error={'message': 'Kỳ thi chưa công khai'}, status_code=403)
         serializer = ContestDetailSerializer(ct)
         data = serializer.data
@@ -704,6 +709,10 @@ class APIContestDetail(V2APIView):
 
     def put(self, request, contest):
         ct = resolve_contest(contest)
+        if 'display_target' in request.data:
+            if not valid_display_target(request.data['display_target']):
+                return dmoj_response(error={'message': 'Nơi hiển thị không hợp lệ'}, status_code=400)
+            ct.display_target = request.data['display_target']
         for field in ['name', 'description', 'time_limit', 'format_name', 'is_rated', 'is_visible', 'hide_scoreboard']:
             if field in request.data:
                 setattr(ct, field, request.data[field])
@@ -747,7 +756,7 @@ class APIContestJoin(V2APIView):
                 'left': True
             })
 
-        if not ct.is_visible or ct.end_time < timezone.now():
+        if not contest_visible(ct, request_surface(request)) or ct.end_time < timezone.now():
             return dmoj_response(error={'message': 'Kỳ thi không mở đăng ký'}, status_code=403)
         from backend.organizations.models import OrganizationContest, OrganizationMember
         org_contest = OrganizationContest.objects.filter(contest=ct).select_related('organization').first()
@@ -814,7 +823,7 @@ class APIContestLeave(V2APIView):
 class APIContestScoreboard(V2APIView):
     def get(self, request, contest):
         ct = get_object_or_404(Contest, key=contest)
-        if not ct.is_visible and not IsPlatformAdmin().has_permission(request, self):
+        if not contest_visible(ct, request_surface(request)) and not IsPlatformAdmin().has_permission(request, self):
             return dmoj_response(error={'message': 'Kỳ thi chưa công khai'}, status_code=403)
         parts = ContestParticipation.objects.filter(contest=ct).select_related('user__user').order_by('-score', 'cumulative_time')
 
@@ -1071,7 +1080,7 @@ class APILoginView(V2APIView):
             )
 
         if user.is_active:
-            token, _ = Token.objects.get_or_create(user=user)
+            token = get_or_rotate_token(user)
             prof, _ = Profile.objects.get_or_create(user=user)
             
             # Also log in to Django session if session is available
@@ -1145,7 +1154,7 @@ class APIAdminCheckView(V2APIView):
                 from rest_framework.authtoken.models import Token
                 try:
                     t = Token.objects.select_related('user').get(key=token_key)
-                    user = t.user
+                    user = t.user if not token_is_expired(t) else None
                 except Token.DoesNotExist:
                     pass
 
@@ -1466,6 +1475,7 @@ class APIAdminContestManageDetailView(V2APIView):
             'end_time': ct.end_time.isoformat() if ct.end_time else None,
             'time_limit': ct.time_limit,
             'is_visible': ct.is_visible,
+            'display_target': ct.display_target,
             'is_rated': ct.is_rated,
             'freeze_time': ct.scoreboard_freeze.isoformat() if getattr(ct, 'scoreboard_freeze', None) else None,
             'scoreboard_public': not getattr(ct, 'hide_scoreboard', False),
@@ -1489,6 +1499,10 @@ class APIAdminContestManageDetailView(V2APIView):
                 try: ct.time_limit = int(request.data['time_limit']) if request.data['time_limit'] else None
                 except ValueError: pass
             if 'is_visible' in request.data: ct.is_visible = bool(request.data['is_visible'])
+            if 'display_target' in request.data:
+                if not valid_display_target(request.data['display_target']):
+                    return dmoj_response(error={'message': 'Nơi hiển thị không hợp lệ'}, status_code=400)
+                ct.display_target = request.data['display_target']
             if 'is_rated' in request.data: ct.is_rated = bool(request.data['is_rated'])
             if 'scoreboard_public' in request.data: ct.hide_scoreboard = not bool(request.data['scoreboard_public'])
             if 'start_time' in request.data and request.data['start_time']:
@@ -1736,8 +1750,7 @@ class APISearchUnifiedView(V2APIView):
         )[:15]
 
         contests = Contest.objects.filter(
-            Q(key__icontains=q) | Q(name__icontains=q) | Q(description__icontains=q),
-            is_visible=True
+            visible_contests(request_surface(request)) & (Q(key__icontains=q) | Q(name__icontains=q) | Q(description__icontains=q))
         )[:10]
 
         users = Profile.objects.filter(

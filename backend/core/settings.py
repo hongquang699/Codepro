@@ -172,13 +172,23 @@ MEDIA_ROOT = BASE_DIR / 'storage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ── Cryptographic Password & Token Hashing (SHA-512 & SHA-256) ────────────────
+# Outbound account email must use a configured delivery service in production.
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = _env_bool('EMAIL_USE_TLS', False)
+EMAIL_USE_SSL = _env_bool('EMAIL_USE_SSL', False)
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@codeprooj.com')
+
+# New passwords use Argon2id; existing hashes remain verifiable and are upgraded on login.
 PASSWORD_HASHERS = [
-    'backend.auth.security.crypto_hash.PBKDF2SHA512PasswordHasher',  # PBKDF2 with HMAC-SHA512 (Primary default)
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'backend.auth.security.crypto_hash.PBKDF2SHA512PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',              # PBKDF2 with HMAC-SHA256 (Compatibility)
     'backend.auth.security.crypto_hash.SHA512PasswordHasher',        # Salted SHA-512
     'backend.auth.security.crypto_hash.SHA256PasswordHasher',        # Salted SHA-256
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
@@ -238,6 +248,7 @@ CSRF_TRUSTED_ORIGINS = _validated_origins(
 # ── Security & Cookie Hardening (XSS, CSRF, Clickjacking) ─────────────────────
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 60 * 60 * 24
 CSRF_COOKIE_SAMESITE = 'Lax'
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -247,10 +258,10 @@ X_FRAME_OPTIONS = 'DENY'
 if not DEBUG:
     if _env_bool('TRUST_PROXY_SSL_HEADER'):
         SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = _env_bool('SECURE_SSL_REDIRECT', True)
-    SESSION_COOKIE_SECURE = _env_bool('SESSION_COOKIE_SECURE', True)
-    CSRF_COOKIE_SECURE = _env_bool('CSRF_COOKIE_SECURE', True)
-    SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 else:
@@ -265,7 +276,7 @@ if DEBUG:
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'backend.auth.security.token_auth.ExpiringTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

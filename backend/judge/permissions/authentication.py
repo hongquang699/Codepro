@@ -1,4 +1,5 @@
-from rest_framework.authentication import BaseAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import BaseAuthentication, SessionAuthentication
+from backend.auth.security.token_auth import ExpiringTokenAuthentication as TokenAuthentication
 from backend.auth.services.session import validate_auth_session
 
 

@@ -171,6 +171,14 @@
                   Bảng điểm công khai (Public Scoreboard)
                 </label>
               </div>
+              <div class="form-group" style="margin-top:1rem;">
+                <label class="form-label" for="cfgDisplayTarget">Nơi hiển thị cuộc thi</label>
+                <select id="cfgDisplayTarget" class="form-input">
+                  <option value="both">Trên web và client</option>
+                  <option value="web">Chỉ trên web</option>
+                  <option value="client">Chỉ trên client</option>
+                </select>
+              </div>
             </form>
           </div>
         </div>
@@ -401,6 +409,7 @@
       document.getElementById('cfgFreezeTime').value = contestData.freeze_time ? contestData.freeze_time.slice(0, 16) : '';
       document.getElementById('cfgAccessCode').value = contestData.access_code || '';
       document.getElementById('cfgIsVisible').checked = !!contestData.is_visible;
+      document.getElementById('cfgDisplayTarget').value = contestData.display_target || 'both';
       document.getElementById('cfgIsRated').checked = !!contestData.is_rated;
       document.getElementById('cfgScoreboardPublic').checked = !!contestData.scoreboard_public;
 
@@ -487,6 +496,7 @@
         freeze_time: document.getElementById('cfgFreezeTime').value || null,
         access_code: document.getElementById('cfgAccessCode').value,
         is_visible: document.getElementById('cfgIsVisible').checked,
+        display_target: document.getElementById('cfgDisplayTarget').value,
         is_rated: document.getElementById('cfgIsRated').checked,
         scoreboard_public: document.getElementById('cfgScoreboardPublic').checked,
       };

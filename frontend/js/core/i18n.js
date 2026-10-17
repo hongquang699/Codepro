@@ -19,6 +19,7 @@
   // 1. EXTENSIVE BILINGUAL TRANSLATION PHRASES (SORTED BY LENGTH FOR GREEDY MATCH)
   // ══════════════════════════════════════════════════════════════════════
   const PHRASE_PAIRS = [
+    ["Tải Client", "Download Client"],
     // Long Sentences & Paragraphs
     ["Hệ thống thi đấu trực tuyến và máy chấm bài tự động chuẩn quốc tế. Cung cấp kho đề thi phong phú từ HSG Tỉnh, HSG Quốc Gia, Olympic Tin học đến ICPC.", "International standard online competitive programming judge platform. Offering rich problem sets from Provincial & National Olympiads to ICPC."],
     ["Hệ thống bài giảng và code mẫu chuẩn C++ các thuật toán kinh điển trong lập trình thi đấu.", "Lectures and standard C++ code templates for classic algorithms in competitive programming."],
