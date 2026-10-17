@@ -148,6 +148,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1340, height: 850, minWidth: 950, minHeight: 630,
     backgroundColor: '#0b1220', title: 'CodeProOJ Client',
+    icon: path.join(__dirname, 'renderer', 'brand-icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true }
   });
   win.removeMenu();

@@ -122,9 +122,7 @@ function initNavbar() {
   navContainer.innerHTML = `
     <div class="nav-left-group">
       <a href="/" class="nav-brand">
-        <span class="brand-badge-code">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        </span>
+        <img class="brand-badge-code" src="/frontend/assets/icons/favicon.svg" width="28" height="28" alt="">
         <span class="brand-text">CodeProOJ</span>
       </a>
       ${isAdmin ? `

@@ -49,21 +49,14 @@
   flex-shrink: 0;
 }
 
-/* Red rounded square with </> inside */
+/* Shared CodeProOJ mark. */
 .brand-badge-code {
   width: 28px;
   height: 28px;
-  background: #dc2626;
   border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight: 800;
-  font-size: 0.85rem;
-  letter-spacing: -1px;
-  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+  display: block;
+  object-fit: contain;
+  box-shadow: 0 2px 8px rgba(32, 76, 180, 0.25);
   user-select: none;
   flex-shrink: 0;
 }
