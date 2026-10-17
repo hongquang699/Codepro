@@ -42,6 +42,8 @@ config/admin_ip_whitelist.json
 # Node dependencies & caches
 node_modules/
 apps/client/dist/
+dist-vercel/
+.vercel/
 frontend/downloads/*.exe
 frontend/downloads/*.blockmap
 frontend/downloads/client-manifest.json

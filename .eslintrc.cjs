@@ -10,6 +10,12 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'script',
   },
+  overrides: [
+    {
+      files: ['apps/client/renderer/*-entry.js'],
+      parserOptions: { sourceType: 'module' },
+    },
+  ],
   rules: {
     'no-unexpected-multiline': 'error',
   },
