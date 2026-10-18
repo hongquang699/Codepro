@@ -22,6 +22,9 @@ function createLiveSync(server, getClientIp = request => request.socket.remoteAd
   server.on('upgrade', (request, socket, head) => {
     let url;
     try { url = new URL(request.url, 'http://localhost'); } catch { socket.destroy(); return; }
+    // Submission streams are forwarded to Django by the gateway's other
+    // upgrade handler. This hub owns only the public invalidation stream.
+    if (/^\/ws\/submissions\/[1-9][0-9]*\/$/.test(url.pathname) && !url.search) return;
     if (url.pathname !== LIVE_PATH || url.search) { socket.destroy(); return; }
     const origin = request.headers.origin;
     if (origin) {

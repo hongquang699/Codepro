@@ -235,7 +235,7 @@ Mở bốn terminal riêng, chạy lần lượt (worker chống gian lận ch�
 
 | Dịch vụ | Lệnh | Cổng mặc định |
 | --- | --- | --- |
-| Django API | `python manage.py runserver 127.0.0.1:8000` | 8000 |
+| Django API + WebSocket | `python -m uvicorn backend.core.asgi:application --host 127.0.0.1 --port 8000 --reload` | 8000 |
 | Judge Manager và embedded workers | `python judge-system/judge-server/main.py` | 9999 |
 | Web gateway | `node apps/web/server.js` | 8888 |
 | Worker chống gian lận | `python manage.py run_anticheat_worker` | Không mở cổng HTTP |

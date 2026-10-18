@@ -1,6 +1,6 @@
 const CONFIG = {
   API_BASE_URL: '/api/v2',
-  WS_URL: 'ws://localhost:8080',
+  WS_URL: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/submissions/`,
   PLATFORM_NAME: 'CodeProOJ',
   SUPPORTED_LANGUAGES: [
     { key: 'CPP17', name: 'C++17 (GNU G++)', ext: 'cpp' },

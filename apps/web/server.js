@@ -1105,6 +1105,38 @@ const server = http.createServer(async (req, res) => {
 
 const liveSync = createLiveSync(server, getClientIp);
 
+server.on('upgrade', (request, socket, head) => {
+  if (!/^\/ws\/submissions\/[1-9][0-9]*\/$/.test(request.url || '')) return;
+  const origin = request.headers.origin;
+  if (origin) {
+    try {
+      if (new URL(origin).host !== request.headers.host) { socket.destroy(); return; }
+    } catch { socket.destroy(); return; }
+  }
+  const upstream = http.request({
+    hostname: BACKEND_HOST,
+    port: BACKEND_PORT,
+    path: request.url,
+    method: 'GET',
+    headers: request.headers,
+    timeout: 5000
+  });
+  upstream.on('upgrade', (response, backendSocket, backendHead) => {
+    const headers = Object.entries(response.headers)
+      .map(([name, value]) => `${name}: ${value}`).join('\r\n');
+    socket.write(`HTTP/1.1 101 Switching Protocols\r\n${headers}\r\n\r\n`);
+    if (backendHead.length) socket.write(backendHead);
+    if (head.length) backendSocket.write(head);
+    socket.pipe(backendSocket).pipe(socket);
+    socket.on('error', () => backendSocket.destroy());
+    backendSocket.on('error', () => socket.destroy());
+  });
+  upstream.on('response', () => socket.destroy());
+  upstream.on('timeout', () => upstream.destroy());
+  upstream.on('error', () => socket.destroy());
+  upstream.end();
+});
+
 server.headersTimeout = 15000;
 server.requestTimeout = 120000;
 server.timeout = 120000;

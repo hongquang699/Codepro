@@ -108,6 +108,13 @@ CSRF_TRUSTED_ORIGINS = [
 WSGI_APPLICATION = 'backend.core.wsgi.application'
 ASGI_APPLICATION = 'backend.core.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer' if os.getenv('REDIS_URL') else 'channels.layers.InMemoryChannelLayer',
+        'CONFIG': {'hosts': [os.environ['REDIS_URL']]} if os.getenv('REDIS_URL') else {},
+    }
+}
+
 DB_ENGINE = os.getenv('DB_ENGINE', '').lower()
 DB_HOST = os.getenv('DB_HOST', '')
 

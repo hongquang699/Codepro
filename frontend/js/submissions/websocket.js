@@ -23,7 +23,7 @@ class SubmissionWebSocket {
         try {
           const data = JSON.parse(event.data);
           if (this.onUpdate) this.onUpdate(data);
-          if (data.status === 'FINISHED' || (data.verdict && !['QUEUED', 'JUDGING', 'COMPILING', 'RUNNING'].includes(data.verdict.toUpperCase()))) {
+          if (data.finished || data.status === 'FINISHED') {
             this.disconnect();
           }
         } catch (e) {
@@ -54,8 +54,7 @@ class SubmissionWebSocket {
         if (res.ok) {
           const data = await res.json();
           if (this.onUpdate) this.onUpdate(data);
-          const v = (data.verdict || '').toUpperCase();
-          if (v && !['QUEUED', 'JUDGING', 'COMPILING', 'RUNNING', 'CHECKING'].includes(v)) {
+          if (data.finished || data.status === 'FINISHED') {
             this.disconnect();
           }
         }

@@ -5,7 +5,7 @@ echo        Khoi dong he thong CodeProOJ (Local Dev)
 echo ========================================================
 
 echo [1/4] Khoi dong Django API Backend (Port 8000)...
-start "CodeProOJ - Django API (8000)" cmd /k "python manage.py runserver 127.0.0.1:8000"
+start "CodeProOJ - Django API (8000)" cmd /k "python -m uvicorn backend.core.asgi:application --host 127.0.0.1 --port 8000 --reload"
 
 ping 127.0.0.1 -n 3 >nul
 

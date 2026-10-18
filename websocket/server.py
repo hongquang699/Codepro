@@ -1,8 +1,7 @@
-# Central WebSocket Broadcast Daemon
-import asyncio
+"""ASGI entry point for the WebSocket service.
 
-async def main():
-    print("[WEBSOCKET DAEMON] Realtime server active on ws://localhost:8080")
+Run with ``uvicorn websocket.server:application --port 8000``. The HTTP and
+WebSocket routes share the Django ASGI application and its channel layer.
+"""
 
-if __name__ == '__main__':
-    asyncio.run(main())
+from backend.core.asgi import application

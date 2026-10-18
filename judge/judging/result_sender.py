@@ -21,7 +21,7 @@ class ResultSender:
             from websocket.submission.consumer import broadcast_submission_update
             broadcast_submission_update(submission_id, {"status": status, "progress": progress})
         except Exception:
-            pass
+            logger.exception("Unable to publish submission %s status", submission_id)
 
     def send_final_result(self, submission_id: int, verdict: str, score: float, time_ms: int, memory_kb: int, testcases: List[Dict[str, Any]] = None):
         """
@@ -39,4 +39,4 @@ class ResultSender:
                 "testcases": testcases or []
             })
         except Exception:
-            pass
+            logger.exception("Unable to publish submission %s result", submission_id)
