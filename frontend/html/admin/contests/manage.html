@@ -80,6 +80,7 @@
           <p id="contestSubtitle">Cấu hình thời gian, đề bài, thí sinh, đóng băng bảng điểm và rejudge kỳ thi.</p>
         </div>
         <div class="topbar-actions">
+          <button type="button" class="btn-top btn-top-secondary" id="btnDownloadArchive" onclick="downloadContestArchive()">Tải bản lưu ZIP</button>
           <button class="btn-top btn-top-secondary" id="btnToggleFreeze">❄️ Đóng băng bảng điểm</button>
           <a href="#" target="_blank" id="btnViewPublicContest" class="btn-top btn-top-primary">👁️ Xem trang thi</a>
         </div>
@@ -690,6 +691,7 @@
     // Initialize
     loadContestData();
   </script>
+  <script src="/frontend/js/admin/contest-archive.js"></script>
   <script src="/frontend/js/core/theme.js"></script>
   <script src="/frontend/js/core/i18n.js"></script>
 </body>

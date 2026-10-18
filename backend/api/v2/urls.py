@@ -1,8 +1,10 @@
 from django.urls import path
 from . import views
+from .contest_archive import ContestArchiveDownload
 from backend.judge.api import admin_views as judge_admin
 
 urlpatterns = [
+    path('admin/contest/<str:contest>/archive', ContestArchiveDownload.as_view(), name='api-contest-archive'),
     # ── USERS & RANKINGS ────────────────────────────────────────────────────
     path('users', views.APIUserList.as_view(), name='api-users'),
     path('user/<str:username>', views.APIUserDetail.as_view(), name='api-user-detail'),
