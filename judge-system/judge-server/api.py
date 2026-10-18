@@ -154,9 +154,11 @@ class JudgeApiRouter:
                 job_id = job.get("job_id")
                 job['assigned_worker'] = worker_id
                 if job_id in self.results:
-                    self.results[job_id]["status"] = "Judging"
-                    self.results[job_id]["verdict"] = "RUNNING"
-                    self.results[job_id]["assigned_worker"] = worker_id
+                    active = self.results[job_id]
+                    active["status"] = "Judging"
+                    active["verdict"] = "RUNNING"
+                    active["assigned_worker"] = worker_id
+                    self.results[job_id] = active
                 return 200, {"job": job}
             return 200, {"job": None}
 

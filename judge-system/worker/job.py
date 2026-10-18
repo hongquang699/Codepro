@@ -20,3 +20,4 @@ class JudgeJob:
     subtask_mode: bool = False
     callback_url: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    problem_version: Optional[Dict[str, str]] = None

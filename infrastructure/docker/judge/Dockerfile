@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir psutil pyyaml requests 'cryptography>=43.0.0'
+RUN pip3 install --no-cache-dir psutil pyyaml requests 'cryptography>=43.0.0' 'boto3>=1.35,<2' 'redis>=5,<6'
 
 WORKDIR /app
 

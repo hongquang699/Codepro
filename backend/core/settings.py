@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'backend.judge.apps.JudgeAppConfig',
+    'backend.problem_storage.apps.ProblemStorageConfig',
     'backend.api.apps.ApiConfig',
     'backend.community.apps.CommunityConfig',
     'backend.ranking.apps.RankingConfig',
@@ -169,6 +170,15 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend')] if DEBUG else []
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'storage'
+
+PROBLEM_STORAGE_ENDPOINT = os.getenv('PROBLEM_STORAGE_ENDPOINT', '')
+PROBLEM_STORAGE_PUBLIC_ENDPOINT = os.getenv('PROBLEM_STORAGE_PUBLIC_ENDPOINT', PROBLEM_STORAGE_ENDPOINT)
+PROBLEM_STORAGE_ACCESS_KEY = os.getenv('PROBLEM_STORAGE_ACCESS_KEY', '')
+PROBLEM_STORAGE_SECRET_KEY = os.getenv('PROBLEM_STORAGE_SECRET_KEY', '')
+PROBLEM_STORAGE_PRIVATE_BUCKET = os.getenv('PROBLEM_STORAGE_PRIVATE_BUCKET', 'problem-private')
+PROBLEM_STORAGE_PUBLIC_BUCKET = os.getenv('PROBLEM_STORAGE_PUBLIC_BUCKET', 'problem-public')
+PROBLEM_STORAGE_QUEUE_URL = os.getenv('PROBLEM_STORAGE_QUEUE_URL', '')
+PROBLEM_STORAGE_INTERNAL_TOKEN = os.getenv('PROBLEM_STORAGE_INTERNAL_TOKEN', '')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

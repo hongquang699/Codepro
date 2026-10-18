@@ -85,6 +85,12 @@ In ra kết quả của bài toán.
     return base_dir
 
 def get_statement(code):
+    # Published versions are authoritative; legacy packages remain available for other problems.
+    from backend.problem_storage.models import ProblemRelease
+    release = ProblemRelease.objects.select_related('version').filter(problem__code=code).first()
+    if release:
+        markdown = release.version.statement
+        return {'markdown': markdown, 'html': markdown}
     base_dir = get_problem_dir(code)
     md_path = os.path.join(base_dir, 'statement', 'statement.md')
     html_path = os.path.join(base_dir, 'statement', 'statement.html')

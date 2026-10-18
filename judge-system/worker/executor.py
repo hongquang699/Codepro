@@ -6,12 +6,14 @@ Coordinates the entire lifecycle of compiling, testcase execution, and score com
 import os
 import shutil
 import logging
+from contextlib import nullcontext
 from typing import Optional
 from .job import JudgeJob
 from .result import JudgeResult
 from .compiler import WorkerCompiler
 from .runner import WorkerRunner
 from testcase.manager import TestcaseManager
+from testcase.versioned import materialize_version
 from judging.score import Scorer
 from judging.subtasks import SubtaskJudge
 from judging.verdict import Verdict
@@ -72,7 +74,10 @@ class JobExecutor:
         binary_path = compile_res.binary_path
 
         # 2. Load testcases
-        testcases = self.testcase_mgr.get_testcases(job.problem_code)
+        version_context = materialize_version(job.problem_version) if job.problem_version else nullcontext(None)
+        with version_context as version_dir:
+            testcases = self.testcase_mgr.get_testcases(job.problem_code, problem_dir=version_dir)
+            subtasks = self.testcase_mgr.get_subtasks(job.problem_code, problem_dir=version_dir) if job.subtask_mode else []
         if not testcases:
             logger.error(f"No testcases found for problem {job.problem_code}")
             return JudgeResult(
@@ -108,7 +113,6 @@ class JobExecutor:
 
         # 4. Subtasks vs Standard Scoring
         if job.subtask_mode:
-            subtasks = self.testcase_mgr.get_subtasks(job.problem_code)
             eval_res = SubtaskJudge.evaluate_subtasks(subtasks, tc_results_dict)
             
             max_time = max(r.get("time_ms", 0) for r in tc_results)

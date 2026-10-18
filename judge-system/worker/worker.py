@@ -144,7 +144,8 @@ class JudgeWorkerDaemon:
             checker_type=job_dict.get("checker_type", "standard"),
             checker_path=job_dict.get("checker_path"),
             float_epsilon=float(job_dict.get("float_epsilon", 1e-6)),
-            subtask_mode=bool(job_dict.get("subtask_mode", False))
+            subtask_mode=bool(job_dict.get("subtask_mode", False)),
+            problem_version=job_dict.get("problem_version"),
         )
         result = self.executor.execute_job(job)
         return result

@@ -14,16 +14,16 @@ class TestcaseManager:
         self.problem_base_dir = os.path.abspath(problem_base_dir)
         self.cache = TestcaseCache()
 
-    def get_testcases(self, problem_code: str) -> List[TestCaseInfo]:
+    def get_testcases(self, problem_code: str, problem_dir=None) -> List[TestCaseInfo]:
         """
         Returns all testcases for a problem, utilizing caching where possible.
         """
-        problem_dir = os.path.join(self.problem_base_dir, problem_code)
+        problem_dir = problem_dir or os.path.join(self.problem_base_dir, problem_code)
         manifest = TestcaseLoader.load_manifest(problem_dir)
         testcases = TestcaseLoader.load_from_directory(problem_dir, manifest)
         
         # Also check storage/testcases/{problem_code} if empty
-        if not testcases:
+        if not testcases and problem_dir == os.path.join(self.problem_base_dir, problem_code):
             storage_cases = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 "..", "storage", "testcases", problem_code
@@ -33,11 +33,11 @@ class TestcaseManager:
 
         return testcases
 
-    def get_subtasks(self, problem_code: str, total_points: float = 100.0) -> List[SubtaskInfo]:
+    def get_subtasks(self, problem_code: str, total_points: float = 100.0, problem_dir=None) -> List[SubtaskInfo]:
         """
         Organizes testcases into subtasks with proportional points.
         """
-        testcases = self.get_testcases(problem_code)
+        testcases = self.get_testcases(problem_code, problem_dir=problem_dir)
         if not testcases:
             return []
 
@@ -47,7 +47,7 @@ class TestcaseManager:
             grouped.setdefault(tc.subtask_id, []).append(tc)
 
         subtask_list: List[SubtaskInfo] = []
-        problem_dir = os.path.join(self.problem_base_dir, problem_code)
+        problem_dir = problem_dir or os.path.join(self.problem_base_dir, problem_code)
         manifest = TestcaseLoader.load_manifest(problem_dir)
         configured = {int(item['id']): item for item in manifest.get('subtasks', [])
                       if isinstance(item, dict) and str(item.get('id', '')).isdigit()}

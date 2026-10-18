@@ -137,8 +137,14 @@ def run_server():
         logger.addHandler(file_handler)
     auth = Authenticator(config.auth_token)
     heartbeat_mgr = HeartbeatManager(timeout_sec=config.heartbeat_interval * 3)
-    queue = SubmissionQueue(backend_type="memory")
-    results_store = {}
+    judge_redis_url = os.getenv('JUDGE_QUEUE_REDIS_URL', '')
+    queue = SubmissionQueue(backend_type='redis' if judge_redis_url else 'memory',
+                            redis_url=judge_redis_url or None)
+    if queue.redis:
+        from dispatcher.result_store import ResultStore
+        results_store = ResultStore(queue.redis)
+    else:
+        results_store = {}
 
     # Initialize router
     router = JudgeApiRouter(

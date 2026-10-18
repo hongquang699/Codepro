@@ -32,6 +32,57 @@ services:
       timeout: 3s
       retries: 12
 
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-09-06T17-38-46Z
+    command: server /data --console-address ":9001"
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+    volumes:
+      - miniodata:/data
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-9000}:9000"
+    networks:
+      - codeprooj_network
+
+  minio-init:
+    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
+    depends_on:
+      - minio
+    entrypoint: ["/bin/sh", "-c"]
+    command: >-
+      until mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do sleep 2; done;
+      mc mb --ignore-existing local/$${PROBLEM_STORAGE_PRIVATE_BUCKET};
+      mc mb --ignore-existing local/$${PROBLEM_STORAGE_PUBLIC_BUCKET};
+      mc version enable local/$${PROBLEM_STORAGE_PRIVATE_BUCKET};
+      mc anonymous set none local/$${PROBLEM_STORAGE_PRIVATE_BUCKET};
+      mc anonymous set download local/$${PROBLEM_STORAGE_PUBLIC_BUCKET}
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
+      PROBLEM_STORAGE_PUBLIC_BUCKET: ${PROBLEM_STORAGE_PUBLIC_BUCKET:-problem-public}
+    networks:
+      - codeprooj_network
+
+  problem-storage-queue:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/problem-storage-queue/Dockerfile
+    restart: always
+    environment:
+      REDIS_URL: redis://redis:6379/1
+      PROBLEM_STORAGE_INTERNAL_TOKEN: ${PROBLEM_STORAGE_INTERNAL_TOKEN:?Set PROBLEM_STORAGE_INTERNAL_TOKEN in .env}
+      BACKEND_VALIDATE_URL: http://backend:8000/api/v1/problem-storage/internal/validate
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - codeprooj_network
+
   backend:
     build:
       context: .
@@ -60,6 +111,14 @@ services:
       EMAIL_USE_SSL: ${EMAIL_USE_SSL:-False}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@codeprooj.com}
       REDIS_URL: redis://redis:6379/0
+      PROBLEM_STORAGE_ENDPOINT: http://minio:9000
+      PROBLEM_STORAGE_PUBLIC_ENDPOINT: ${PROBLEM_STORAGE_PUBLIC_ENDPOINT:-http://127.0.0.1:9000}
+      PROBLEM_STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      PROBLEM_STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
+      PROBLEM_STORAGE_PUBLIC_BUCKET: ${PROBLEM_STORAGE_PUBLIC_BUCKET:-problem-public}
+      PROBLEM_STORAGE_QUEUE_URL: http://problem-storage-queue:3010
+      PROBLEM_STORAGE_INTERNAL_TOKEN: ${PROBLEM_STORAGE_INTERNAL_TOKEN:?Set PROBLEM_STORAGE_INTERNAL_TOKEN in .env}
       JUDGE_SERVER_URL: http://judge-server:9999
       JUDGE_AUTH_TOKEN: ${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
       TRUSTED_PROXY_IPS: 172.16.0.0/12
@@ -127,9 +186,14 @@ services:
       BACKEND_HOST: backend
       BACKEND_PORT: 8000
       JUDGE_AUTH_TOKEN: ${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
+      JUDGE_QUEUE_REDIS_URL: redis://redis:6379/2
       JUDGE_PROBLEM_DATA_DIR: /var/coding-platform/problem-data/problems
       TESTCASE_ENCRYPTION_KEY: ${TESTCASE_ENCRYPTION_KEY:?Set TESTCASE_ENCRYPTION_KEY in .env}
       JUDGE_STORAGE_DIR: /var/coding-platform/storage
+      PROBLEM_STORAGE_ENDPOINT: http://minio:9000
+      PROBLEM_STORAGE_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER in .env}
+      PROBLEM_STORAGE_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      PROBLEM_STORAGE_PRIVATE_BUCKET: ${PROBLEM_STORAGE_PRIVATE_BUCKET:-problem-private}
       JUDGE_LOG_DIR: /app/judge-system/logs
     depends_on:
       - backend
@@ -179,6 +243,7 @@ services:
 volumes:
   pgdata:
   redisdata:
+  miniodata:
   staticfiles:
 
 networks:

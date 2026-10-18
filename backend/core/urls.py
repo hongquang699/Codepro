@@ -7,6 +7,7 @@ from django.conf import settings
 from backend.judge.api.admin_page import judge_admin_page
 
 urlpatterns = [
+    path('api/v1/problem-storage/', include('backend.problem_storage.urls')),
     path('api/v1/admin/contests/<str:contest_id>/anti-cheat/', include('backend.anti_cheat.api.urls')),
     path('api/v1/anti-cheat/', include('backend.anti_cheat.api.personal_urls')),
     path('internal/judge-admin-page', judge_admin_page),

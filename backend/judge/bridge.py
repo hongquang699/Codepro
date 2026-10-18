@@ -38,7 +38,8 @@ def _judge_server_online() -> bool:
 
 def _submit_to_judge_server(job_id: str, problem_code: str, language: str,
                               source: str, time_limit: float, memory_limit: int,
-                              checker_type: str = 'standard', subtask_mode: bool = False) -> bool:
+                              checker_type: str = 'standard', subtask_mode: bool = False,
+                              problem_version: dict | None = None) -> bool:
     """Enqueues a grading job to the external judge server."""
     payload = json.dumps({
         'submission_id': job_id,
@@ -49,7 +50,8 @@ def _submit_to_judge_server(job_id: str, problem_code: str, language: str,
         'memory_limit': memory_limit,
         'checker_type': checker_type,
         'subtask_mode': subtask_mode,
-        'priority': 1
+        'priority': 1,
+        'problem_version': problem_version,
     }).encode('utf-8')
 
     try:
@@ -138,6 +140,12 @@ def grade_submission(submission_id):
     sub.save(update_fields=['status'])
 
     prob = sub.problem
+    from backend.problem_storage.models import SubmissionVersion
+    pin = SubmissionVersion.objects.select_related('version').filter(submission=sub).first()
+    version_ref = None
+    if pin:
+        v = pin.version
+        version_ref = {'id': str(v.id), 'key': v.private_key, 'sha256': v.sha256}
     lang_key = sub.language.key.upper()
     judge_lang = _map_language_key(lang_key)
     if not judge_lang:
@@ -165,7 +173,8 @@ def grade_submission(submission_id):
             time_limit=time_limit,
             memory_limit=memory_limit,
             checker_type=checker_type,
-            subtask_mode=problem_package.has_subtasks(prob.code)
+            subtask_mode=bool(pin and v.groups.count() > 1) if pin else problem_package.has_subtasks(prob.code),
+            problem_version=version_ref
         )
 
         if queued:
