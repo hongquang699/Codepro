@@ -4,6 +4,11 @@ let draftTimer;
 let pollTimer;
 let currentDraftKey = '';
 let codeEditor;
+let headerProfileRequest = 0;
+let shareSession = null;
+let shareTimer;
+let shareSending = false;
+let shareDirty = false;
 const sourceValue = () => codeEditor ? codeEditor.getValue() : $('source-code').value;
 function setSourceValue(value) { if (codeEditor) codeEditor.setValue(value); else $('source-code').value = value; }
 function ensureCodeEditor() {
@@ -30,7 +35,60 @@ function errorText(err) {
 }
 function isAdmin() { return state.account?.role === 'admin' && !!(state.account?.is_staff || state.account?.is_superuser); }
 function roleName(role) { return ({ admin: 'Quản trị viên', teacher: 'Giáo viên', setter: 'Người ra đề', user: 'Thí sinh' })[role] || 'Thí sinh'; }
+function ratingColor(value) {
+  const rating = Number(value) || 0;
+  if (rating >= 2400) return '#ef4444';
+  if (rating >= 2100) return '#f97316';
+  if (rating >= 1900) return '#a855f7';
+  if (rating >= 1600) return '#3b82f6';
+  if (rating >= 1400) return '#10b981';
+  if (rating >= 1200) return '#06b6d4';
+  return '#94a3b8';
+}
+function profileAvatarUrl(value) {
+  if (typeof value !== 'string' || !value || value.length > 300000) return '';
+  if (/^data:image\/(?:png|jpeg|gif|webp);base64,[a-z\d+/=]+$/i.test(value)) return value;
+  try {
+    const url = new URL(value, 'http://127.0.0.1:8888');
+    if (url.protocol === 'https:' || (url.protocol === 'http:' && url.origin === 'http://127.0.0.1:8888')) return url.href;
+  } catch { /* Invalid avatar URL falls back to the initial. */ }
+  return '';
+}
+function showAvatar(imageId, fallbackId, value) {
+  const image = $(imageId);
+  const fallback = $(fallbackId);
+  const url = profileAvatarUrl(value);
+  image.onload = () => { image.hidden = false; fallback.hidden = true; };
+  image.onerror = () => { image.hidden = true; fallback.hidden = false; };
+  image.hidden = true;
+  fallback.hidden = false;
+  image.removeAttribute('src');
+  if (url) image.src = url;
+}
+function applyHeaderProfile(profile = {}, ratingData = {}) {
+  if (!state.account) return;
+  const name = profile.display_name || state.account.display_name || state.account.username;
+  const rating = Number(ratingData.rating ?? profile.rating) || 0;
+  const color = ratingColor(rating);
+  $('topbar-display-name').textContent = name;
+  $('topbar-display-name').style.color = color;
+  $('topbar-rating').textContent = rating > 0 ? `${profile.rank || ratingData.rank || 'Rating'} · ${rating}` : 'Chưa có rating';
+  $('topbar-account').setAttribute('aria-label', `Xem hồ sơ ${name}, ${rating > 0 ? `${rating} rating` : 'chưa có rating'}`);
+  $('topbar-avatar').style.setProperty('--rating-color', color);
+  $('topbar-avatar-fallback').textContent = name.trim().charAt(0).toUpperCase() || '?';
+  showAvatar('topbar-avatar-image', 'topbar-avatar-fallback', profile.avatar);
+}
+async function refreshHeaderProfile() {
+  const username = state.account?.username;
+  const requestId = ++headerProfileRequest;
+  if (!username) return;
+  try {
+    const data = await window.client.api({ kind: 'userProfile', key: username });
+    if (requestId === headerProfileRequest && state.account?.username === username) applyHeaderProfile(data?.profile, data?.rating);
+  } catch { /* Keep the account name and fallback avatar when offline. */ }
+}
 async function logoutAccount() {
+  if (shareSession) await stopShare(true);
   await window.client.logout();
   state.account = null;
   updateAccount();
@@ -43,7 +101,13 @@ function setBusy(button, busy, label) {
 }
 function draftKey() { return `${state.selected}:${$('language-select').value}`; }
 function updateAccount() {
-  $('login-btn').textContent = state.account ? state.account.username : 'Đăng nhập';
+  headerProfileRequest++;
+  $('login-btn').hidden = !!state.account;
+  $('topbar-account').hidden = !state.account;
+  $('topbar-logout').hidden = !state.account;
+  $('topbar-context').textContent = `CODEPROOJ / ${isAdmin() ? 'ADMIN' : 'STUDENT'}`;
+  if (state.account) { applyHeaderProfile(); refreshHeaderProfile(); }
+  else { $('topbar-display-name').textContent = ''; $('topbar-rating').textContent = ''; showAvatar('topbar-avatar-image', 'topbar-avatar-fallback', ''); }
   document.body.classList.toggle('admin-mode', isAdmin());
   $('admin-nav').hidden = !isAdmin();
   document.querySelectorAll('.admin-only').forEach(item => { item.hidden = !isAdmin(); });
@@ -122,6 +186,7 @@ async function loadLanguages() {
 
 async function selectProblem(code) {
   if (draftTimer) { clearTimeout(draftTimer); draftTimer = null; await saveDraft(); }
+  else if (currentDraftKey && state.selected !== code) await saveDraft();
   state.selected = code;
   state.problem = null;
   setProblemFocus(true);
@@ -159,6 +224,7 @@ function dateText(value) { return value ? new Date(value).toLocaleString('vi-VN'
 function statusText(value) { return ({ ongoing: 'Đang diễn ra', upcoming: 'Sắp tới', ended: 'Đã kết thúc' })[value] || value; }
 function setContestFocus(contest) {
   state.contestKey = contest?.key || null;
+  if (contest) state.contest = contest;
   updateProblemFocus();
 }
 function setProblemFocus(active) {
@@ -171,10 +237,50 @@ function setProblemFocus(active) {
 }
 function updateProblemFocus() {
   const focused = $('problems-view').classList.contains('problem-focus');
+  const inContest = focused && !!state.contestKey;
+  $('problems-view').classList.toggle('contest-mode', inContest);
   $('contest-context').hidden = !focused;
-  $('back-to-contest').textContent = state.contestKey ? '← Quay lại cuộc thi' : '← Quay lại danh sách';
-  $('contest-context-label').textContent = state.contestKey ? 'ĐANG LÀM BÀI THI' : 'ĐANG LÀM BÀI TẬP';
-  $('contest-context-name').textContent = state.contestKey ? (state.contest?.name || '') : (state.problem?.name || '');
+  $('back-to-contest').textContent = inContest ? '← Quay lại cuộc thi' : '← Quay lại danh sách';
+  $('contest-context-label').textContent = inContest ? 'KHÔNG GIAN CUỘC THI' : 'ĐANG LÀM BÀI TẬP';
+  $('contest-context-name').textContent = inContest ? (state.contest?.name || '') : (state.problem?.name || '');
+  $('contest-session-meta').hidden = !inContest;
+  $('contest-task-list').hidden = !inContest;
+  if (inContest) {
+    $('contest-session-meta').textContent = `${statusText(state.contest?.status)} · ${state.contest?.problems?.length || 0} bài · Kết thúc ${dateText(state.contest?.end_time)}`;
+    renderContestTasks();
+    $('page-title').textContent = state.contest?.name || 'Cuộc thi';
+    $('nav-problems').classList.remove('active');
+    $('nav-problems').removeAttribute('aria-current');
+    $('nav-contests').classList.add('active');
+    $('nav-contests').setAttribute('aria-current', 'page');
+  } else if (state.view === 'problems') {
+    $('page-title').textContent = 'Bài tập';
+    $('nav-contests').classList.remove('active');
+    $('nav-contests').removeAttribute('aria-current');
+    $('nav-problems').classList.add('active');
+    $('nav-problems').setAttribute('aria-current', 'page');
+  }
+}
+function renderContestTasks() {
+  const list = $('contest-task-list'); list.replaceChildren();
+  for (const problem of state.contest?.problems || []) {
+    const button = element('button', '', 'contest-task');
+    button.type = 'button';
+    button.setAttribute('aria-label', `Bài ${problem.output_prefix || problem.order}: ${problem.name}`);
+    if (problem.code === state.selected) { button.classList.add('active'); button.setAttribute('aria-current', 'true'); }
+    button.append(element('span', problem.output_prefix || problem.order, 'contest-task-letter'));
+    const content = element('span', '', 'contest-task-copy');
+    content.append(element('strong', problem.name), element('small', `${problem.points ?? 100} điểm`));
+    button.append(content);
+    button.addEventListener('click', () => { if (problem.code !== state.selected) selectProblem(problem.code); });
+    list.append(button);
+  }
+}
+async function enterContest(contest, code = contest?.problems?.[0]?.code) {
+  if (!code) { notice('Cuộc thi chưa có bài thi.', true); return; }
+  showView('problems');
+  setContestFocus(contest);
+  await selectProblem(code);
 }
 function renderStatement(value, box = $('statement-content')) {
   if (window.CodeProStatement) window.CodeProStatement.render(value, box, window.katex);
@@ -210,17 +316,40 @@ function renderContests() {
     heading.append(element('h3', `${label} (${groupItems.length})`), element('p', description));
     section.append(heading);
     for (const item of groupItems) {
-      const button = element('button', '', 'contest-card'); button.type = 'button';
-      if (item.key === state.contest?.key) button.classList.add('selected');
+      const card = element('div', '', 'contest-card');
+      if (item.key === state.contest?.key) card.classList.add('selected');
       const icon = element('span', '', 'contest-card-icon'); icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v3h4v3a4 4 0 0 1-4 4h-.2A5 5 0 0 1 13 15.8V19h3v2H8v-2h3v-3.2A5 5 0 0 1 8.2 13H8a4 4 0 0 1-4-4V6h4V3Z"/><path d="M8 6v4a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3V6M4 8v1a2 2 0 0 0 2 2h2m12-3v1a2 2 0 0 1-2 2h-2"/></svg>';
       const info = element('span', '', 'contest-card-info');
       info.append(element('strong', item.name), element('small', `${dateText(item.start_time)} – ${dateText(item.end_time)}`), element('small', `${item.participant_count ?? 0} thí sinh · ${item.key}${isAdmin() ? ` · ${{ both: 'Web + client', web: 'Chỉ web', client: 'Chỉ client' }[item.display_target] || 'Web + client'}${item.is_visible ? '' : ' · Bản nháp'}` : ''}`));
-      const action = element('span', item.status === 'ended' ? 'Xem kết quả' : 'Xem chi tiết', 'contest-card-action');
-      button.append(icon, info, action);
-      button.addEventListener('click', () => openContest(item.key, true)); section.append(button);
+      const details = element('button', '', 'contest-card-open'); details.type = 'button';
+      details.setAttribute('aria-label', `Xem chi tiết ${item.name}`);
+      details.append(icon, info);
+      details.addEventListener('click', () => openContest(item.key, true));
+      const action = element('button', item.status === 'ongoing' ? 'Tham gia' : item.status === 'ended' ? 'Xem kết quả' : 'Xem chi tiết', 'contest-card-action');
+      action.type = 'button';
+      action.addEventListener('click', async () => {
+        if (item.status !== 'ongoing') { await openContest(item.key, true); return; }
+        setBusy(action, true, 'Tham gia');
+        try { await joinAndEnterContest(item.key); } catch (err) { notice(errorText(err), true); }
+        finally { setBusy(action, false, 'Tham gia'); }
+      });
+      card.append(details, action); section.append(card);
     }
     box.append(section);
   }
+}
+async function joinAndEnterContest(key, detail) {
+  if (!state.account) { $('login-dialog').showModal(); return; }
+  const contest = detail || (await window.client.api({ kind: 'contest', key }))?.object;
+  if (!contest) throw new Error('Không tìm thấy cuộc thi.');
+  state.contest = contest;
+  if (!contest.is_registered) {
+    await window.client.api({ kind: 'contestJoin', key, body: {} });
+    contest.is_registered = true;
+    notice('Đã tham gia cuộc thi.');
+  }
+  if (contest.status === 'ongoing') await enterContest(contest);
+  else await openContest(key, true);
 }
 async function openContest(key, scrollToDetail = false) {
   $('contest-detail').hidden = false;
@@ -237,9 +366,25 @@ async function openContest(key, scrollToDetail = false) {
     head.append(element('span', statusText(contest.status), `status-pill ${contest.status}`), element('h2', contest.name), element('p', contest.description || 'Chưa có mô tả.'), element('small', `${dateText(contest.start_time)} → ${dateText(contest.end_time)}`));
     box.append(head);
     const actions = element('div', '', 'contest-actions');
-    if (state.account && contest.status !== 'ended') {
-      const join = element('button', contest.is_registered ? 'Rời cuộc thi' : 'Tham gia cuộc thi', 'button secondary');
-      join.addEventListener('click', async () => { try { await window.client.api({ kind: contest.is_registered ? 'contestLeave' : 'contestJoin', key, body: {} }); notice(contest.is_registered ? 'Đã rời cuộc thi.' : 'Đã tham gia cuộc thi.'); await openContest(key); } catch (err) { notice(errorText(err), true); } }); actions.append(join);
+    if (contest.status !== 'ended') {
+      const join = element('button', contest.is_registered && contest.status === 'upcoming' ? 'Đã đăng ký' : contest.is_registered ? 'Vào làm bài' : state.account ? 'Tham gia cuộc thi' : 'Đăng nhập để tham gia', 'button primary');
+      join.disabled = contest.is_registered && contest.status === 'upcoming';
+      join.addEventListener('click', async () => {
+        setBusy(join, true, 'Tham gia cuộc thi');
+        try { await joinAndEnterContest(key, contest); } catch (err) { notice(errorText(err), true); }
+        finally { setBusy(join, false, 'Tham gia cuộc thi'); }
+      });
+      actions.append(join);
+      if (state.account && contest.is_registered) {
+        const leave = element('button', 'Rời cuộc thi', 'button subtle');
+        leave.addEventListener('click', async () => {
+          setBusy(leave, true, 'Rời cuộc thi');
+          try { await window.client.api({ kind: 'contestLeave', key, body: {} }); notice('Đã rời cuộc thi.'); await openContest(key); }
+          catch (err) { notice(errorText(err), true); }
+          finally { setBusy(leave, false, 'Rời cuộc thi'); }
+        });
+        actions.append(leave);
+      }
     }
     const score = element('button', 'Bảng xếp hạng', 'button subtle'); score.addEventListener('click', () => loadScoreboard(key)); actions.append(score);
     if (isAdmin()) { const edit = element('button', 'Chỉnh sửa', 'button secondary'); edit.addEventListener('click', () => editContest(contest)); actions.append(edit); }
@@ -248,7 +393,11 @@ async function openContest(key, scrollToDetail = false) {
     if (!contest.problems?.length) list.append(element('div', 'Chưa có bài thi.', 'placeholder'));
     for (const problem of contest.problems || []) {
       const button = element('button', `${problem.output_prefix || problem.order}. ${problem.name} · ${problem.points ?? 100} điểm`, 'contest-problem');
-      button.addEventListener('click', async () => { showView('problems'); setContestFocus(contest); await selectProblem(problem.code); }); list.append(button);
+      button.type = 'button';
+      const canOpen = isAdmin() || contest.status === 'ended' || (contest.status === 'ongoing' && contest.is_registered);
+      button.disabled = !canOpen;
+      if (!canOpen) button.title = contest.status === 'upcoming' ? 'Bài thi sẽ mở khi cuộc thi bắt đầu.' : 'Tham gia cuộc thi để mở đề bài.';
+      button.addEventListener('click', () => enterContest(contest, problem.code)); list.append(button);
     }
     box.append(list);
     renderContests();
@@ -320,7 +469,9 @@ async function loadUsers() {
 let editAction = null;
 function editForm(title, fields, action) {
   $('edit-title').textContent = title; $('edit-error').textContent = '';
+  $('edit-submit').dataset.label = 'Lưu'; $('edit-submit').textContent = 'Lưu';
   $('edit-dialog').classList.toggle('statement-edit', fields.some(field => field.key === 'description') && title.includes('bài tập'));
+  $('edit-dialog').classList.toggle('contest-edit', title.includes('cuộc thi'));
   const box = $('edit-fields'); box.replaceChildren();
   for (const field of fields) {
     const label = element('label', field.label); label.htmlFor = `edit-${field.key}`;
@@ -336,7 +487,14 @@ function editForm(title, fields, action) {
     if (field.required) input.required = true;
     if (field.readOnly) input.readOnly = true;
     if (field.type === 'number') { input.step = field.step || 'any'; input.min = '0'; }
-    box.append(label, input);
+    if (field.placeholder) input.placeholder = field.placeholder;
+    if (field.maxLength) input.maxLength = field.maxLength;
+    if ($('edit-dialog').classList.contains('contest-edit')) {
+      const wrapper = element('div', '', `contest-form-field${field.wide ? ' wide' : ''}${field.type === 'checkbox' ? ' checkbox-field' : ''}`);
+      wrapper.append(label, input);
+      if (field.hint) wrapper.append(element('small', field.hint));
+      box.append(wrapper);
+    } else box.append(label, input);
   }
   if ($('edit-dialog').classList.contains('statement-edit')) {
     const hint = element('p', 'Soạn đề bằng Markdown; công thức $...$ hiển thị trong bản xem trước. Nếu đề cũ đã mất biến, hãy đối chiếu nguồn gốc trước khi lưu.', 'edit-hint');
@@ -350,24 +508,88 @@ function editForm(title, fields, action) {
   editAction = action; $('edit-dialog').showModal();
 }
 function dateInput(value) { if (!value) return ''; const date = new Date(value); return Number.isNaN(date.getTime()) ? '' : new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
+function contestProblemCodes(value) { return String(value || '').split(/[\s,;]+/).map(code => code.trim().toUpperCase()).filter(Boolean); }
+async function addContestProblemPicker() {
+  const box = $('edit-fields');
+  const wrapper = element('div', '', 'contest-problem-picker wide');
+  const heading = element('div', '', 'contest-picker-heading');
+  heading.append(element('strong', 'Chọn bài thi'), element('small', 'Có thể tìm theo mã hoặc tên bài. Thứ tự chọn là thứ tự trong cuộc thi.'));
+  const search = document.createElement('input'); search.type = 'search'; search.placeholder = 'Tìm bài tập…'; search.setAttribute('aria-label', 'Tìm bài tập để thêm vào cuộc thi');
+  const count = element('div', '', 'contest-picker-count');
+  const list = element('div', 'Đang tải bài tập…', 'contest-picker-list');
+  wrapper.append(heading, search, count, list); box.append(wrapper);
+  const codesInput = $('edit-problems');
+  let problems = [];
+  const render = () => {
+    const selected = new Set(contestProblemCodes(codesInput.value));
+    count.textContent = `${selected.size} bài đã chọn`;
+    list.replaceChildren();
+    const query = search.value.trim().toLocaleLowerCase('vi-VN');
+    const visible = problems.filter(item => !query || `${item.code} ${item.name}`.toLocaleLowerCase('vi-VN').includes(query));
+    if (!visible.length) { list.append(element('p', problems.length ? 'Không tìm thấy bài phù hợp.' : 'Chưa có bài tập.', 'placeholder')); return; }
+    for (const item of visible) {
+      const row = element('label', '', 'contest-picker-row');
+      const check = document.createElement('input'); check.type = 'checkbox'; check.checked = selected.has(item.code);
+      const text = element('span'); text.append(element('strong', item.code), element('small', item.name));
+      check.addEventListener('change', () => {
+        const codes = contestProblemCodes(codesInput.value);
+        codesInput.value = (check.checked ? [...codes, item.code] : codes.filter(code => code !== item.code)).join(', ');
+        render();
+      });
+      row.append(check, text); list.append(row);
+    }
+  };
+  search.addEventListener('input', render);
+  codesInput.addEventListener('input', render);
+  render();
+  try {
+    let page = 1;
+    while (page <= 100) {
+      const data = await window.client.api({ kind: 'problems', query: { all: 1, page, page_size: 1000 } });
+      problems.push(...(data?.objects || []));
+      if (!data?.has_more && page >= (data?.total_pages || 1)) break;
+      page++;
+    }
+    if (box.contains(wrapper)) render();
+  } catch (error) { if (box.contains(wrapper)) list.replaceChildren(element('p', `Không tải được danh sách bài: ${errorText(error)}`, 'placeholder')); }
+}
 function editContest(contest = null) {
+  const start = new Date(); start.setMinutes(0, 0, 0); start.setHours(start.getHours() + 1);
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
   editForm(contest ? 'Chỉnh sửa cuộc thi' : 'Tạo cuộc thi', [
-    { key: 'key', label: 'Mã cuộc thi', value: contest?.key, required: true, readOnly: !!contest },
-    { key: 'name', label: 'Tên cuộc thi', value: contest?.name, required: true },
-    { key: 'description', label: 'Mô tả', type: 'textarea', value: contest?.description },
-    { key: 'start_time', label: 'Bắt đầu', type: 'datetime-local', value: dateInput(contest?.start_time), required: true },
-    { key: 'end_time', label: 'Kết thúc', type: 'datetime-local', value: dateInput(contest?.end_time), required: true },
+    { key: 'key', label: 'Mã cuộc thi', value: contest?.key, required: true, readOnly: !!contest, maxLength: 50, placeholder: 'VD: CODEPRO2026', hint: 'Chữ, số, dấu gạch ngang hoặc gạch dưới.' },
+    { key: 'name', label: 'Tên cuộc thi', value: contest?.name, required: true, maxLength: 128, placeholder: 'Tên hiển thị cho thí sinh' },
+    { key: 'description', label: 'Mô tả', type: 'textarea', value: contest?.description, wide: true, placeholder: 'Giới thiệu, quy định và lưu ý của cuộc thi…' },
+    { key: 'start_time', label: 'Bắt đầu', type: 'datetime-local', value: dateInput(contest?.start_time || start), required: true, hint: 'Theo giờ trên máy của bạn.' },
+    { key: 'end_time', label: 'Kết thúc', type: 'datetime-local', value: dateInput(contest?.end_time || end), required: true, hint: 'Phải sau thời gian bắt đầu.' },
     { key: 'format_name', label: 'Hình thức', type: 'select', options: [['icpc', 'ICPC'], ['ioi', 'IOI']], value: contest?.format_name || 'icpc' },
-    { key: 'problems', label: 'Mã bài thi (cách nhau bằng dấu phẩy)', value: contest?.problems?.map(item => item.code).join(', ') || '' },
     { key: 'display_target', label: 'Nơi hiển thị', type: 'select', options: [['both', 'Trên web và client'], ['client', 'Chỉ trên client'], ['web', 'Chỉ trên web']], value: contest?.display_target || 'both' },
-    { key: 'is_visible', label: 'Công khai', type: 'checkbox', value: contest?.is_visible ?? true },
+    { key: 'problems', label: 'Mã bài thi theo thứ tự', value: contest?.problems?.map(item => item.code).join(', ') || '', wide: true, placeholder: 'VD: APLUS, MAXSUM', hint: 'Chọn từ danh sách bên dưới hoặc nhập mã, cách nhau bằng dấu phẩy.' },
+    { key: 'is_visible', label: 'Công khai ngay', type: 'checkbox', value: contest?.is_visible ?? false, hint: 'Tắt để lưu bản nháp, chỉ quản trị viên nhìn thấy.' },
     { key: 'is_rated', label: 'Tính rating', type: 'checkbox', value: contest?.is_rated ?? false }
   ], async values => {
-    const body = { ...values, start_time: new Date(values.start_time).toISOString(), end_time: new Date(values.end_time).toISOString(), problems: values.problems.split(',').map(x => x.trim().toUpperCase()).filter(Boolean) };
-    if (new Date(body.end_time) <= new Date(body.start_time)) throw new Error('Thời gian kết thúc phải sau thời gian bắt đầu.');
+    const key = values.key.toUpperCase();
+    if (!/^[A-Z0-9_-]{1,50}$/.test(key)) throw new Error('Mã cuộc thi chỉ gồm chữ, số, dấu - hoặc _, tối đa 50 ký tự.');
+    const begin = new Date(values.start_time), finish = new Date(values.end_time);
+    if (Number.isNaN(begin.getTime()) || Number.isNaN(finish.getTime()) || finish <= begin) throw new Error('Thời gian kết thúc phải sau thời gian bắt đầu.');
+    const problems = contestProblemCodes(values.problems);
+    if (problems.length !== new Set(problems).size) throw new Error('Danh sách bài thi có mã bị lặp.');
+    if (problems.length > 26) throw new Error('Một cuộc thi hiện hỗ trợ tối đa 26 bài.');
+    if (values.is_visible && !problems.length) throw new Error('Hãy thêm ít nhất một bài trước khi công khai cuộc thi.');
+    for (const code of problems) {
+      if (!/^[A-Z0-9_-]{1,64}$/.test(code)) throw new Error(`Mã bài ${code} không hợp lệ.`);
+      try { if (!(await window.client.api({ kind: 'problem', key: code }))?.object) throw new Error('missing'); }
+      catch { throw new Error(`Không tìm thấy bài thi ${code}. Hãy kiểm tra mã bài.`); }
+    }
+    const duration = Math.round((finish - begin) / 1000);
+    const body = { ...values, key, start_time: begin.toISOString(), end_time: finish.toISOString(), problems };
+    if (!contest) body.duration_seconds = duration;
     await window.client.api({ kind: contest ? 'contest' : 'contests', key: contest?.key, method: contest ? 'PUT' : 'POST', body });
-    notice(contest ? 'Đã cập nhật cuộc thi.' : 'Đã tạo cuộc thi.'); await loadContests();
+    notice(contest ? 'Đã cập nhật cuộc thi.' : 'Đã tạo cuộc thi.'); await loadContests(); await openContest(key);
   });
+  $('edit-submit').dataset.label = contest ? 'Lưu thay đổi' : 'Tạo cuộc thi';
+  $('edit-submit').textContent = $('edit-submit').dataset.label;
+  addContestProblemPicker();
 }
 function editProblem(problem = null) {
   editForm(problem ? 'Chỉnh sửa bài tập' : 'Tạo bài tập', [
@@ -411,6 +633,7 @@ async function loadDraft() {
   if (key !== draftKey()) return;
   setSourceValue(source || (key.endsWith(':PY3') ? 'import sys\n\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()\n' : '#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    return 0;\n}\n'));
   $('draft-status').textContent = source ? 'Đã tải bản nháp' : 'Bản nháp tự lưu';
+  queueShareSync();
 }
 
 async function saveDraft() {
@@ -418,6 +641,111 @@ async function saveDraft() {
   const key = currentDraftKey, source = sourceValue();
   try { await window.client.setDraft(key, source); $('draft-status').textContent = 'Đã lưu bản nháp'; }
   catch (err) { $('draft-status').textContent = 'Lưu bản nháp thất bại'; notice(errorText(err), true); }
+}
+
+function shareBody() {
+  return { problem: state.selected, contest: state.contestKey || null, language: $('language-select').value, source: sourceValue() };
+}
+function queueShareSync() {
+  if (!shareSession || !state.selected) return;
+  clearTimeout(shareTimer);
+  shareTimer = setTimeout(syncShare, 850);
+}
+async function syncShare() {
+  if (!shareSession || !state.selected) return;
+  if (shareSending) { shareDirty = true; return; }
+  const token = shareSession.token;
+  shareSending = true;
+  try {
+    await window.client.api({ kind: 'codeShare', key: token, method: 'PUT', body: shareBody() });
+    if (shareSession?.token === token) $('share-updated').textContent = `Đã đồng bộ lúc ${new Date().toLocaleTimeString('vi-VN')}`;
+  } catch (error) {
+    if (shareSession?.token === token) $('share-updated').textContent = `Chưa đồng bộ: ${errorText(error)}`;
+  } finally {
+    shareSending = false;
+    if (shareDirty) { shareDirty = false; queueShareSync(); }
+  }
+}
+async function renderShareDialog() {
+  const active = !!shareSession;
+  $('share-active').hidden = !active;
+  $('start-share').hidden = active;
+  $('share-code').classList.toggle('sharing', active);
+  $('share-code').textContent = active ? '● Đang chia sẻ' : 'Chia sẻ cho spectator';
+  if (active) $('share-link').value = await window.client.shareUrl(shareSession.token);
+  else $('share-link').value = '';
+}
+async function openShareDialog() {
+  if (!state.account) { $('login-dialog').showModal(); return; }
+  $('share-error').textContent = '';
+  if (!shareSession) {
+    try {
+      const data = await window.client.api({ kind: 'codeShares' });
+      shareSession = (data?.objects || []).find(item => item.owner === state.account.username && item.problem === state.selected) || null;
+    } catch { /* A new share can still be created while the list is unavailable. */ }
+  }
+  await renderShareDialog();
+  $('share-dialog').showModal();
+}
+async function startShare() {
+  const button = $('start-share'); setBusy(button, true, 'Bắt đầu chia sẻ');
+  $('share-error').textContent = '';
+  try {
+    if (!state.selected || !state.problem) throw new Error('Hãy mở đề bài trước khi chia sẻ.');
+    shareSession = await window.client.api({ kind: 'codeShares', method: 'POST', body: shareBody() });
+    await renderShareDialog();
+    $('share-updated').textContent = 'Đang chia sẻ mã nguồn hiện tại.';
+    notice('Đã tạo liên kết spectator.');
+    if (isAdmin() && state.view === 'admin') loadAdminShares();
+  } catch (error) { $('share-error').textContent = errorText(error); }
+  finally { setBusy(button, false, 'Bắt đầu chia sẻ'); }
+}
+async function stopShare(silent = false) {
+  if (!shareSession) return true;
+  const token = shareSession.token;
+  clearTimeout(shareTimer);
+  shareSession = null;
+  try {
+    await window.client.api({ kind: 'codeShare', key: token, method: 'PUT', body: { is_active: false } });
+    if (!silent) notice('Đã dừng chia sẻ mã nguồn.');
+    await renderShareDialog();
+    if (isAdmin() && state.view === 'admin') loadAdminShares();
+    return true;
+  } catch (error) {
+    shareSession = { token };
+    if (!silent) $('share-error').textContent = errorText(error);
+    await renderShareDialog();
+    return false;
+  }
+}
+
+async function loadAdminShares() {
+  if (!isAdmin()) return;
+  const box = $('admin-share-items');
+  box.replaceChildren(element('div', 'Đang tải phiên chia sẻ…', 'placeholder'));
+  try {
+    const data = await window.client.api({ kind: 'codeShares' });
+    box.replaceChildren();
+    if (!data?.objects?.length) { box.append(element('div', 'Chưa có phiên chia sẻ nào đang mở.', 'placeholder')); return; }
+    for (const share of data.objects) {
+      const row = element('div', '', 'admin-share-row');
+      const info = element('div');
+      info.append(element('strong', `${share.owner} · ${share.problem} · ${share.language}`), element('small', `${share.contest || 'Bài tập'} · Cập nhật ${dateText(share.updated_at)} · Hết hạn ${dateText(share.expires_at)}`));
+      const actions = element('div', '', 'admin-share-actions');
+      const copy = element('button', 'Sao chép link', 'button secondary'); copy.type = 'button';
+      copy.addEventListener('click', async () => { try { await window.client.copyShare(share.token); notice('Đã sao chép liên kết spectator.'); } catch (error) { notice(errorText(error), true); } });
+      const revoke = element('button', 'Thu hồi', 'button subtle'); revoke.type = 'button';
+      revoke.addEventListener('click', async () => {
+        setBusy(revoke, true, 'Thu hồi');
+        try {
+          await window.client.api({ kind: 'codeShare', key: share.token, method: 'PUT', body: { is_active: false } });
+          if (shareSession?.token === share.token) { shareSession = null; await renderShareDialog(); }
+          notice('Đã thu hồi phiên chia sẻ.'); await loadAdminShares();
+        } catch (error) { notice(errorText(error), true); setBusy(revoke, false, 'Thu hồi'); }
+      });
+      actions.append(copy, revoke); row.append(info, actions); box.append(row);
+    }
+  } catch (error) { box.replaceChildren(element('div', `Không tải được phiên chia sẻ: ${errorText(error)}`, 'placeholder')); }
 }
 
 async function runLocal() {
@@ -492,7 +820,9 @@ async function loadProfile() {
     const rating = data?.rating || {};
     $('profile-name').textContent = profile.display_name || username;
     $('profile-handle').textContent = `@${username}`;
-    $('profile-avatar').textContent = (profile.display_name || username).trim().slice(0, 1).toUpperCase();
+    $('profile-avatar-fallback').textContent = (profile.display_name || username).trim().slice(0, 1).toUpperCase();
+    showAvatar('profile-avatar-image', 'profile-avatar-fallback', profile.avatar);
+    applyHeaderProfile(profile, rating);
     $('profile-rank').textContent = profile.rank || rating.rank || 'Unrated';
     $('profile-role').textContent = roleName(state.account.role);
     $('profile-verified').hidden = !profile.is_verified;
@@ -548,6 +878,72 @@ async function loadProfile() {
   }
 }
 
+function setStatementWidth(value) {
+  const width = Math.max(25, Math.min(75, Number(value) || 50));
+  const split = document.querySelector('.split');
+  split.style.setProperty('--statement-fr', `${width}fr`);
+  split.style.setProperty('--editor-fr', `${100 - width}fr`);
+  $('workspace-resizer').setAttribute('aria-valuenow', String(Math.round(width)));
+  try { window.localStorage.setItem('codeprooj-statement-width', String(width)); } catch { /* Local storage can be unavailable. */ }
+}
+
+function initWorkspaceResizer() {
+  const handle = $('workspace-resizer');
+  let dragging = false;
+  handle.addEventListener('pointerdown', event => { dragging = true; handle.setPointerCapture?.(event.pointerId); event.preventDefault(); });
+  handle.addEventListener('pointermove', event => {
+    if (!dragging) return;
+    const rect = handle.parentElement.getBoundingClientRect();
+    if (rect.width) setStatementWidth((event.clientX - rect.left) / rect.width * 100);
+  });
+  const stop = () => { dragging = false; };
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
+  handle.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const current = Number(handle.getAttribute('aria-valuenow')) || 50;
+    setStatementWidth(event.key === 'Home' ? 25 : event.key === 'End' ? 75 : current + (event.key === 'ArrowRight' ? 5 : -5));
+  });
+  let saved;
+  try { saved = window.localStorage.getItem('codeprooj-statement-width'); } catch { /* Local storage can be unavailable. */ }
+  setStatementWidth(saved || 50);
+}
+
+function renderCompilerPaths(paths) {
+  $('cpp-compiler').value = paths?.cpp || '';
+  $('python-compiler').value = paths?.python || '';
+}
+
+async function showCompilerPaths() {
+  if (!window.client.compilerPaths) return;
+  try { renderCompilerPaths(await window.client.compilerPaths()); }
+  catch (error) { $('compiler-status').textContent = errorText(error); }
+}
+
+function initCompilerSettings() {
+  for (const [name, language] of [['cpp', 'cpp'], ['python', 'python']]) {
+    $(`choose-${name}-compiler`).addEventListener('click', async () => {
+      try { renderCompilerPaths(await window.client.chooseCompiler(language)); $('compiler-status').textContent = 'Đã lưu đường dẫn compiler.'; }
+      catch (error) { $('compiler-status').textContent = errorText(error); }
+    });
+    $(`clear-${name}-compiler`).addEventListener('click', async () => {
+      try { renderCompilerPaths(await window.client.clearCompiler(language)); $('compiler-status').textContent = 'Đã dùng lại compiler trong PATH.'; }
+      catch (error) { $('compiler-status').textContent = errorText(error); }
+    });
+  }
+  $('check-compilers').addEventListener('click', async () => {
+    $('compiler-status').textContent = 'Đang kiểm tra…';
+    try {
+      const result = await window.client.checkCompilers();
+      $('compiler-status').textContent = [
+        `C++17: ${result.cpp.available ? result.cpp.version : 'Không tìm thấy g++'}`,
+        `Python 3: ${result.python.available ? result.python.version : 'Không tìm thấy Python 3'}`
+      ].join('\n');
+    } catch (error) { $('compiler-status').textContent = errorText(error); }
+  });
+}
+
 function showView(view) {
   if (view.startsWith('admin') && !isAdmin()) return;
   if (view !== 'problems') { setContestFocus(null); setProblemFocus(false); }
@@ -564,12 +960,14 @@ function showView(view) {
   if (view === 'submissions') showSubmissions();
   if (view === 'account') loadProfile();
   if (view === 'contests') loadContests();
-  if (view === 'admin') loadOverview();
+  if (view === 'admin') { loadOverview(); loadAdminShares(); }
   if (view === 'admin-problems') loadAdminProblems();
   if (view === 'admin-users') loadUsers();
 }
 
 async function init() {
+  initWorkspaceResizer();
+  initCompilerSettings();
   state.account = await window.client.account(); updateAccount();
   let pendingTopics = new Set();
   let refreshTimer = null;
@@ -588,8 +986,10 @@ async function init() {
         if (state.view === 'admin-problems') loadAdminProblems();
       }
       if (topics.has('submissions') && state.view === 'submissions') showSubmissions();
+      if (topics.has('account')) refreshHeaderProfile();
       if (topics.has('account') && state.view === 'account') loadProfile();
       if (topics.has('account') && state.view === 'admin-users') loadUsers();
+      if (topics.has('shares') && state.view === 'admin') loadAdminShares();
     }, 250);
   });
   window.client.onLiveStatus(connected => {
@@ -602,7 +1002,9 @@ async function init() {
   document.documentElement.style.setProperty('--editor-font-size', `${$('editor-font-size').value}px`);
   $('editor-font-size').addEventListener('change', () => { const size = $('editor-font-size').value; document.documentElement.style.setProperty('--editor-font-size', `${size}px`); try { window.localStorage.setItem('codeprooj-editor-size', size); } catch { /* Storage can be unavailable in isolated preview contexts. */ } });
   $('nav-account').addEventListener('click', () => showView('account'));
-  $('nav-settings').addEventListener('click', () => $('preferences-dialog').showModal());
+  $('topbar-account').addEventListener('click', () => showView('account'));
+  $('topbar-logout').addEventListener('click', logoutAccount);
+  $('nav-settings').addEventListener('click', () => { $('preferences-dialog').showModal(); showCompilerPaths(); });
   $('profile-login').addEventListener('click', () => $('login-dialog').showModal());
   $('profile-logout').addEventListener('click', logoutAccount);
   $('close-preferences').addEventListener('click', () => $('preferences-dialog').close());
@@ -623,6 +1025,21 @@ async function init() {
   $('go-admin-problems').addEventListener('click', () => showView('admin-problems'));
   $('go-admin-users').addEventListener('click', () => showView('admin-users'));
   $('new-contest').addEventListener('click', () => editContest());
+  $('refresh-shares').addEventListener('click', loadAdminShares);
+  $('share-code').addEventListener('click', openShareDialog);
+  $('close-share').addEventListener('click', () => $('share-dialog').close());
+  $('start-share').addEventListener('click', startShare);
+  $('copy-share').addEventListener('click', async () => {
+    if (!shareSession) return;
+    try { await window.client.copyShare(shareSession.token); notice('Đã sao chép liên kết spectator.'); }
+    catch (error) { $('share-error').textContent = errorText(error); }
+  });
+  $('open-share').addEventListener('click', async () => {
+    if (!shareSession) return;
+    try { await window.client.openShare(shareSession.token); }
+    catch (error) { $('share-error').textContent = errorText(error); }
+  });
+  $('stop-share').addEventListener('click', () => stopShare());
   $('new-problem').addEventListener('click', () => editProblem());
   for (const button of document.querySelectorAll('.filter')) button.addEventListener('click', () => { state.contestStatus = button.dataset.status; document.querySelectorAll('.filter').forEach(node => node.classList.toggle('active', node === button)); renderContests(); });
   $('user-search-form').addEventListener('submit', event => { event.preventDefault(); state.userQuery = $('user-search').value.trim(); state.userPage = 1; loadUsers(); });
@@ -632,14 +1049,14 @@ async function init() {
   $('edit-form').addEventListener('submit', async event => {
     event.preventDefault(); $('edit-error').textContent = '';
     const values = {};
-    for (const input of $('edit-fields').querySelectorAll('input, select, textarea')) values[input.name] = input.type === 'checkbox' ? input.checked : input.value.trim();
-    const button = $('edit-submit'); setBusy(button, true, 'Lưu');
+    for (const input of $('edit-fields').querySelectorAll('input, select, textarea')) if (input.name) values[input.name] = input.type === 'checkbox' ? input.checked : input.value.trim();
+    const button = $('edit-submit'); const label = button.dataset.label || 'Lưu'; setBusy(button, true, label);
     try { const result = await editAction(values); if (result !== false) $('edit-dialog').close(); }
     catch (err) { $('edit-error').textContent = errorText(err); }
-    finally { setBusy(button, false, 'Lưu'); }
+    finally { setBusy(button, false, label); }
   });
   $('language-select').addEventListener('change', async () => { if (draftTimer) { clearTimeout(draftTimer); draftTimer = null; await saveDraft(); } updateFileTab(); await loadDraft(); });
-  $('source-code').addEventListener('input', () => { $('draft-status').textContent = 'Đang lưu…'; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 600); });
+  $('source-code').addEventListener('input', () => { $('draft-status').textContent = 'Đang lưu…'; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 600); queueShareSync(); });
   $('source-code').addEventListener('keydown', event => { if (event.key === 'Tab') { event.preventDefault(); const field = event.target; field.setRangeText('    ', field.selectionStart, field.selectionEnd, 'end'); field.dispatchEvent(new Event('input')); } });
   $('open-file').addEventListener('click', async () => { try { const file = await window.client.openFile(); if (file) { setSourceValue(file.source); await saveDraft(); notice(`Đã mở ${file.name}.`); codeEditor?.focus(); } } catch (err) { notice(errorText(err), true); } });
   $('save-file').addEventListener('click', async () => { try { if (await window.client.saveFile(sourceValue(), $('language-select').value)) notice('Đã lưu tệp mã nguồn.'); } catch (err) { notice(errorText(err), true); } });

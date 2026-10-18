@@ -1,6 +1,6 @@
 {
   "name": "codeprooj-client",
-  "version": "1.2.1",
+  "version": "1.2.6",
   "private": true,
   "description": "CodeProOJ desktop client for Windows",
   "main": "main.js",

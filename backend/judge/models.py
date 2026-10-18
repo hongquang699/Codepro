@@ -180,6 +180,22 @@ class ContestParticipation(models.Model):
     def __str__(self):
         return f"{self.user.user.username} in {self.contest.key}"
 
+class CodeShare(models.Model):
+    """A short-lived, read-only snapshot stream for a spectator link."""
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='code_shares')
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
+    contest = models.ForeignKey(Contest, on_delete=models.SET_NULL, null=True, blank=True)
+    language = models.CharField(max_length=32)
+    source = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-updated_at']
+
 class Judge(models.Model):
     name = models.CharField(max_length=50, unique=True)
     auth_key = models.CharField(max_length=128)

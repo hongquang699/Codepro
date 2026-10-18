@@ -12,6 +12,7 @@ function topicsForMutation(method, pathname, statusCode) {
   if (/\bproblems?\b/.test(pathname)) topics.add('problems');
   if (/\bsubmissions?\b|\/submit\b|rejudge/.test(pathname)) topics.add('submissions');
   if (/\busers?\b|\/profile\b/.test(pathname)) topics.add('account');
+  if (/\/code-shares?(?:\/|$)/.test(pathname)) topics.add('shares');
   return [...topics];
 }
 

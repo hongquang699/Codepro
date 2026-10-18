@@ -19,5 +19,12 @@ contextBridge.exposeInMainWorld('client', {
   openFile: () => ipcRenderer.invoke('file:open'),
   saveFile: (source, language) => ipcRenderer.invoke('file:save', source, language),
   run: args => ipcRenderer.invoke('run', args),
-  openSite: route => ipcRenderer.invoke('open-site', route)
+  compilerPaths: () => ipcRenderer.invoke('compiler:paths'),
+  chooseCompiler: language => ipcRenderer.invoke('compiler:choose', language),
+  clearCompiler: language => ipcRenderer.invoke('compiler:clear', language),
+  checkCompilers: () => ipcRenderer.invoke('compiler:check'),
+  openSite: route => ipcRenderer.invoke('open-site', route),
+  shareUrl: token => ipcRenderer.invoke('share:url', token),
+  copyShare: token => ipcRenderer.invoke('share:copy', token),
+  openShare: token => ipcRenderer.invoke('share:open', token)
 });

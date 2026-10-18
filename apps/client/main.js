@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, safeStorage, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, safeStorage, shell, clipboard } = require('electron');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
@@ -23,6 +23,8 @@ const allowedPaths = new Map([
   ['contestJoin', '/api/v2/contest/'],
   ['contestLeave', '/api/v2/contest/'],
   ['scoreboard', '/api/v2/contest/'],
+  ['codeShares', '/api/v2/code-shares'],
+  ['codeShare', '/api/v2/code-share/'],
   ['adminOverview', '/api/v2/admin/overview'],
   ['users', '/api/v2/users'],
   ['userRole', '/api/v2/admin/users/']
@@ -52,7 +54,7 @@ function connectLive() {
     try {
       const event = JSON.parse(raw.toString());
       if (event.type === 'invalidate' && Array.isArray(event.topics)) {
-        const topics = event.topics.filter(topic => ['contests', 'problems', 'submissions', 'account'].includes(topic));
+        const topics = event.topics.filter(topic => ['contests', 'problems', 'submissions', 'account', 'shares'].includes(topic));
         if (topics.length) emitLive('live:invalidate', { topics });
       }
     } catch { /* Ignore malformed gateway messages. */ }
@@ -71,6 +73,19 @@ function connectLive() {
 
 function accountFile() { return path.join(app.getPath('userData'), 'account.json'); }
 function draftFile() { return path.join(app.getPath('userData'), 'drafts.json'); }
+function compilerFile() { return path.join(app.getPath('userData'), 'compilers.json'); }
+
+async function compilerPaths() {
+  const saved = await readJson(compilerFile(), {});
+  return { cpp: typeof saved.cpp === 'string' ? saved.cpp : '', python: typeof saved.python === 'string' ? saved.python : '' };
+}
+
+async function compilerCommand(language) {
+  const paths = await compilerPaths();
+  if (language === 'CPP17') return { command: paths.cpp || 'g++', prefix: [] };
+  const command = paths.python || (process.platform === 'win32' ? 'py' : 'python3');
+  return { command, prefix: path.basename(command).toLowerCase() === 'py.exe' || command === 'py' ? ['-3'] : [] };
+}
 
 async function readJson(file, fallback) {
   try { return JSON.parse(await fs.readFile(file, 'utf8')); } catch { return fallback; }
@@ -112,9 +127,9 @@ function endpoint(kind, key = '', query = {}) {
 
 async function request({ kind, key, query, body, method: requestedMethod }) {
   const method = requestedMethod || (body ? 'POST' : 'GET');
-  const writes = { login: ['POST'], verify2fa: ['POST'], submit: ['POST'], contests: ['POST'], contest: ['PUT'], problems: ['POST'], problem: ['PUT'], problemStatement: ['PUT'], contestJoin: ['POST'], contestLeave: ['POST'], userRole: ['POST'] };
+  const writes = { login: ['POST'], verify2fa: ['POST'], submit: ['POST'], contests: ['POST'], contest: ['PUT'], problems: ['POST'], problem: ['PUT'], problemStatement: ['PUT'], contestJoin: ['POST'], contestLeave: ['POST'], userRole: ['POST'], codeShares: ['POST'], codeShare: ['PUT'] };
   if (!['GET', 'POST', 'PUT'].includes(method) || (method !== 'GET' && !writes[kind]?.includes(method))) throw new Error('Thao tác không hợp lệ.');
-  if (['contestJoin', 'contestLeave', 'contest', 'problem', 'problemStatement', 'submission', 'scoreboard', 'userRole', 'userProfile'].includes(kind) && !key) throw new Error('Thiếu mã đối tượng.');
+  if (['contestJoin', 'contestLeave', 'contest', 'problem', 'problemStatement', 'submission', 'scoreboard', 'userRole', 'userProfile', 'codeShare'].includes(kind) && !key) throw new Error('Thiếu mã đối tượng.');
   if (['contests', 'contest', 'problems', 'problem', 'problemStatement', 'userRole'].includes(kind) && method !== 'GET' && account?.role !== 'admin') throw new Error('Cần quyền quản trị.');
   const url = endpoint(kind, key, query);
   const controller = new AbortController();
@@ -184,11 +199,13 @@ async function localRun({ language, source, input }) {
   try {
     if (language === 'PY3') {
       await fs.writeFile(path.join(cwd, 'main.py'), source);
-      return await runProcess(process.platform === 'win32' ? 'py' : 'python3', process.platform === 'win32' ? ['-3', 'main.py'] : ['main.py'], cwd, input, 5000);
+      const compiler = await compilerCommand(language);
+      return await runProcess(compiler.command, [...compiler.prefix, 'main.py'], cwd, input, 5000);
     }
     await fs.writeFile(path.join(cwd, 'main.cpp'), source);
     const binary = process.platform === 'win32' ? 'main.exe' : 'main';
-    const compiled = await runProcess('g++', ['-std=c++17', '-O2', 'main.cpp', '-o', binary], cwd, '', 15000);
+    const compiler = await compilerCommand(language);
+    const compiled = await runProcess(compiler.command, ['-std=c++17', '-O2', 'main.cpp', '-o', binary], cwd, '', 15000);
     if (compiled.code !== 0) return { ...compiled, stage: 'compile' };
     return { ...await runProcess(path.join(cwd, binary), [], cwd, input, 5000), stage: 'run' };
   } finally { await fs.rm(cwd, { recursive: true, force: true }); }
@@ -249,9 +266,52 @@ app.whenReady().then(async () => {
     return true;
   });
   ipcMain.handle('run', (_, args) => localRun(args));
+  ipcMain.handle('compiler:paths', () => compilerPaths());
+  ipcMain.handle('compiler:choose', async (_, language) => {
+    if (!['cpp', 'python'].includes(language)) throw new Error('Ngôn ngữ compiler không hợp lệ.');
+    const result = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'Chương trình thực thi', extensions: process.platform === 'win32' ? ['exe'] : ['*'] }] });
+    if (result.canceled || !result.filePaths[0]) return compilerPaths();
+    const selected = result.filePaths[0];
+    const file = path.basename(selected).toLowerCase();
+    if (language === 'cpp' && !/^g\+\+(?:-[\d.]+)?(?:\.exe)?$/.test(file)) throw new Error('Hãy chọn tệp g++ của trình biên dịch C++.');
+    if (language === 'python' && !/^(?:python(?:3(?:\.[\d]+)?)?|py)(?:\.exe)?$/.test(file)) throw new Error('Hãy chọn python hoặc py của Python 3.');
+    if (!(await fs.stat(selected)).isFile()) throw new Error('Tệp compiler không hợp lệ.');
+    const paths = await compilerPaths();
+    paths[language] = selected;
+    await writeJson(compilerFile(), paths);
+    return paths;
+  });
+  ipcMain.handle('compiler:clear', async (_, language) => {
+    if (!['cpp', 'python'].includes(language)) throw new Error('Ngôn ngữ compiler không hợp lệ.');
+    const paths = await compilerPaths();
+    paths[language] = '';
+    await writeJson(compilerFile(), paths);
+    return paths;
+  });
+  ipcMain.handle('compiler:check', async () => {
+    const results = {};
+    for (const [key, language] of [['cpp', 'CPP17'], ['python', 'PY3']]) {
+      const { command, prefix } = await compilerCommand(language);
+      const result = await runProcess(command, [...prefix, '--version'], os.tmpdir(), '', 5000);
+      results[key] = { available: result.code === 0 && !result.timedOut, version: (result.stdout || result.stderr).split(/\r?\n/)[0].slice(0, 180) };
+    }
+    return results;
+  });
   ipcMain.handle('open-site', (_, route) => {
     if (typeof route !== 'string' || !/^\/(problems|contests|submissions)(\/|$)/.test(route)) return;
     shell.openExternal(new URL(route, API_ORIGIN).toString());
+  });
+  ipcMain.handle('share:url', (_, shareToken) => {
+    if (typeof shareToken !== 'string' || !/^[A-Za-z0-9_-]{20,64}$/.test(shareToken)) throw new Error('Liên kết chia sẻ không hợp lệ.');
+    return new URL(`/spectate/${shareToken}`, API_ORIGIN).toString();
+  });
+  ipcMain.handle('share:copy', (_, shareToken) => {
+    if (typeof shareToken !== 'string' || !/^[A-Za-z0-9_-]{20,64}$/.test(shareToken)) throw new Error('Liên kết chia sẻ không hợp lệ.');
+    clipboard.writeText(new URL(`/spectate/${shareToken}`, API_ORIGIN).toString());
+  });
+  ipcMain.handle('share:open', (_, shareToken) => {
+    if (typeof shareToken !== 'string' || !/^[A-Za-z0-9_-]{20,64}$/.test(shareToken)) throw new Error('Liên kết chia sẻ không hợp lệ.');
+    shell.openExternal(new URL(`/spectate/${shareToken}`, API_ORIGIN).toString());
   });
   createWindow();
   connectLive();

@@ -877,6 +877,9 @@ const server = http.createServer(async (req, res) => {
 
   // Check aliases
   let mappedPath = ROUTE_ALIASES[reqUrl] || reqUrl;
+  if (/^\/spectate\/[A-Za-z0-9_-]{20,64}$/.test(reqUrl)) {
+    mappedPath = '/frontend/html/spectate/index.html';
+  }
 
   // Dynamic route patterns
   const mSubDetail = reqUrl.match(/^\/(?:submissions|submission)\/(\d+)$/);

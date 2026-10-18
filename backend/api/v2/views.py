@@ -21,7 +21,7 @@ from security.encryption import file_cipher
 from backend.judge.models import (
     Profile, Organization, Language, Problem, ProblemType, Contest,
     ContestProblem, Submission, SubmissionTestCase, Judge,
-    ContestParticipation, RatingHistory, BlogPost, Comment, Clarification
+    ContestParticipation, RatingHistory, BlogPost, Comment, Clarification, CodeShare
 )
 from backend.judge.bridge import grade_submission
 from backend.judge.contest_visibility import contest_visible, request_surface, valid_display_target, visible_contests
@@ -61,6 +61,100 @@ class IsPlatformAdmin(BasePermission):
 class IsPlatformAdminOrReadOnly(IsPlatformAdmin):
     def has_permission(self, request, view):
         return request.method in ('GET', 'HEAD', 'OPTIONS') or super().has_permission(request, view)
+
+
+def code_share_payload(share, include_source=False):
+    data = {
+        'token': share.token,
+        'owner': share.owner.username,
+        'problem': share.problem.code,
+        'problem_name': share.problem.name,
+        'contest': share.contest.key if share.contest else None,
+        'language': share.language,
+        'is_active': share.is_active and share.expires_at > timezone.now(),
+        'updated_at': share.updated_at,
+        'expires_at': share.expires_at,
+    }
+    if include_source:
+        data['source'] = share.source
+    return data
+
+
+def code_share_context(request, body):
+    source = body.get('source')
+    language = body.get('language')
+    code = body.get('problem')
+    contest_key = body.get('contest') or None
+    if not isinstance(source, str) or len(source) > 500000:
+        raise ValueError('Mã nguồn không hợp lệ hoặc quá lớn.')
+    if not isinstance(language, str) or not re.fullmatch(r'[A-Za-z0-9_]{1,32}', language):
+        raise ValueError('Ngôn ngữ không hợp lệ.')
+    problem = Problem.objects.filter(code=code).first() if isinstance(code, str) else None
+    if not problem or not problem.is_public:
+        raise ValueError('Bài tập không công khai hoặc không tồn tại.')
+    contest = None
+    if contest_key:
+        contest = Contest.objects.filter(key=contest_key).first() if isinstance(contest_key, str) else None
+        if not contest or not ContestProblem.objects.filter(contest=contest, problem=problem).exists():
+            raise ValueError('Bài thi không thuộc cuộc thi.')
+        if not IsPlatformAdmin().has_permission(request, None):
+            if not contest_visible(contest, request_surface(request)) or not ContestParticipation.objects.filter(
+                    contest=contest, user__user=request.user).exists():
+                raise ValueError('Bạn chưa tham gia cuộc thi này.')
+    return source, language, problem, contest
+
+
+class APICodeShareList(V2APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        shares = CodeShare.objects.filter(is_active=True, expires_at__gt=timezone.now()).select_related(
+            'owner', 'problem', 'contest')
+        if not IsPlatformAdmin().has_permission(request, self):
+            shares = shares.filter(owner=request.user)
+        return dmoj_response({'objects': [code_share_payload(share) for share in shares[:100]]})
+
+    def post(self, request):
+        try:
+            source, language, problem, contest = code_share_context(request, request.data)
+        except ValueError as error:
+            return dmoj_response(error={'message': str(error)}, status_code=400)
+        share = CodeShare.objects.create(
+            token=secrets.token_urlsafe(32), owner=request.user, problem=problem,
+            contest=contest, language=language, source=source,
+            expires_at=timezone.now() + timezone.timedelta(hours=24),
+        )
+        return dmoj_response(code_share_payload(share), status_code=201)
+
+
+class APICodeShareDetail(V2APIView):
+    def get(self, request, token):
+        share = CodeShare.objects.select_related('owner', 'problem', 'contest').filter(token=token).first()
+        if not share or not share.is_active or share.expires_at <= timezone.now():
+            return dmoj_response(error={'message': 'Liên kết chia sẻ đã hết hạn hoặc bị thu hồi.'}, status_code=404)
+        response = dmoj_response(code_share_payload(share, include_source=True))
+        response['Cache-Control'] = 'no-store'
+        return response
+
+    def put(self, request, token):
+        if not request.user.is_authenticated:
+            return dmoj_response(error={'message': 'Cần đăng nhập.'}, status_code=401)
+        share = CodeShare.objects.filter(token=token).first()
+        if not share or (share.owner_id != request.user.id and not IsPlatformAdmin().has_permission(request, self)):
+            return dmoj_response(error={'message': 'Không có quyền quản lý phiên chia sẻ.'}, status_code=403)
+        if request.data.get('is_active') is False:
+            share.is_active = False
+            share.save(update_fields=['is_active', 'updated_at'])
+            return dmoj_response(code_share_payload(share))
+        if share.owner_id != request.user.id or not share.is_active or share.expires_at <= timezone.now():
+            return dmoj_response(error={'message': 'Phiên chia sẻ đã kết thúc.'}, status_code=403)
+        try:
+            source, language, problem, contest = code_share_context(request, request.data)
+        except ValueError as error:
+            return dmoj_response(error={'message': str(error)}, status_code=400)
+        share.source, share.language, share.problem, share.contest = source, language, problem, contest
+        share.save(update_fields=['source', 'language', 'problem', 'contest', 'updated_at'])
+        return dmoj_response(code_share_payload(share))
 
 
 # ── USERS & PROFILES ────────────────────────────────────────────────────────

@@ -18,6 +18,7 @@ test('successful writes notify connected clients without exposing response data'
     assert.equal(JSON.parse((await ready)[0].toString()).type, 'ready');
 
     assert.deepEqual(topicsForMutation('POST', '/api/v2/submit', 201), ['submissions']);
+    assert.deepEqual(topicsForMutation('PUT', '/api/v2/code-share/abc', 200), ['shares']);
     assert.deepEqual(topicsForMutation('PUT', '/api/v2/contest/ABC', 403), []);
     const update = once(client, 'message');
     hub.publish('PUT', '/api/v2/contest/ABC', 200);

@@ -5,6 +5,8 @@ from backend.judge.api import admin_views as judge_admin
 
 urlpatterns = [
     path('admin/contest/<str:contest>/archive', ContestArchiveDownload.as_view(), name='api-contest-archive'),
+    path('code-shares', views.APICodeShareList.as_view(), name='api-code-shares'),
+    path('code-share/<str:token>', views.APICodeShareDetail.as_view(), name='api-code-share'),
     # ── USERS & RANKINGS ────────────────────────────────────────────────────
     path('users', views.APIUserList.as_view(), name='api-users'),
     path('user/<str:username>', views.APIUserDetail.as_view(), name='api-user-detail'),
