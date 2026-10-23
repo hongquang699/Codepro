@@ -1044,6 +1044,15 @@ const server = http.createServer(async (req, res) => {
           if (statErr || !realStats.isFile() || realStats.size > 2 * 1024 * 1024) {
             return tryServe(index + 1);
           }
+          if (ext !== '.html') {
+            const etag = `W/"${realStats.size.toString(16)}-${Math.trunc(realStats.mtimeMs).toString(16)}"`;
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('ETag', etag);
+            if (req.headers['if-none-match'] === etag) {
+              res.writeHead(304);
+              return res.end();
+            }
+          }
           fs.readFile(realTarget, (readErr, content) => {
         if (readErr) {
           return tryServe(index + 1);
@@ -1058,9 +1067,6 @@ const server = http.createServer(async (req, res) => {
           let html = content.toString('utf8');
           const coreInjections = `
   <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
-  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css">
   <link rel="stylesheet" href="/frontend/css/global/theme.css">
   <link rel="stylesheet" href="/frontend/css/global/icons.css">
   <script>

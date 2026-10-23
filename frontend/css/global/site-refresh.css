@@ -308,3 +308,262 @@ body:has(.layout > .side) { background: var(--color-bg); color: var(--color-text
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Competitive arena: one visual language across practice, contests and results. */
+:root {
+  --arena-accent: #67d9e8;
+  --arena-accent-soft: rgba(103, 217, 232, .12);
+  --arena-grid: rgba(144, 178, 225, .045);
+  --arena-panel-top: rgba(130, 177, 248, .10);
+  --arena-table-hover: rgba(75, 132, 231, .12);
+}
+[data-theme="light"] {
+  --arena-accent: #087d96;
+  --arena-accent-soft: rgba(8, 125, 150, .08);
+  --arena-grid: rgba(45, 86, 143, .045);
+  --arena-panel-top: rgba(72, 126, 205, .045);
+  --arena-table-hover: rgba(36, 94, 213, .07);
+}
+[data-theme="light"] .navbar .nav-links a.nav-client-link {
+  color: #17478f;
+  background: #e8f0ff;
+  border-color: #b8cff3;
+}
+[data-theme="light"] :is(#statTotalProbs, #statUsers, #statProblems) { color: #1b57af !important; }
+[data-theme="light"] :is(#statSolvedProbs, #statSubmissions) { color: #14754b !important; }
+[data-theme="light"] :is(#statAvgRate, #statContests) { color: #945500 !important; }
+[data-theme="light"] #statPointsEarned { color: #7135a9 !important; }
+[data-theme="light"] .article-title,
+[data-theme="light"] .article-content h2,
+[data-theme="light"] #authorBoxName,
+[data-theme="light"] .article-container > section > h3 { color: var(--color-text) !important; }
+[data-theme="light"] .article-content,
+[data-theme="light"] .comment-card p { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .article-meta,
+[data-theme="light"] .article-container .card p { color: var(--color-text-muted) !important; }
+[data-theme="light"] .comment-card,
+[data-theme="light"] .article-container .card { background: var(--color-card) !important; border-color: var(--color-border) !important; }
+[data-theme="light"] #commentText { background: var(--input-bg) !important; color: var(--color-text) !important; border-color: var(--input-border) !important; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --arena-accent: #087d96;
+    --arena-accent-soft: rgba(8, 125, 150, .08);
+    --arena-grid: rgba(45, 86, 143, .045);
+    --arena-panel-top: rgba(72, 126, 205, .045);
+    --arena-table-hover: rgba(36, 94, 213, .07);
+  }
+  :root:not([data-theme]) .navbar .nav-links a.nav-client-link {
+    color: #17478f;
+    background: #e8f0ff;
+    border-color: #b8cff3;
+  }
+  :root:not([data-theme]) :is(#statTotalProbs, #statUsers, #statProblems) { color: #1b57af !important; }
+  :root:not([data-theme]) :is(#statSolvedProbs, #statSubmissions) { color: #14754b !important; }
+  :root:not([data-theme]) :is(#statAvgRate, #statContests) { color: #945500 !important; }
+  :root:not([data-theme]) #statPointsEarned { color: #7135a9 !important; }
+  :root:not([data-theme]) .article-title,
+  :root:not([data-theme]) .article-content h2,
+  :root:not([data-theme]) #authorBoxName,
+  :root:not([data-theme]) .article-container > section > h3 { color: var(--color-text) !important; }
+  :root:not([data-theme]) .article-content,
+  :root:not([data-theme]) .comment-card p { color: var(--color-text-secondary) !important; }
+  :root:not([data-theme]) .article-meta,
+  :root:not([data-theme]) .article-container .card p { color: var(--color-text-muted) !important; }
+  :root:not([data-theme]) .comment-card,
+  :root:not([data-theme]) .article-container .card { background: var(--color-card) !important; border-color: var(--color-border) !important; }
+  :root:not([data-theme]) #commentText { background: var(--input-bg) !important; color: var(--color-text) !important; border-color: var(--input-border) !important; }
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 86% -8%, var(--color-primary-subtle) 0, transparent 31rem),
+    linear-gradient(var(--arena-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--arena-grid) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
+  background-attachment: fixed;
+}
+
+/* The masthead stays compact while leaving space for the working area. */
+.navbar {
+  background: var(--navbar-bg);
+  border-bottom: 1px solid var(--navbar-border);
+  box-shadow: 0 8px 28px rgba(2, 8, 20, .13);
+}
+.navbar .nav-brand { font-size: 1.05rem; letter-spacing: -.03em; }
+.navbar .brand-badge-code { border-radius: 9px; }
+.navbar .nav-links a {
+  position: relative;
+  min-height: 44px;
+  font-size: .88rem;
+  font-weight: 650;
+}
+.navbar .nav-links a.active::after {
+  content: "";
+  position: absolute;
+  inset: auto .7rem 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--arena-accent);
+}
+
+/* Titles, scorecards and panels use the same information hierarchy. */
+:is(.page-hdr, .page-header, .ranking-header, .submissions-header) {
+  position: relative;
+  border-bottom-color: var(--color-border);
+}
+:is(.page-hdr, .page-header, .ranking-title-group) h1 {
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+:is(.page-hdr, .page-header, .ranking-title-group) p {
+  max-width: 76ch;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+:is(.card, .home-card, .profile-card, .table-card, .filter-card, .submissions-card,
+  .ranking-card, .sidebar-card, .stat-card-item, .stat-box, .auth-card, .admin-card,
+  .admin-panel, .dashboard-card, .settings-card, .content-card, .contest-card-wide) {
+  background-image: linear-gradient(180deg, var(--arena-panel-top), transparent 7rem);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-sm);
+}
+:is(.stat-box, .stat-card-item) {
+  position: relative;
+  overflow: hidden;
+  border-top: 2px solid var(--color-primary);
+}
+:is(.stat-num, .stat-card-item .num, .contest-timer-digits, .rating-value) {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.05em;
+}
+:is(.stat-lbl, .stat-card-item .lbl, .contest-timer-label) {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+
+/* The landing page reads as a contest lobby instead of a generic marketing page. */
+.hero-container {
+  overflow: hidden;
+  background-image:
+    radial-gradient(ellipse at 52% 0%, var(--color-primary-glow), transparent 55%),
+    linear-gradient(120deg, var(--arena-accent-soft), transparent 45%);
+  border-bottom: 1px solid var(--color-border);
+  padding-block: clamp(3.25rem, 6vw, 6rem) clamp(4rem, 7vw, 6.5rem);
+}
+.hero-pill {
+  border: 1px solid var(--color-primary-glow);
+  background: var(--color-primary-subtle);
+  color: var(--arena-accent);
+  font-family: var(--font-family-mono);
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.hero-title { max-width: 19ch; margin-inline: auto; }
+.hero-subtitle { font-size: clamp(.98rem, 1.5vw, 1.13rem); }
+.hero-actions { gap: .7rem; }
+.hero-actions .btn-hero { min-height: 46px; padding-inline: 1.15rem; }
+.stats-bar { position: relative; margin-top: -2rem; }
+
+/* Dense tables make verdicts, ranks and problem metadata easy to scan. */
+:is(.data-table, .prob-tbl, .table, .ranking-table, .submissions-table,
+  .contest-problem-table, .admin-table, .profile-table) {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+:is(.data-table, .prob-tbl, .table, .ranking-table, .submissions-table,
+  .contest-problem-table, .admin-table, .profile-table) th {
+  background: var(--table-header-bg);
+  color: var(--color-text-muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+:is(.data-table, .prob-tbl, .table, .ranking-table, .submissions-table,
+  .contest-problem-table, .admin-table, .profile-table) td {
+  border-bottom: 1px solid var(--table-border);
+  vertical-align: middle;
+}
+:is(.data-table, .prob-tbl, .table, .ranking-table, .submissions-table,
+  .contest-problem-table, .admin-table, .profile-table) tbody tr:hover {
+  background: var(--arena-table-hover);
+}
+:is(.data-table, .prob-tbl, .ranking-table, .submissions-table) a {
+  font-weight: 650;
+}
+:is(.data-table, .prob-tbl, .ranking-table, .submissions-table) a:hover {
+  color: var(--arena-accent);
+}
+
+/* Filters and score status remain legible in either color theme. */
+:is(.filter-card, .filter-bar, .ranking-filter-bar, .admin-toolbar, .toolbar) {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+}
+:is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  background-color: var(--input-bg);
+  color: var(--color-text);
+  border-color: var(--input-border);
+}
+:is(.tag-btn, .filter-chip, .ranking-tab, .prob-tab, .tabs a) {
+  border-radius: 999px;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+:is(.badge, .status-badge, .contest-badge-status, .verdict-badge) {
+  font-family: var(--font-family-mono);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .015em;
+  white-space: nowrap;
+}
+.badge-ac { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success); }
+.badge-wa { background: var(--color-danger-bg); color: var(--color-danger); border-color: var(--color-danger); }
+.badge-tle { background: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-warning); }
+.badge-pending { background: var(--color-primary-subtle); color: var(--color-primary); border-color: var(--color-primary); }
+
+/* Source code has its own calm, high contrast reading surface. */
+:is(pre, .code-block, .code-panel, .editor-wrapper, .monaco-editor, .cm-editor) {
+  background-color: var(--code-bg);
+  border-color: var(--color-border);
+}
+code, pre, .contest-timer-digits { font-family: var(--font-family-mono); }
+pre { line-height: 1.65; tab-size: 4; }
+
+@media (max-width: 700px) {
+  .hero-container { padding-inline: 1rem; }
+  .hero-title { max-width: 100%; }
+  .hero-actions .btn-hero { width: 100%; justify-content: center; }
+  .stats-bar { margin-top: -1.25rem; }
+  :is(.table-card, .ranking-card, .submissions-card) { overflow-x: auto; }
+  :is(.data-table, .prob-tbl, .ranking-table, .submissions-table,
+    .contest-problem-table, .admin-table) { min-width: 640px; }
+}
+
+@media (max-width: 900px) {
+  .navbar .nav-links {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .navbar .nav-links::-webkit-scrollbar { display: none; }
+  :is(.stats-grid, .stats-bar) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :is(.contest-card-wide, .ranking-card, .submissions-card, .table-card) {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  :is(.contest-problem-table, .ranking-table, .submissions-table, .prob-tbl) {
+    min-width: 640px;
+  }
+}
+@media (max-width: 420px) {
+  :is(.stats-grid, .stats-bar) { gap: .65rem; }
+  :is(.stat-box, .stat-card-item) { padding: .9rem; }
+  :is(.stat-num, .stat-card-item .num) { font-size: 1.5rem; }
+  .contest-card-wide { padding: 1rem !important; }
+}

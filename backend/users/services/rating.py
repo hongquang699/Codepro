@@ -12,28 +12,9 @@ def calculate_rank(rating):
     return 'Newbie'
 
 def get_user_rating(user):
-    # Try UserRating model first
     ur = UserRating.objects.filter(user=user).first()
     if not ur:
-        # Fallback to judge.models.Profile
-        try:
-            from backend.judge.models import Profile as JudgeProfile
-            jp = JudgeProfile.objects.filter(user=user).first()
-            rating_val = (jp.rating if jp and jp.rating is not None else 0)
-            rank_name = jp.display_rank if jp and jp.display_rank else ('Unrated' if rating_val == 0 else calculate_rank(rating_val))
-        except Exception:
-            rating_val = 0
-            rank_name = 'Unrated'
-
-        ur, _ = UserRating.objects.get_or_create(
-            user=user,
-            defaults={
-                'current_rating': rating_val,
-                'max_rating': rating_val,
-                'rank': rank_name,
-                'contest_count': 0,
-            }
-        )
+        return {'rating': 0, 'max_rating': 0, 'rank': 'Unrated', 'contest_count': 0}
 
     disp_rating = ur.current_rating if ur.contest_count > 0 else 0
     disp_rank = ur.rank if ur.contest_count > 0 else 'Unrated'

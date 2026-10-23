@@ -64,11 +64,12 @@
     let rawAttempted = [];
 
     async function init() {
-      const data = await ProfileAPI.getOverview(username);
-      document.title = `Bài tập - ${data.profile.display_name || username} (@${username})`;
-      ProfileAPI.renderHeader('profileHeaderContainer', data, 'problems');
-
+      let profileLoaded = false;
       try {
+        const data = await ProfileAPI.getOverview(username);
+        document.title = `Bài tập - ${data.profile.display_name || username} (@${username})`;
+        ProfileAPI.renderHeader('profileHeaderContainer', data, 'problems');
+        profileLoaded = true;
         const res = await ProfileAPI.getProblems(username);
         rawSolved = res.solved || [];
         rawAttempted = res.attempted || [];
@@ -80,6 +81,9 @@
         renderChips(rawAttempted, 'attemptedContainer', '#f59e0b', 'rgba(245, 158, 11, 0.12)', 'rgba(245, 158, 11, 0.3)');
       } catch (err) {
         console.error(err);
+        if (!profileLoaded) document.getElementById('profileHeaderContainer').textContent = `Không tải được hồ sơ: ${err.message}`;
+        document.getElementById('solvedContainer').textContent = 'Không tải được danh sách bài tập.';
+        document.getElementById('attemptedContainer').textContent = 'Không tải được danh sách bài tập.';
       }
     }
 

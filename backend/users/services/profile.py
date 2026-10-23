@@ -26,16 +26,20 @@ def get_profile_data(username):
     if not user:
         return None
 
-    prof = get_or_create_profile(user)
+    prof = UserProfile.objects.filter(user=user).first()
+    if prof is None:
+        prof = UserProfile(user=user, display_name=user.get_full_name() or user.username, country='Vietnam')
     
     # Rating & Rank
     rating_val = 0
     rank_name = 'Unrated'
     is_verified = False
+    judge_bio = ''
     try:
         from backend.judge.models import Profile as JudgeProfile
         jp = JudgeProfile.objects.filter(user=user).first()
         if jp:
+            judge_bio = jp.about or ''
             rating_val = jp.rating if jp.rating is not None else 0
             rank_name = jp.display_rank or ('Unrated' if rating_val == 0 else 'Newbie')
             is_verified = getattr(jp, 'is_verified', False)
@@ -62,7 +66,7 @@ def get_profile_data(username):
         'display_name': prof.display_name or user.get_full_name() or user.username,
         'avatar': prof.avatar or '',
         'cover': prof.cover or '',
-        'bio': prof.bio or '',
+        'bio': prof.bio or judge_bio,
         'country': prof.country or 'Vietnam',
         'school': prof.school or '',
         'organization': prof.organization or '',

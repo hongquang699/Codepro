@@ -155,6 +155,9 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'database' / 'vnoi_db.sqlite3',
+            'OPTIONS': {
+                'timeout': 30,
+            },
         }
     }
 

@@ -156,9 +156,26 @@ services:
       DB_USER: ${DB_USER:-coding_app}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       DB_NAME: ${DB_NAME:-coding_platform}
+      AI_SIMILARITY_URL: ${AI_SIMILARITY_URL:-}
+      AI_SIMILARITY_TOKEN: ${AI_SIMILARITY_TOKEN:-}
     depends_on:
       - backend
       - postgres
+    networks:
+      - codeprooj_network
+
+  ai-similarity:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/ai-similarity/Dockerfile
+    restart: always
+    environment:
+      AI_SIMILARITY_TOKEN: ${AI_SIMILARITY_TOKEN:-}
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     networks:
       - codeprooj_network
 

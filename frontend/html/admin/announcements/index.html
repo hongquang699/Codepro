@@ -124,7 +124,7 @@
       try {
         const res = await fetch('/api/v2/admin/system', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'set_announcement', message, active })
         });
         const json = await res.json();

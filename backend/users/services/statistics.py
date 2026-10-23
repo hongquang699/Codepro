@@ -33,22 +33,9 @@ def get_user_statistics(user):
     except Exception:
         pass
 
-    # Save/update cache record
-    stat, _ = UserStatistics.objects.update_or_create(
-        user=user,
-        defaults={
-            'total_submissions': total_submissions,
-            'accepted_submissions': ac,
-            'wrong_answers': wa,
-            'time_limit_exceeded': tle,
-            'memory_limit_exceeded': mle,
-            'runtime_errors': rte,
-            'compilation_errors': ce,
-            'solved_problems': solved_problems,
-            'attempted_problems': attempted_problems,
-            'contests': contests,
-        }
-    )
+    # Public reads must not write a cache row; concurrent profile requests can
+    # otherwise contend for the SQLite writer lock.
+    contest_wins = UserStatistics.objects.filter(user=user).values_list('contest_wins', flat=True).first() or 0
 
     ac_rate = round((ac / total_submissions * 100), 1) if total_submissions > 0 else 0.0
 
@@ -64,6 +51,6 @@ def get_user_statistics(user):
         'attempted_problems': attempted_problems,
         'ac_rate': ac_rate,
         'contests': contests,
-        'contest_wins': stat.contest_wins,
+        'contest_wins': contest_wins,
         'rating': rating,
     }

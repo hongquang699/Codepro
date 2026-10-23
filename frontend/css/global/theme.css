@@ -7,8 +7,8 @@
  * - Clean elevation, card borders, and smooth transitions
  */
 
-/* Google Fonts Import for high quality typography & perfect Vietnamese diacritics */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Serve the primary UI fonts locally so page rendering does not wait on Google Fonts. */
+@import url('/frontend/css/global/fonts.css');
 
 /* ══════════════════════════════════════════════════════════════════════
    1. COLOR TOKENS: DEFAULT DARK MODE

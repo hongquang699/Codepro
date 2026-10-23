@@ -88,9 +88,10 @@
 
       <!-- Filter Row -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;">
-        <div style="display:flex;gap:.5rem;">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
           <button onclick="setFilter('all')" id="filterAll" class="btn-act" style="background:#2563eb;color:#fff;">Tất cả (<span id="countAll">0</span>)</button>
           <button onclick="setFilter('published')" id="filterPublished" class="btn-act">Đã xuất bản (<span id="countPub">0</span>)</button>
+          <button onclick="setFilter('hidden')" id="filterHidden" class="btn-act">Ẩn tạm thời (<span id="countHidden">0</span>)</button>
           <button onclick="setFilter('draft')" id="filterDraft" class="btn-act">Bản nháp (<span id="countDraft">0</span>)</button>
         </div>
         <input type="text" id="adminProblemSearch" placeholder="Tìm theo mã bài, tên bài..." style="background:#090d16;border:1px solid #334155;border-radius:8px;color:#fff;padding:.45rem .85rem;font-size:.85rem;width:260px;outline:none;" oninput="renderAdminProblems()">
@@ -106,7 +107,7 @@
                 <th style="width:130px;">Giới hạn</th>
                 <th style="width:110px;text-align:center;">Trạng thái</th>
                 <th style="width:100px;text-align:center;">Điểm</th>
-                <th style="width:280px;min-width:260px;text-align:right;white-space:nowrap;">Thao tác</th>
+                <th style="width:420px;min-width:380px;text-align:right;white-space:nowrap;">Thao tác</th>
               </tr>
             </thead>
             <tbody id="adminProblemsTbody">
@@ -125,12 +126,21 @@
     const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
     let problemsData = [];
     let currentFilter = 'all';
+    const escapeCell = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
     async function loadAdminProblems() {
       try {
-        const resp = await fetch(`${API}/api/v2/problems?page_size=1000`);
-        const json = await resp.json();
-        const probs = json?.data?.objects || [];
+        const probs = [];
+        let page = 1;
+        let hasMore = false;
+        do {
+          const resp = await fetch(`${API}/api/v2/problems?all=1&page_size=1000&page=${page}`, { headers: window.adminApiHeaders() });
+          const json = await resp.json();
+          if (!resp.ok) throw new Error(json?.error?.message || `HTTP ${resp.status}`);
+          probs.push(...(json?.data?.objects || []));
+          hasMore = json?.data?.has_more === true;
+          page += 1;
+        } while (hasMore);
 
         problemsData = probs.map(p => ({
           code: p.code,
@@ -138,7 +148,7 @@
           time_limit: p.time_limit || 1.0,
           memory_limit: p.memory_limit ? Math.round(p.memory_limit / 1024) : 256,
           points: p.points || 100,
-          status: p.is_public !== false ? 'published' : 'draft',
+          status: p.is_public ? 'published' : (p.status === 'ready' || p.status === 'published' ? 'hidden' : 'draft'),
           types: p.types || []
         }));
 
@@ -146,7 +156,7 @@
         renderAdminProblems();
       } catch (err) {
         document.getElementById('adminProblemsTbody').innerHTML = `
-          <tr><td colspan="6" style="text-align:center;padding:3rem;color:#ef4444;">⚠ Lỗi tải: ${err.message}</td></tr>
+          <tr><td colspan="6" style="text-align:center;padding:3rem;color:#ef4444;">⚠ Lỗi tải: ${escapeCell(err.message)}</td></tr>
         `;
       }
     }
@@ -154,12 +164,13 @@
     function updateCounts() {
       document.getElementById('countAll').textContent = problemsData.length;
       document.getElementById('countPub').textContent = problemsData.filter(p => p.status === 'published').length;
+      document.getElementById('countHidden').textContent = problemsData.filter(p => p.status === 'hidden').length;
       document.getElementById('countDraft').textContent = problemsData.filter(p => p.status === 'draft').length;
     }
 
     window.setFilter = function(f) {
       currentFilter = f;
-      ['all', 'published', 'draft'].forEach(id => {
+      ['all', 'published', 'hidden', 'draft'].forEach(id => {
         const b = document.getElementById('filter' + (id[0].toUpperCase() + id.slice(1)));
         if (b) {
           b.style.background = (id === f) ? '#2563eb' : 'rgba(255,255,255,.05)';
@@ -189,20 +200,20 @@
           <tr>
             <td>
               <a href="/problems/${p.code}" target="_blank" style="color:#60a5fa;font-family:monospace;font-weight:700;text-decoration:none;">
-                ${p.code}
+                ${escapeCell(p.code)}
               </a>
             </td>
             <td>
-              <div style="font-weight:700;color:#fff;">${p.title}</div>
+              <div style="font-weight:700;color:#fff;">${escapeCell(p.title)}</div>
               <div style="font-size:.78rem;color:#94a3b8;margin-top:2px;">
-                ${p.types.map(t => typeof t==='string'?t:t.name).join(', ') || 'Thuật toán'}
+                ${p.types.map(t => escapeCell(typeof t==='string'?t:t.name)).join(', ') || 'Thuật toán'}
               </div>
             </td>
             <td style="color:#94a3b8;font-size:.82rem;font-family:monospace;">
               ${p.time_limit}s / ${p.memory_limit}MB
             </td>
             <td style="text-align:center;">
-              <span class="badge-v ${isPub ? 'bv-AC' : 'bv-other'}">${isPub ? 'PUBLISHED' : 'DRAFT'}</span>
+              <span class="badge-v ${isPub ? 'bv-AC' : 'bv-other'}">${isPub ? 'Công khai' : (p.status === 'hidden' ? 'Ẩn tạm thời' : 'Bản nháp')}</span>
             </td>
             <td style="text-align:center;font-weight:700;color:#f1f5f9;">
               ${p.points}đ
@@ -210,6 +221,7 @@
             <td style="text-align:right;white-space:nowrap;">
               <div style="display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:nowrap;">
                 <a href="/admin/problems/create?code=${p.code}" class="btn-act">✏️ Sửa</a>
+                <button onclick="toggleProblemVisibility('${p.code}', this)" class="btn-act" title="${isPub ? 'Ẩn bài tập khỏi kho công khai' : 'Công khai bài tập'}">${isPub ? '🙈 Ẩn tạm thời' : '🌐 Công khai'}</button>
                 <a href="/frontend/html/admin/problems/testcases.html?code=${p.code}" class="btn-act" title="Bộ test">📁 Tests</a>
                 <button onclick="rejudgeProblem('${p.code}')" class="btn-act" title="Chấm lại toàn bộ">🔄</button>
                 <a href="/problems/${p.code}" target="_blank" class="btn-act">👁️ Xem</a>
@@ -218,6 +230,29 @@
           </tr>
         `;
       }).join('');
+    };
+
+    window.toggleProblemVisibility = async function(code, button) {
+      const problem = problemsData.find(p => p.code === code);
+      if (!problem || button.disabled) return;
+      const hide = problem.status === 'published';
+      button.disabled = true;
+      try {
+        const resp = await fetch(`${API}/api/v1/problems/${encodeURIComponent(code)}/${hide ? 'unpublish' : 'publish'}`, {
+          method: 'POST', headers: window.adminApiHeaders('application/json')
+        });
+        const json = await resp.json();
+        if (!resp.ok) {
+          const details = json?.error?.checklist?.filter(item => !item.ok).map(item => item.name).join(', ');
+          throw new Error((json?.error?.message || `HTTP ${resp.status}`) + (details ? ` Còn thiếu: ${details}` : ''));
+        }
+        problem.status = hide ? 'hidden' : 'published';
+        updateCounts();
+        renderAdminProblems();
+      } catch (err) {
+        alert(`Không thể ${hide ? 'ẩn' : 'công khai'} ${code}: ${err.message}`);
+        button.disabled = false;
+      }
     };
 
     window.rejudgeProblem = async function(code) {

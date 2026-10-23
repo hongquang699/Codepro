@@ -6,7 +6,8 @@ from django.utils import timezone
 from backend.judge.models import Submission
 from backend.contest_admin.services.audit_service import log_contest_audit
 from backend.anti_cheat.models import AntiCheatCase, AntiCheatSettings, ScanJob, SimilarityResult
-from .similarity import ALGORITHM_VERSION, fingerprint, normalize_tokens, similarity_score, source_digest
+from .similarity import fingerprint, normalize_tokens, source_digest
+from .similarity_client import compare
 
 
 def enqueue_scan(contest, actor=None, submission=None):
@@ -42,19 +43,13 @@ def _submission_data(submission, minimum):
     return fingerprint(tokens)
 
 
-def _record_match(job, first, second, first_fingerprint, second_fingerprint, score):
+def _record_match(job, first, second, score, algorithm_version, evidence):
     a, b = sorted((first, second), key=lambda item: item.pk)
-    evidence = {
-        'common_fingerprints': len(first_fingerprint & second_fingerprint),
-        'fingerprints_a': len(first_fingerprint),
-        'fingerprints_b': len(second_fingerprint),
-        'method': 'Jaccard similarity of normalized token fingerprints',
-    }
     result, _ = SimilarityResult.objects.update_or_create(
         submission_a=a, submission_b=b,
         defaults={
             'contest': job.contest, 'problem': a.problem, 'score': score,
-            'algorithm_version': ALGORITHM_VERSION,
+            'algorithm_version': algorithm_version,
             'source_a_sha256': source_digest(a.source),
             'source_b_sha256': source_digest(b.source),
             'evidence': evidence,
@@ -99,9 +94,11 @@ def process_scan(job_id):
                             continue
                         if job.target_submission_id and job.target_submission_id not in (prior_id, submission.pk):
                             continue
-                        score = similarity_score(previous, current)
+                        score, algorithm_version, evidence = compare(
+                            prior, submission, previous, current,
+                        )
                         if score >= config.similarity_threshold:
-                            _record_match(job, prior, submission, previous, current, score)
+                            _record_match(job, prior, submission, score, algorithm_version, evidence)
                             matches += 1
                     prepared[submission.pk] = (submission, current)
                     for item in current:

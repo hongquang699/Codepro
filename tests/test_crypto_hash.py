@@ -59,13 +59,13 @@ class CryptoHashTestCase(TestCase):
         self.assertTrue(verify_password_hash(pwd, hashed))
         self.assertFalse(verify_password_hash("WrongPassword", hashed))
 
-    def test_django_user_password_uses_pbkdf2_sha512(self):
+    def test_django_user_password_uses_argon2(self):
         user = User.objects.create_user(
             username='sha512_user',
             password='TestPassword512!'
         )
-        # Verify Django uses the primary hasher (PBKDF2SHA512PasswordHasher)
-        self.assertTrue(user.password.startswith('pbkdf2_sha512$'))
+        # New passwords use the primary Argon2 hasher; legacy hashes remain verifiable.
+        self.assertTrue(user.password.startswith('argon2$'))
         self.assertTrue(user.check_password('TestPassword512!'))
         self.assertFalse(user.check_password('WrongPassword!'))
 

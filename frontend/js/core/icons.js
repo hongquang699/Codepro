@@ -255,8 +255,12 @@
      * - Converts plain emojis to vector icons
      */
     enhance(root = document) {
+      const elements = selector => [
+        ...(root.matches && root.matches(selector) ? [root] : []),
+        ...root.querySelectorAll(selector)
+      ];
       // 1. Ensure Flaticon CSS is loaded in document head
-      if (!document.querySelector('link[href*="uicons"]') && !document.querySelector('link[href*="flaticon"]')) {
+      if (!document.querySelector('link[href*="uicons"], link[href*="flaticon"], link[href="/frontend/css/global/icons.css"]')) {
         const uiconsLink = document.createElement('link');
         uiconsLink.rel = 'stylesheet';
         uiconsLink.href = 'https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css';
@@ -273,7 +277,7 @@
       }
 
       // 3. Replace <cp-icon name="..."> elements with Flaticon <i> tags
-      root.querySelectorAll('cp-icon').forEach(el => {
+      elements('cp-icon').forEach(el => {
         const name = el.getAttribute('name');
         const size = el.getAttribute('size');
         const color = el.getAttribute('color');
@@ -282,7 +286,7 @@
       });
 
       // 4. Enhance .nav-links automatically
-      root.querySelectorAll('.nav-links a').forEach(a => {
+      elements('.nav-links a').forEach(a => {
         if (a.querySelector('i.fi, .cp-icon')) return;
         const text = (a.textContent || '').trim().toLowerCase();
         let icon = null;
@@ -308,7 +312,7 @@
       });
 
       // 5. Enhance search inputs containing emoji 🔍/🔎 in placeholder with vector icon
-      root.querySelectorAll('input[placeholder*="🔍"], input[placeholder*="🔎"]').forEach(inp => {
+      elements('input[placeholder*="🔍"], input[placeholder*="🔎"]').forEach(inp => {
         inp.placeholder = inp.placeholder.replace(/[🔍🔎]\s*/g, '').trim();
         inp.classList.add('input-with-search-icon');
       });
@@ -317,6 +321,15 @@
       const targetBody = root.body || (root === document ? document.body : root);
       if (targetBody) {
         CPIcons.replaceEmojisInTree(targetBody);
+      }
+
+      // Brand icons are rare; load their font only on pages that use one.
+      if (document.querySelector('[class*="fi-brands-"]') && !document.querySelector('link[data-cp-brand-icons]')) {
+        const brands = document.createElement('link');
+        brands.rel = 'stylesheet';
+        brands.href = 'https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css';
+        brands.dataset.cpBrandIcons = 'true';
+        document.head.appendChild(brands);
       }
     },
 
@@ -347,9 +360,19 @@
     CPIcons.enhance();
     if (typeof MutationObserver !== 'undefined' && document.body) {
       let timeout;
-      const observer = new MutationObserver(() => {
+      const pending = new Set();
+      const observer = new MutationObserver(records => {
+        for (const record of records) {
+          for (const node of record.addedNodes) pending.add(node);
+        }
         clearTimeout(timeout);
-        timeout = setTimeout(() => CPIcons.enhance(), 60);
+        timeout = setTimeout(() => {
+          for (const node of pending) {
+            if (node.nodeType === 1 && node.isConnected) CPIcons.enhance(node);
+            else if (node.nodeType === 3 && node.isConnected) CPIcons.replaceEmojisInTree(node);
+          }
+          pending.clear();
+        }, 60);
       });
       observer.observe(document.body, { childList: true, subtree: true });
     }

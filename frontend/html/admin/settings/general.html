@@ -211,7 +211,7 @@
       try {
         const resp = await fetch(`${API}/api/v2/admin/system`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'set_announcement', message: text, active: active })
         });
         if (resp.ok) {
@@ -231,7 +231,7 @@
       try {
         const resp = await fetch(`${API}/api/v2/admin/system`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'toggle_maintenance', enabled: nextState })
         });
         if (resp.ok) {
@@ -248,7 +248,7 @@
       try {
         const resp = await fetch(`${API}/api/v2/admin/system`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'flush_cache' })
         });
         const json = await resp.json();

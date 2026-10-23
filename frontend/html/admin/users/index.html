@@ -441,7 +441,7 @@
       try {
         const resp = await fetch(`${API}/api/v2/admin/users/${selectedUser.username}/role`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify(payload)
         });
         const json = await resp.json();
@@ -468,14 +468,15 @@
       try {
         const resp = await fetch(`${API}/api/v2/admin/users/${username}/role`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ is_active: nextActive })
         });
         if (resp.ok) {
           alert(`✓ Đã ${actText} thành công!`);
           loadUsers();
         } else {
-          alert('Lỗi khi thực hiện thao tác.');
+          const json = await resp.json();
+          alert(`Lỗi: ${json?.error?.message || json?.detail || 'Không thể cập nhật tài khoản.'}`);
         }
       } catch (e) {
         alert('Lỗi kết nối: ' + e.message);

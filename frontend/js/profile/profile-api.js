@@ -11,6 +11,16 @@ const ProfileAPI = (() => {
     return headers;
   }
 
+  async function readJson(res) {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Máy chủ trả về dữ liệu không hợp lệ (HTTP ${res.status}).`);
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || `Lỗi HTTP ${res.status}`);
+    return data;
+  }
+
   function getRankColor(rank, rating) {
     if (typeof CPRating !== 'undefined') {
       return CPRating.getColor(rank, rating);
@@ -66,8 +76,8 @@ const ProfileAPI = (() => {
     getUsernameFromUrl,
 
     async getOverview(username) {
-      const res = await fetch(`${API_BASE}/api/v1/users/${username}`, { headers: getHeaders() });
-      return await res.json();
+      const res = await fetch(`${API_BASE}/api/v1/users/${encodeURIComponent(username)}`, { headers: getHeaders() });
+      return readJson(res);
     },
 
     async getStatistics(username) {
@@ -82,13 +92,13 @@ const ProfileAPI = (() => {
     },
 
     async getContests(username) {
-      const res = await fetch(`${API_BASE}/api/v1/users/${username}/contests`, { headers: getHeaders() });
-      return await res.json();
+      const res = await fetch(`${API_BASE}/api/v1/users/${encodeURIComponent(username)}/contests`, { headers: getHeaders() });
+      return readJson(res);
     },
 
     async getProblems(username) {
-      const res = await fetch(`${API_BASE}/api/v1/users/${username}/problems`, { headers: getHeaders() });
-      return await res.json();
+      const res = await fetch(`${API_BASE}/api/v1/users/${encodeURIComponent(username)}/problems`, { headers: getHeaders() });
+      return readJson(res);
     },
 
     async getRating(username) {

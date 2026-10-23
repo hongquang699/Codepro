@@ -166,8 +166,11 @@ function initNavbar() {
       }).catch(() => {});
   }
 
-  // Check and render Global Announcement Banner or Maintenance Notice
-  fetch('/api/v2/admin/system').then(r => r.json()).then(res => {
+  // The system settings endpoint is admin-only; public pages must not poll it.
+  if (isAdmin) fetch('/api/v2/admin/system', {
+    credentials: 'include',
+    headers: token ? { Authorization: `Token ${token}` } : {}
+  }).then(r => r.ok ? r.json() : null).then(res => {
     const data = res?.data || {};
     if (data.maintenance_mode) {
       const banner = document.createElement('div');
@@ -177,7 +180,11 @@ function initNavbar() {
     } else if (data.announcement_active && data.global_announcement) {
       const banner = document.createElement('div');
       banner.style.cssText = 'background: rgba(37, 99, 235, 0.15); border-bottom: 1px solid rgba(59, 130, 246, 0.3); color: #93c5fd; text-align: center; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 0.5rem;';
-      banner.innerHTML = `<span>📢</span> <span>${data.global_announcement}</span>`;
+      const icon = document.createElement('span');
+      icon.textContent = '📢';
+      const message = document.createElement('span');
+      message.textContent = data.global_announcement;
+      banner.append(icon, message);
       navbar.insertAdjacentElement('afterend', banner);
     }
   }).catch(() => {});

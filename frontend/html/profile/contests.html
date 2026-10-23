@@ -62,11 +62,12 @@
     const username = ProfileAPI.getUsernameFromUrl();
 
     async function init() {
-      const data = await ProfileAPI.getOverview(username);
-      document.title = `Kỳ thi - ${data.profile.display_name || username} (@${username})`;
-      ProfileAPI.renderHeader('profileHeaderContainer', data, 'contests');
-
+      let profileLoaded = false;
       try {
+        const data = await ProfileAPI.getOverview(username);
+        document.title = `Kỳ thi - ${data.profile.display_name || username} (@${username})`;
+        ProfileAPI.renderHeader('profileHeaderContainer', data, 'contests');
+        profileLoaded = true;
         const res = await ProfileAPI.getContests(username);
         const list = res.results || [];
         document.getElementById('contestsBadge').textContent = `Đã tham gia: ${list.length} cuộc thi`;
@@ -107,7 +108,11 @@
           `;
         }).join('');
       } catch (err) {
-        document.getElementById('contestsTableBody').innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">Lỗi tải lịch sử thi: ${err.message}</td></tr>`;
+        console.error(err);
+        if (!profileLoaded) document.getElementById('profileHeaderContainer').textContent = `Không tải được hồ sơ: ${err.message}`;
+        const tbody = document.getElementById('contestsTableBody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;"></td></tr>';
+        tbody.querySelector('td').textContent = `Lỗi tải lịch sử thi: ${err.message}`;
       }
     }
 

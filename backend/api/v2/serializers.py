@@ -78,7 +78,7 @@ class ProblemListSerializer(serializers.ModelSerializer):
         model = Problem
         fields = [
             'code', 'name', 'types', 'time_limit', 'memory_limit',
-            'points', 'partial', 'is_public'
+            'points', 'partial', 'is_public', 'status'
         ]
 
 class ProblemDetailSerializer(serializers.ModelSerializer):

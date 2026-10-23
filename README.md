@@ -1,4 +1,6 @@
-# CodeProOJ - Hệ Thống Chấm Bài & Luyện Lập Trình Thi Đấu Trực Tuyến
+# Codepro
+
+<p align="center"><img src="docs/branding/codepro-logo.png" alt="Codepro logo" width="280"></p>
 > Nền tảng CodeProOJ phục vụ luyện thi Olympic Tin học, HSG Quốc Gia và ICPC, với hệ thống chấm bài phân tán và môi trường quản trị riêng.
 
 ## Giao diện sáng và tối

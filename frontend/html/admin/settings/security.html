@@ -470,7 +470,7 @@
       try {
         const res = await fetch('/api/v2/admin/security/config', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'set_mode', mode: mode })
         });
         const json = await res.json();
@@ -507,7 +507,7 @@
       try {
         const res = await fetch('/api/v2/admin/security/config', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action, ip, reason, durationMs: 1800000 })
         });
         const json = await res.json();
@@ -523,7 +523,7 @@
       try {
         const res = await fetch('/api/v2/admin/security/config', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'unjail_ip', ip: ip })
         });
         const json = await res.json();
@@ -538,7 +538,7 @@
       try {
         const res = await fetch('/api/v2/admin/security/config', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'clear_jails' })
         });
         const json = await res.json();

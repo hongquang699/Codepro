@@ -241,10 +241,11 @@
       try {
         const res = await fetch(`/api/v2/admin/users/${username}/role`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ role, is_active })
         });
         const json = await res.json();
+        if (!res.ok) throw new Error(json?.error?.message || json?.detail || `HTTP ${res.status}`);
         alert(json.data?.message || 'Đã cập nhật vai trò');
         loadUserData();
       } catch (e) {
@@ -263,10 +264,11 @@
       try {
         const res = await fetch(`/api/v2/admin/users/${username}/role`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ password: p1 })
         });
         const json = await res.json();
+        if (!res.ok) throw new Error(json?.error?.message || json?.detail || `HTTP ${res.status}`);
         alert('Đã đổi mật khẩu thành công!');
         document.getElementById('inputNewPassword').value = '';
         document.getElementById('inputConfirmPassword').value = '';

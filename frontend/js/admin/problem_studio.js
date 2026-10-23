@@ -47,10 +47,10 @@ let activeCode = '';
 
           // Banner
           document.getElementById('bannerTitle').innerText = `${currentProblem.code} - ${currentProblem.title}`;
-          const isPub = currentProblem.status === 'published';
+          const isPub = currentProblem.is_public === true;
           const badgeEl = document.getElementById('bannerStatus');
           badgeEl.className = isPub ? 'badge badge-ac' : 'badge badge-pending';
-          badgeEl.innerText = isPub ? 'PUBLISHED' : 'DRAFT';
+          badgeEl.innerText = isPub ? 'CÔNG KHAI' : (currentProblem.status === 'draft' ? 'BẢN NHÁP' : 'ẨN TẠM THỜI');
           document.getElementById('bannerSub').innerText = `Gói bài tập problem-data/problems/${currentProblem.code}/`;
 
           const quickPub = document.getElementById('quickPublishBtn');
@@ -560,7 +560,7 @@ if __name__ == '__main__':
           const pubBtn = document.getElementById('finalPublishBtn');
           const unpubBtn = document.getElementById('finalUnpublishBtn');
 
-          if (d.status === 'published') {
+          if (d.is_public === true) {
             pubBtn.style.display = 'none';
             unpubBtn.style.display = 'block';
           } else {
@@ -605,8 +605,10 @@ if __name__ == '__main__':
         }).then(r => r.json());
 
         if (res.status === 200) {
-          alert('Đã chuyển bài tập về trạng thái Draft (Ẩn khỏi thí sinh).');
+          alert('Đã ẩn tạm thời bài tập khỏi kho công khai. Có thể công khai lại khi cần.');
           window.location.reload();
+        } else {
+          alert((res.error && res.error.message) || 'Không thể ẩn bài tập.');
         }
       } catch (e) {
         alert('Lỗi: ' + e.message);

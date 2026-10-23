@@ -113,7 +113,8 @@
     }
 
     // Use the current server session for system administrators; retain the teacher role for the same account.
-    fetch('/api/v1/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } })
+    const hasAuthSession = Auth.getToken() || /(?:^|;\s*)(?:sessionid|cp_session)=/.test(document.cookie);
+    if (hasAuthSession) fetch('/api/v1/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } })
       .then(response => response.ok ? response.json() : null)
       .then(result => {
         const current = result?.user;

@@ -505,7 +505,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify(payload)
         });
         const json = await res.json();
@@ -520,7 +520,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'toggle_freeze' })
         });
         const json = await res.json();
@@ -551,7 +551,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'add_problem', problem_code: code, points, order })
         });
         const json = await res.json();
@@ -571,7 +571,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'remove_problem', problem_code: code })
         });
         const json = await res.json();
@@ -588,7 +588,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'add_participant', username: uname })
         });
         const json = await res.json();
@@ -608,7 +608,7 @@
       try {
         const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: window.adminApiHeaders('application/json'),
           body: JSON.stringify({ action: 'remove_participant', username: uname })
         });
         const json = await res.json();
@@ -624,7 +624,7 @@
       const statusDiv = document.getElementById('rejudgeStatusMsg');
       statusDiv.innerHTML = '<span style="color:#f59e0b;">⏳ Đang gửi lệnh rejudge...</span>';
       try {
-        const res = await fetch(`/api/v2/rejudge/contest/${contestKey}`, { method: 'POST' });
+        const res = await fetch(`/api/v2/rejudge/contest/${contestKey}`, { method: 'POST', headers: window.adminApiHeaders() });
         const json = await res.json();
         statusDiv.innerHTML = `<span style="color:#10b981;">✅ ${json.data?.message || 'Đã kích hoạt rejudge thành công!'}</span>`;
         setTimeout(loadContestData, 2000);

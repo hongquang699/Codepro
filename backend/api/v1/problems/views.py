@@ -396,7 +396,8 @@ class ProblemPublishAPI(ProblemAuthoringAPIView):
 class ProblemUnpublishAPI(ProblemAuthoringAPIView):
     def post(self, request, pk):
         p = get_problem_by_id_or_code(pk)
-        p.status = 'draft'
+        if p.status == 'published':
+            p.status = 'ready'
         p.is_public = False
         p.save(update_fields=['status', 'is_public'])
-        return api_response({'id': p.id, 'code': p.code, 'status': p.status, 'message': 'Đã chuyển bài tập về trạng thái Draft.'})
+        return api_response({'id': p.id, 'code': p.code, 'status': p.status, 'is_public': False, 'message': 'Đã ẩn tạm thời bài tập.'})

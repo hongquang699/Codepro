@@ -1,16 +1,10 @@
 /**
  * CodeProOJ - Flaticon Vector Icons & Stickers Engine
- * Official Flaticon (flaticon.com) Vector Icons (Regular Rounded, Solid Rounded, Bold Rounded, Brands)
+ * Official Flaticon (flaticon.com) Regular Rounded vector icons
  */
 
 /* Flaticon Uicons CDN Official Links (flaticon.com) */
 @import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css');
-@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css');
-
-/* Backup Fallback CDN */
-@import url('https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons@3.3.1/css/all/all.min.css');
 
 /* Base Flaticon Icon Styles */
 i.fi, span.fi, [class^="fi-rr-"], [class*=" fi-rr-"], 

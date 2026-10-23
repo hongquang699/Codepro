@@ -79,23 +79,23 @@
     <!-- Filter Card -->
     <div class="filter-card">
       <div class="filter-row">
-        <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm theo mã bài (SUMA, MAXSUM...), tên bài..." oninput="filterAndRender()">
+        <input type="text" class="search-input" id="searchInput" aria-label="Tìm bài tập theo mã hoặc tên" placeholder="Tìm kiếm theo mã bài (SUMA, MAXSUM...), tên bài..." oninput="filterAndRender()">
         
-        <select class="filter-select" id="diffSelect" onchange="filterAndRender()">
+        <select class="filter-select" id="diffSelect" aria-label="Lọc theo độ khó" onchange="filterAndRender()">
           <option value="">Tất cả độ khó</option>
           <option value="easy">🟢 Dễ (&le; 50 điểm)</option>
           <option value="medium">🟡 Trung bình (51 - 100 điểm)</option>
           <option value="hard">🔴 Khó (&gt; 100 điểm)</option>
         </select>
 
-        <select class="filter-select" id="statusSelect" onchange="filterAndRender()">
+        <select class="filter-select" id="statusSelect" aria-label="Lọc theo trạng thái giải bài" onchange="filterAndRender()">
           <option value="">Tất cả trạng thái</option>
           <option value="solved">✅ Đã giải (AC)</option>
           <option value="attempted">❌ Đã thử nhưng chưa AC</option>
           <option value="unsolved">⚪ Chưa thử</option>
         </select>
 
-        <select class="filter-select" id="sortSelect" onchange="filterAndRender()">
+        <select class="filter-select" id="sortSelect" aria-label="Sắp xếp bài tập" onchange="filterAndRender()">
           <option value="code-asc">Mã bài (A-Z)</option>
           <option value="pts-desc">Điểm giảm dần</option>
           <option value="pts-asc">Điểm tăng dần</option>
