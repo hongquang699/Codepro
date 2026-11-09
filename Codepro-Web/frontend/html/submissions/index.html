@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách bài nộp - CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/footer.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/status.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/list.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="page-wrapper">
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-left-group">
+        <a href="/" class="nav-brand">
+          <img class="brand-badge-code" src="/frontend/assets/icons/favicon.svg" width="28" height="28" alt="">
+          <span class="brand-text">CodeProOJ</span>
+        </a>
+        <a href="/frontend/html/admin/dashboard.html" class="nav-admin-link" id="navAdminLink">Quản trị</a>
+      </div>
+      <div class="nav-right-group">
+        <ul class="nav-links">
+          <li><a href="/">Trang chủ</a></li>
+          <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+          <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+          <li><a href="/ranking">Xếp hạng</a></li>
+          <li><a href="/submissions" class="active">Bài nộp</a></li>
+          <li><a href="/frontend/html/community/feed/index.html">Cộng đồng</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="/submit" class="btn-filter" style="padding: 7px 18px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <cp-icon name="send" size="xs"></cp-icon> Nộp bài
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Submissions List Main Container -->
+  <main class="list-container">
+    <div class="list-header">
+      <h1 class="list-title" style="display:flex; align-items:center; gap:0.5rem;"><cp-icon name="list-check" size="md"></cp-icon> Trạng thái & Lịch sử nộp bài</h1>
+      <span id="totalCount" class="tool-btn" style="cursor: default; font-weight: 700;">
+        Đang tải...
+      </span>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filter-card">
+      <div class="filter-group">
+        <label for="filterProblem" style="display:flex; align-items:center; gap:0.35rem;"><cp-icon name="document" size="xs"></cp-icon> Bài tập</label>
+        <input type="text" id="filterProblem" class="filter-input" placeholder="Mã bài (vd: SUMA)">
+      </div>
+
+      <div class="filter-group">
+        <label for="filterUser" style="display:flex; align-items:center; gap:0.35rem;"><cp-icon name="user" size="xs"></cp-icon> Người nộp</label>
+        <input type="text" id="filterUser" class="filter-input" placeholder="Tên tài khoản">
+      </div>
+
+      <div class="filter-group">
+        <label for="filterLanguage" style="display:flex; align-items:center; gap:0.35rem;"><cp-icon name="terminal" size="xs"></cp-icon> Ngôn ngữ</label>
+        <select id="filterLanguage" class="filter-input">
+          <option value="">Tất cả ngôn ngữ</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterVerdict" style="display:flex; align-items:center; gap:0.35rem;"><cp-icon name="shield" size="xs"></cp-icon> Kết quả</label>
+        <select id="filterVerdict" class="filter-input">
+          <option value="">Tất cả kết quả</option>
+          <option value="AC">Accepted (AC)</option>
+          <option value="WA">Wrong Answer (WA)</option>
+          <option value="TLE">Time Limit Exceeded (TLE)</option>
+          <option value="MLE">Memory Limit Exceeded (MLE)</option>
+          <option value="RTE">Runtime Error (RTE)</option>
+          <option value="CE">Compilation Error (CE)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button id="btnApplyFilter" class="btn-filter" style="display:inline-flex; align-items:center; gap:0.35rem;">
+          <cp-icon name="filter" size="xs"></cp-icon> Lọc
+        </button>
+        <button id="btnResetFilter" class="btn-reset" style="display:inline-flex; align-items:center; gap:0.35rem;">
+          <cp-icon name="refresh" size="xs"></cp-icon> Đặt lại
+        </button>
+      </div>
+    </div>
+
+    <!-- Submissions Table -->
+    <div class="submissions-card">
+      <div class="table-responsive">
+        <table class="submissions-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;"># ID</th>
+              <th style="width: 140px;">Người nộp</th>
+              <th style="width: 130px;">Bài tập</th>
+              <th style="width: 180px;">Trạng thái</th>
+              <th style="width: 90px;">Điểm</th>
+              <th style="width: 150px;">Ngôn ngữ</th>
+              <th style="width: 110px;">Thời gian</th>
+              <th style="width: 110px;">Bộ nhớ</th>
+              <th style="width: 160px;">Thời điểm nộp</th>
+            </tr>
+          </thead>
+          <tbody id="submissionsTableBody">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 40px; color: var(--color-text-muted);">
+                Đang tải danh sách bài nộp...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-container" id="paginationControls"></div>
+    </div>
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-copyright">
+        &copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.
+      </div>
+      <div class="footer-links">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/live-sync.js"></script>
+  <script src="/frontend/components/submission/TimeMemory.js"></script>
+  <script src="/frontend/components/submission/Score.js"></script>
+  <script src="/frontend/components/submission/LanguageSelector.js"></script>
+  <script src="/frontend/components/submission/SubmissionStatus.js"></script>
+  <script src="/frontend/components/submission/SubmissionTable.js"></script>
+  <script src="/frontend/js/submissions/list.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo Cáo &amp; Thống Kê Kỳ Thi | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="ca-stat-grid">
+        <div class="ca-stat-card">
+          <div class="ca-stat-label">Tổng Thí Sinh</div>
+          <div class="ca-stat-value" id="repTotalUsers">0</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label">Tổng Bài Nộp</div>
+          <div class="ca-stat-value" id="repTotalSubs">0</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label">Bài Nộp AC</div>
+          <div class="ca-stat-value" id="repAcSubs" style="color: #10b981;">0</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label">Tỷ Lệ Thành Công</div>
+          <div class="ca-stat-value" id="repSuccessRate" style="color: var(--color-primary);">0%</div>
+        </div>
+      </div>
+
+      <!-- 2 Columns: Results Breakdown + Language Usage -->
+      <div class="ca-grid-2">
+        <div class="ca-panel">
+          <div class="ca-panel-header">
+            <h3 class="ca-panel-title">📊 Phân Bố Kết Quả Chấm</h3>
+          </div>
+          <div class="ca-panel-body" id="repResultsBreakdown">
+            <!-- Progress bars -->
+          </div>
+        </div>
+
+        <div class="ca-panel">
+          <div class="ca-panel-header">
+            <h3 class="ca-panel-title">💻 Ngôn Ngữ Lập Trình Sử Dụng</h3>
+          </div>
+          <div class="ca-panel-body" id="repLangBreakdown">
+            <!-- Languages table -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Problems Performance Matrix -->
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">📈 Hiệu Suất Từng Đề Bài (Problem Performance)</h3>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="width:70px;text-align:center;">Mã</th>
+                <th>Tên Bài Tập</th>
+                <th style="text-align:center;">Tổng Lượt Nộp</th>
+                <th style="text-align:center;">Lượt Giải Đúng (AC)</th>
+                <th style="text-align:center;width:240px;">Tỷ Lệ Giải Được (%)</th>
+              </tr>
+            </thead>
+            <tbody id="repProblemsTbody">
+              <tr><td colspan="5" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Đang tổng hợp dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('reports', contestKey);
+    ContestAdminUI.renderHeader('Báo Cáo &amp; Thống Kê', `Số liệu chi tiết về kết quả và lượt giải kỳ thi ${contestKey}`);
+
+    async function loadReports() {
+      const res = await ContestAdminAPI.getReports(contestKey);
+      if (!res.data) return;
+
+      const d = res.data;
+      document.getElementById('repTotalUsers').textContent = d.total_participants;
+      document.getElementById('repTotalSubs').textContent = d.total_submissions.toLocaleString();
+      const acCount = d.results_breakdown.AC || 0;
+      document.getElementById('repAcSubs').textContent = acCount.toLocaleString();
+      const rate = d.total_submissions > 0 ? Math.round((acCount / d.total_submissions) * 100) : 0;
+      document.getElementById('repSuccessRate').textContent = `${rate}%`;
+
+      // Results Breakdown
+      const rContainer = document.getElementById('repResultsBreakdown');
+      const colors = { AC: '#10b981', WA: '#ef4444', TLE: '#f59e0b', MLE: '#0e7490', CE: '#64748b', RTE: '#9a3412' };
+      rContainer.innerHTML = Object.entries(d.results_breakdown).map(([k, v]) => {
+        const pct = d.total_submissions > 0 ? Math.round((v / d.total_submissions) * 100) : 0;
+        return `
+          <div style="margin-bottom:.85rem;">
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;margin-bottom:.25rem;">
+              <span style="color: ${colors[k] || '#fff'};">${k} (${v} bài)</span>
+              <span style="color: var(--color-text-muted);">${pct}%</span>
+            </div>
+            <div style="background: var(--color-bg);height:8px;border-radius:4px;overflow:hidden;border: 1px solid var(--color-border-subtle);">
+              <div style="background: ${colors[k] || '#3b82f6'};width:${pct}%;height:100%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Languages Breakdown
+      const lContainer = document.getElementById('repLangBreakdown');
+      const langs = Object.entries(d.languages_breakdown);
+      if (langs.length === 0) {
+        lContainer.innerHTML = '<div style="color: var(--color-text-muted);font-size:.85rem;">Chưa có dữ liệu ngôn ngữ.</div>';
+      } else {
+        lContainer.innerHTML = langs.map(([l, c]) => `
+          <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);">
+            <strong style="color: #fff;">${l}</strong>
+            <span style="color: var(--color-primary);font-weight:700;">${c} bài nộp</span>
+          </div>
+        `).join('');
+      }
+
+      // Problems matrix
+      const tbodyP = document.getElementById('repProblemsTbody');
+      const probs = d.problems_stats || [];
+      if (probs.length === 0) {
+        tbodyP.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Chưa có dữ liệu bài tập.</td></tr>';
+      } else {
+        tbodyP.innerHTML = probs.map(p => `
+          <tr>
+            <td style="font-family:monospace;font-weight:800;color: var(--color-primary);text-align:center;">${p.prefix}</td>
+            <td><strong style="color: #fff;">${p.name}</strong> <span style="font-size:.72rem;color: var(--color-text-muted);">(${p.code})</span></td>
+            <td style="text-align:center;font-weight:700;">${p.total_submissions}</td>
+            <td style="text-align:center;font-weight:700;color: #10b981;">${p.accepted_count}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:.65rem;">
+                <div style="flex:1;background: var(--color-bg);height:8px;border-radius:4px;overflow:hidden;border: 1px solid var(--color-border-subtle);">
+                  <div style="background: #10b981;width:${p.ac_rate}%;height:100%;"></div>
+                </div>
+                <span style="font-size:.8rem;font-weight:700;color: #34d399;width:45px;">${p.ac_rate}%</span>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    loadReports();
+  </script>
+</body>
+</html>

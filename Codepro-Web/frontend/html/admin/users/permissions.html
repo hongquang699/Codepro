@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <meta charset="UTF-8">
+  <title>Đang chuyển hướng... | CodeProOJ</title>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const u = params.get('user') || params.get('username') || '';
+    if (u) {
+      window.location.replace(`/frontend/html/admin/users/detail.html?user=${encodeURIComponent(u)}&tab=permissions`);
+    } else {
+      window.location.replace('/admin/users');
+    }
+  </script>
+  <style>
+    body { background: var(--color-bg-secondary); color: var(--color-text-muted); font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div>Đang chuyển hướng...</div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

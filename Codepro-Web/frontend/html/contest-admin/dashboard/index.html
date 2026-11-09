@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Khiển Kỳ Thi | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <!-- Live Stat Cards Grid -->
+      <div class="ca-stat-grid">
+        <div class="ca-stat-card">
+          <div class="ca-stat-label"><cp-icon name="users" size="sm"></cp-icon> Thí Sinh (Users)</div>
+          <div class="ca-stat-value" id="valParticipants">0</div>
+          <div class="ca-stat-desc">Đã tham gia dự thi</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label"><cp-icon name="edit" size="sm"></cp-icon> Bài Tập (Problems)</div>
+          <div class="ca-stat-value" id="valProblems">0</div>
+          <div class="ca-stat-desc">Tổng số đề bài thi</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label"><cp-icon name="document" size="sm"></cp-icon> Bài Nộp (Submit)</div>
+          <div class="ca-stat-value" id="valSubmissions">0</div>
+          <div class="ca-stat-desc" id="valAcRate">Tỷ lệ AC: 0%</div>
+        </div>
+        <div class="ca-stat-card">
+          <div class="ca-stat-label"><cp-icon name="judge" size="sm"></cp-icon> Hàng Đợi (Queue)</div>
+          <div class="ca-stat-value" id="valJudgeQueue" style="color: var(--color-primary);">0</div>
+          <div class="ca-stat-desc" id="valWorkersStatus">Workers: 8/8 ONLINE</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="ca-panel" style="margin-bottom:1.5rem;">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">⚡ Thao Tác Nhanh Trong Kỳ Thi</h3>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <button id="btnToggleFreeze" onclick="toggleFreeze()" class="ca-btn ca-btn-freeze">
+              ❄️ Đóng băng bảng điểm
+            </button>
+            <button onclick="rejudgeAll()" class="ca-btn ca-btn-danger">
+              🔄 Chấm lại toàn bộ (Rejudge)
+            </button>
+            <a id="btnExportScoreboard" href="#" target="_blank" class="ca-btn ca-btn-secondary">
+              📥 Xuất kết quả (CSV)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 Columns: System & Queue Status + Problems Quick Matrix -->
+      <div class="ca-grid-2">
+        <div class="ca-panel">
+          <div class="ca-panel-header">
+            <h3 class="ca-panel-title">🖥️ Cụm Máy Chấm &amp; Hệ Thống (Jury)</h3>
+            <span id="juryHealthBadge" class="ca-badge ca-badge-running">HEALTHY</span>
+          </div>
+          <div class="ca-panel-body">
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);">
+              <span style="color: var(--color-text-muted);">Trạng thái Judge Server</span>
+              <strong id="juryStatusText" style="color: #10b981;">ONLINE (Port 9999)</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);">
+              <span style="color: var(--color-text-muted);">Hàng đợi chờ chấm</span>
+              <strong id="juryQueueText" style="color: var(--color-primary);">0 jobs</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);">
+              <span style="color: var(--color-text-muted);">Lỗi hệ thống (Errors/IE)</span>
+              <strong id="juryErrorsText" style="color: var(--color-text);">0</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;">
+              <span style="color: var(--color-text-muted);">Thời gian còn lại</span>
+              <strong id="juryTimeRemaining" style="color: #f59e0b;font-family:monospace;">--:--:--</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="ca-panel">
+          <div class="ca-panel-header">
+            <h3 class="ca-panel-title">📝 Đề Bài Thi (Problems Matrix)</h3>
+            <a id="lnkManageProblems" href="#" class="ca-btn ca-btn-secondary" style="font-size:.78rem;padding:.25rem .65rem;">
+              Quản lý đề &rarr;
+            </a>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="ca-table">
+              <thead>
+                <tr>
+                  <th>Mã</th>
+                  <th>Tên bài</th>
+                  <th style="text-align:center;">Điểm</th>
+                  <th style="text-align:center;">Đã giải</th>
+                </tr>
+              </thead>
+              <tbody id="quickProblemsTbody">
+                <tr><td colspan="4" style="text-align:center;padding:1.5rem;color: var(--color-text-muted);">Đang tải danh sách bài...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('dashboard', contestKey);
+    ContestAdminUI.renderHeader('Bảng Điều Khiển Kỳ Thi', `Quản lý vận hành kỳ thi ${contestKey}`);
+
+    document.getElementById('lnkManageProblems').href = `/admin/contests/${contestKey}/problems`;
+    document.getElementById('btnExportScoreboard').href = ContestAdminAPI.getExportUrl(contestKey);
+
+    let isScoreboardFrozen = false;
+
+    async function loadDashboard() {
+      const res = await ContestAdminAPI.getDashboard(contestKey);
+      if (!res.data) return;
+
+      const c = res.data.contest;
+      const s = res.data.stats;
+
+      isScoreboardFrozen = Boolean(c.hide_scoreboard);
+      ContestAdminUI.updateStatusBadge(c.status, isScoreboardFrozen);
+
+      const btnFreeze = document.getElementById('btnToggleFreeze');
+      if (isScoreboardFrozen) {
+        btnFreeze.innerHTML = '☀️ Mở khóa bảng điểm (Unfreeze)';
+        btnFreeze.className = 'ca-btn ca-btn-success';
+      } else {
+        btnFreeze.innerHTML = '❄️ Đóng băng bảng điểm (Freeze)';
+        btnFreeze.className = 'ca-btn ca-btn-freeze';
+      }
+
+      document.getElementById('valParticipants').textContent = s.participants_count.toLocaleString();
+      document.getElementById('valProblems').textContent = s.problems_count;
+      document.getElementById('valSubmissions').textContent = s.submissions_count.toLocaleString();
+      document.getElementById('valAcRate').textContent = `AC: ${s.ac_count} (${s.ac_rate}%)`;
+      document.getElementById('valJudgeQueue').textContent = s.judge_queue;
+      document.getElementById('valWorkersStatus').textContent = `Workers: ${s.judge_workers_online}/8 ${s.judge_status}`;
+
+      document.getElementById('juryStatusText').textContent = `${s.judge_status} (Online)`;
+      document.getElementById('juryQueueText').textContent = `${s.judge_queue} jobs`;
+      document.getElementById('juryErrorsText').textContent = s.errors_count;
+
+      // Countdown
+      const sec = c.time_remaining_seconds;
+      if (sec > 0) {
+        const hrs = Math.floor(sec / 3600);
+        const mins = Math.floor((sec % 3600) / 60);
+        const sRem = sec % 60;
+        document.getElementById('juryTimeRemaining').textContent = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${sRem.toString().padStart(2,'0')}`;
+      } else {
+        document.getElementById('juryTimeRemaining').textContent = c.status === 'FINISHED' ? 'Đã kết thúc' : 'Chưa bắt đầu';
+      }
+
+      // Load quick problems
+      loadQuickProblems();
+    }
+
+    async function loadQuickProblems() {
+      const res = await ContestAdminAPI.getProblems(contestKey);
+      const tbody = document.getElementById('quickProblemsTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color: var(--color-text-muted);">Chưa gán bài tập nào.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = res.data.map(p => `
+        <tr>
+          <td style="font-family:monospace;font-weight:800;color: var(--color-primary);">${p.prefix}</td>
+          <td><strong style="color: #fff;">${p.name}</strong> <span style="font-size:.72rem;color: var(--color-text-muted);">(${p.code})</span></td>
+          <td style="text-align:center;font-weight:700;">${p.points}</td>
+          <td style="text-align:center;font-weight:700;color: #10b981;">${p.solved_count}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function toggleFreeze() {
+      const action = isScoreboardFrozen ? 'unfreeze' : 'freeze';
+      const promptText = isScoreboardFrozen ? 'mở khóa bảng điểm công khai' : 'đóng băng bảng điểm (thí sinh không thấy điểm mới)';
+      if (!confirm(`Bạn có chắc chắn muốn ${promptText}?`)) return;
+
+      const res = await ContestAdminAPI.toggleFreeze(contestKey, action);
+      alert(res.message || res.error);
+      loadDashboard();
+    }
+
+    async function rejudgeAll() {
+      if (!confirm(`CẢNH BÁO: Bạn có chắc chắn muốn chấm lại TOÀN BỘ bài nộp của kỳ thi ${contestKey}? Quá trình này sẽ đẩy toàn bộ bài vào hàng đợi máy chấm.`)) return;
+      const res = await ContestAdminAPI.rejudge(contestKey, {});
+      alert(res.message || res.error);
+      loadDashboard();
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

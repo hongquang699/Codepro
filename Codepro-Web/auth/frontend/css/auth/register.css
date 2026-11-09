@@ -1,0 +1,31 @@
+/* frontend/css/auth/register.css */
+@import url('./auth.css');
+
+.register-card {
+  max-width: 460px;
+}
+
+.password-strength-bar {
+  height: 4px;
+  width: 100%;
+  background: #334155;
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.password-strength-segment {
+  height: 100%;
+  flex: 1;
+  transition: background-color 0.3s ease;
+  margin-right: 2px;
+}
+
+.password-strength-segment:last-child {
+  margin-right: 0;
+}
+
+.strength-weak { background-color: #ef4444; }
+.strength-medium { background-color: #f59e0b; }
+.strength-strong { background-color: #10b981; }

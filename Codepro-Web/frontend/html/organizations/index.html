@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổ Chức &amp; Trường Học | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <style>
+    .org-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+    .org-card { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 12px; padding: 1.5rem; transition: transform 0.15s, border-color 0.15s; }
+    .org-card:hover { transform: translateY(-2px); border-color: var(--color-primary); }
+    .org-badge { font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary); border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent); }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/contests">Cuộc thi</a></li>
+        <li><a href="/ranking">Xếp hạng</a></li>
+        <li><a href="/submissions">Bài nộp</a></li>
+        <li><a href="/organizations" class="active">Tổ chức</a></li>
+        <li><a href="/forum">Diễn đàn</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/login" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/register" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+      <div>
+        <h1 style="font-size:2.2rem;font-weight:800;color: var(--color-text);margin:0 0 0.5rem 0;">Danh Sách Tổ Chức &amp; Trường Học</h1>
+        <p style="color: var(--color-text-muted);font-size:1rem;margin:0;">Các trường THPT Chuyên, Đại học và Câu lạc bộ lập trình thi đấu trên toàn quốc.</p>
+      </div>
+      <div>
+        <input type="text" id="searchOrgInput" placeholder="Tìm trường hoặc tổ chức..." style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.65rem 1rem;color: #fff;font-size:0.9rem;width:280px;outline: none;" oninput="filterOrgs()">
+      </div>
+    </div>
+
+    <div class="org-grid" id="orgGrid">
+      <div style="text-align:center;padding:3rem;color: var(--color-text-muted);grid-column:1/-1;">Đang tải danh sách tổ chức...</div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    let allOrgs = [];
+
+    const defaultOrgs = [
+      { slug: "codeprooj", name: "Cộng Đồng Vietnam Olympiad in Informatics (CodeProOJ)", short_name: "CodeProOJ", type: "Cộng đồng", member_count: 1240, avg_rating: 1980, province: "Toàn quốc" },
+      { slug: "thpt-chuyen-khtn", name: "THPT Chuyên Khoa Học Tự Nhiên - ĐHQGHN", short_name: "HUS High School", type: "THPT Chuyên", member_count: 320, avg_rating: 2150, province: "Hà Nội" },
+      { slug: "thpt-chuyen-su-pham", name: "THPT Chuyên Đại Học Sư Phạm Hà Nội", short_name: "CSP High School", type: "THPT Chuyên", member_count: 245, avg_rating: 2010, province: "Hà Nội" },
+      { slug: "thpt-chuyen-le-hong-phong", name: "THPT Chuyên Lê Hồng Phong TP.HCM", short_name: "LHP HCM", type: "THPT Chuyên", member_count: 190, avg_rating: 1890, province: "TP. Hồ Chí Minh" },
+      { slug: "dh-bach-khoa-hn", name: "Đại học Bách Khoa Hà Nội (HUST)", short_name: "HUST", type: "Đại học", member_count: 480, avg_rating: 1920, province: "Hà Nội" },
+      { slug: "dh-cong-nghe-uet", name: "Trường Đại học Công nghệ - ĐHQGHN (UET)", short_name: "VNU-UET", type: "Đại học", member_count: 410, avg_rating: 2080, province: "Hà Nội" }
+    ];
+
+    async function loadOrgs() {
+      try {
+        const res = await fetch('/api/v2/organizations');
+        const json = await res.json();
+        const items = json.data?.items || json.data?.results || [];
+        allOrgs = items.length > 0 ? items : defaultOrgs;
+        renderOrgs(allOrgs);
+      } catch (e) {
+        allOrgs = defaultOrgs;
+        renderOrgs(allOrgs);
+      }
+    }
+
+    function renderOrgs(list) {
+      const grid = document.getElementById('orgGrid');
+      if (list.length === 0) {
+        grid.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);grid-column:1/-1;">Không tìm thấy tổ chức phù hợp.</div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(o => `
+        <div class="org-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+            <span class="org-badge">${o.type || 'Tổ chức'}</span>
+            <span style="font-size:0.78rem;color: var(--color-text-dim);">📍 ${o.province || 'Việt Nam'}</span>
+          </div>
+          <h3 style="margin:0 0 0.5rem 0;color: var(--color-text);font-size:1.15rem;line-height:1.4;">${o.name}</h3>
+          <div style="font-size:0.85rem;color: var(--color-text-muted);margin-bottom:1.25rem;">
+            Mã viết tắt: <strong style="color: var(--color-text-secondary);">${o.short_name || o.slug}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-top: 1px solid var(--color-border-subtle);padding-top:0.85rem;font-size:0.85rem;">
+            <div>
+              <span style="color: var(--color-text-dim);">Thành viên:</span>
+              <strong style="color: var(--color-primary);margin-left:4px;">${o.member_count || 1}</strong>
+            </div>
+            <div>
+              <span style="color: var(--color-text-dim);">Rating TB:</span>
+              <strong style="color: #34d399;margin-left:4px;">${o.avg_rating || 1500}</strong>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterOrgs() {
+      const q = document.getElementById('searchOrgInput').value.toLowerCase().trim();
+      if (!q) return renderOrgs(allOrgs);
+      const filtered = allOrgs.filter(o => 
+        (o.name && o.name.toLowerCase().includes(q)) || 
+        (o.short_name && o.short_name.toLowerCase().includes(q)) ||
+        (o.province && o.province.toLowerCase().includes(q))
+      );
+      renderOrgs(filtered);
+    }
+
+    // Check user auth
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+      const u = Auth.getUser();
+      document.getElementById('navAuth').innerHTML = `
+        <a href="/profile/${u.username}" class="btn btn-secondary"><cp-icon name="user" size="sm"></cp-icon> @${u.username}</a>
+        <button onclick="Auth.logout()" class="btn btn-danger" style="margin-left:0.5rem;">Đăng xuất</button>
+      `;
+    }
+
+    loadOrgs();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

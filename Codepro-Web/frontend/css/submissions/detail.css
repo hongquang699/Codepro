@@ -1,0 +1,411 @@
+/* Submission Detail Page Styling */
+
+.detail-container {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.detail-card {
+  background: var(--color-surface, var(--color-card));
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.3));
+  overflow: hidden;
+}
+
+/* Header & Meta */
+.submission-summary-header {
+  padding: 24px 28px;
+  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  border-bottom: 1px solid var(--color-border, var(--color-border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sub-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sub-id-badge {
+  font-family: var(--font-family-mono, monospace);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text, var(--color-text));
+}
+
+.sub-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 24px 28px;
+  background: color-mix(in srgb, var(--color-card) 30%, transparent);
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, var(--color-text-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metric-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text, var(--color-text));
+}
+
+.metric-value.score {
+  font-size: 1.3rem;
+  color: var(--color-primary);
+}
+
+/* Compiler Warning / CE output box */
+.compiler-box {
+  margin: 0 28px 24px;
+  padding: 16px;
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: var(--radius-md, 8px);
+  color: #fde047;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  display: none;
+}
+
+/* Testcases Matrix */
+.section-header {
+  padding: 20px 28px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text, var(--color-text));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.testcase-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.testcase-table th {
+  padding: 14px 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted, var(--color-text-muted));
+  background: #090e17;
+  border-bottom: 1px solid var(--color-border, var(--color-border));
+}
+
+.testcase-table td {
+  padding: 14px 20px;
+  font-size: 0.92rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  color: var(--color-text, var(--color-text));
+}
+
+.testcase-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Code Viewer */
+.code-viewer-container {
+  border-top: 1px solid var(--color-border, var(--color-border));
+}
+
+.code-viewer-header {
+  padding: 12px 28px;
+  background: #090e17;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border, var(--color-border));
+}
+
+.code-pre {
+  margin: 0;
+  padding: 20px 28px;
+  background: #090e17;
+  color: var(--color-text);
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TMATH CODING / DMOJ SUBMISSION RESULT STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--color-text-muted, var(--color-text-muted));
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-bar a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.breadcrumb-bar a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-bar .sep {
+  color: #475569;
+}
+
+/* ── Verdict Hero Banner (TMath Coding Style) ── */
+.verdict-hero-card {
+  padding: 2.25rem 1.5rem;
+  border-radius: 14px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.verdict-hero-ac {
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.18) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.3);
+}
+
+.verdict-hero-wa {
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.18) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #f87171;
+  box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.3);
+}
+
+.verdict-hero-tle {
+  background: radial-gradient(circle at center, rgba(245, 158, 11, 0.18) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+  box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3);
+}
+
+.verdict-hero-mle {
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-accent) 18%, transparent) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
+}
+
+.verdict-hero-rte {
+  background: radial-gradient(circle at center, rgba(249, 115, 22, 0.18) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #fb923c;
+}
+
+.verdict-hero-ce {
+  background: radial-gradient(circle at center, rgba(148, 163, 184, 0.18) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: rgba(148, 163, 184, 0.45);
+  color: var(--color-text-secondary);
+}
+
+.verdict-hero-judging {
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-primary) 18%, transparent) 0%, color-mix(in srgb, var(--color-card) 70%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
+  animation: pulseJudging 2s infinite ease-in-out;
+}
+
+@keyframes pulseJudging {
+  0%, 100% { border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); box-shadow: 0 0 15px color-mix(in srgb, var(--color-primary) 10%, transparent); }
+  50% { border-color: color-mix(in srgb, var(--color-primary) 65%, transparent); box-shadow: 0 0 25px color-mix(in srgb, var(--color-primary) 30%, transparent); }
+}
+
+.verdict-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.verdict-subtitle {
+  font-size: 0.96rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ── Metrics Stats Grid (TMath 4 to 6 Boxes) ── */
+.sub-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sub-stat-box {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: 10px;
+  padding: 1.1rem 1rem;
+  text-align: center;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.sub-stat-box:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.sub-stat-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.sub-stat-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-text);
+  font-family: var(--font-family-mono, monospace);
+}
+
+/* ── Actions Row ── */
+.submission-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.btn-action-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
+.btn-action-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-action-secondary {
+  background: var(--color-card);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-action-secondary:hover {
+  background: var(--color-surface-hover);
+  color: #ffffff;
+}
+
+/* ── Testcase Status Badges ── */
+.tc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.tc-badge.ac {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.tc-badge.wa {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.tc-badge.tle {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tc-badge.mle {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.tc-badge.rte {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.tc-badge.ce {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhóm &amp; Câu Lạc Bộ Tin Học | CodeProOJ Community</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/community/community.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/frontend/html/problem/index.html" class="nav-link">Bài tập</a>
+        <a href="/frontend/html/contest/index.html" class="nav-link">Cuộc thi</a>
+        <a href="/frontend/html/ranking/index.html" class="nav-link">Xếp hạng</a>
+        <a href="/frontend/html/submission/index.html" class="nav-link">Bài nộp</a>
+        <a href="/frontend/html/community/home/index.html" class="nav-link active">Cộng đồng</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/frontend/html/admin/dashboard.html" class="btn-nav btn-admin">Quản trị</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="comm-layout">
+    <!-- Left Sidebar -->
+    <aside class="comm-left-sidebar">
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Menu Cộng đồng</div>
+        <nav class="comm-nav-list">
+          <a href="/frontend/html/community/home/index.html" class="comm-nav-link">
+            <span>🏠</span> Trang chủ Feed
+          </a>
+          <a href="/frontend/html/community/forum/index.html" class="comm-nav-link">
+            <span><cp-icon name="send" size="sm"></cp-icon> </span> Diễn đàn thảo luận
+          </a>
+          <a href="/frontend/html/community/groups/index.html" class="comm-nav-link active">
+            <cp-icon name="users" size="sm"></cp-icon> Nhóm &amp; CLB Tin học
+          </a>
+          <a href="/frontend/html/community/notifications/index.html" class="comm-nav-link">
+            <cp-icon name="bell" size="sm"></cp-icon> Thông báo
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="comm-main" style="grid-column: span 2;">
+      <div style="margin-bottom:1.5rem;">
+        <h1 style="font-size:1.6rem;color: var(--color-text);font-weight:800;margin-bottom:0.3rem;"><cp-icon name="users" size="sm"></cp-icon> Câu Lạc Bộ &amp; Đội Tuyển Tin Học</h1>
+        <p style="color: var(--color-text-muted);font-size:0.9rem;">Kết nối các nhóm luyện thi ICPC, đội tuyển học sinh giỏi tỉnh, chuyên Tin và các câu lạc bộ đại học.</p>
+      </div>
+
+      <div class="forum-cat-grid" id="groupsGrid">
+        <div style="color: var(--color-text-muted);padding:2rem;">Đang tải danh sách câu lạc bộ...</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/community/api.js"></script>
+  <script src="/frontend/js/community/groups.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

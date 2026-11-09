@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0; url=/ranking">
+  <script>window.location.replace('/ranking');</script>
+  <title>Đang chuyển hướng...</title>
+  <!-- Flaticon Uicons Vector Icons -->
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking-table.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/rating.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/contest-ranking.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/footer.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="ranking-page">
+  <!-- Reusable CodeProOJ Top Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container"></div>
+  </nav>
+
+  <div class="ranking-container">
+    <div class="ranking-nav-actions" style="margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <a href="/" class="ranking-back-link" title="Quay về Trang chủ CodeProOJ">
+        <i class="fi fi-rr-arrow-left"></i>
+        <i class="fi fi-rr-home"></i>
+        <span>Quay về Trang chủ</span>
+      </a>
+      <div class="ranking-breadcrumb" style="font-size: 0.88rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 6px;">
+        <a href="/" style="color: var(--color-text-muted); text-decoration: none;"><i class="fi fi-rr-home"></i> Trang chủ</a>
+        <span>/</span>
+        <a href="/frontend/html/ranking/index.html" style="color: var(--color-text-muted); text-decoration: none;">Bảng xếp hạng</a>
+      </div>
+    </div>
+
+    <header class="ranking-header">
+      <div class="ranking-title-group">
+        <h1 id="contestTitle"><i class="fi fi-rr-chart-histogram"></i> Bảng điểm Cuộc thi (Live Scoreboard)</h1>
+        <p id="contestSubtitle">Bảng điểm thời gian thực chuẩn luật ICPC/CodeProOJ với ma trận bài giải A, B, C, D...</p>
+      </div>
+
+      <nav class="ranking-tabs">
+        <a href="/frontend/html/ranking/index.html" class="ranking-tab"><i class="fi fi-rr-trophy"></i> Tổng thể</a>
+        <a href="/frontend/html/ranking/rating.html" class="ranking-tab"><i class="fi fi-rr-bolt"></i> Rating</a>
+        <a href="/frontend/html/ranking/contest.html" class="ranking-tab active"><i class="fi fi-rr-flag"></i> Cuộc thi</a>
+        <a href="/frontend/html/ranking/country.html" class="ranking-tab"><i class="fi fi-rr-globe"></i> Quốc gia</a>
+        <a href="/frontend/html/ranking/school.html" class="ranking-tab"><i class="fi fi-rr-graduation-cap"></i> Trường học</a>
+        <a href="/frontend/html/ranking/organization.html" class="ranking-tab"><i class="fi fi-rr-building"></i> Tổ chức</a>
+      </nav>
+    </header>
+
+    <div class="freeze-banner" id="freezeNotice" style="display: none;">
+      <span><i class="fi fi-rr-snowflake"></i> <strong>Scoreboard đã được đóng băng (Frozen).</strong> Các lần nộp bài mới sẽ hiển thị dưới dạng chờ kết quả (?1).</span>
+      <span id="freezeCountdown"></span>
+    </div>
+
+    <main class="ranking-card">
+      <div class="ranking-controls">
+        <input type="text" id="contestKeyInput" class="ranking-input" value="weekly-01" placeholder="Mã kỳ thi (e.g. weekly-01)">
+        <button id="loadScoreboardBtn" class="ranking-btn"><i class="fi fi-rr-refresh"></i> Xem bảng điểm</button>
+        <button id="recalcRatingBtn" class="ranking-btn" style="background: #10b981;"><i class="fi fi-rr-calculator"></i> Tính lại Rating Kỳ thi</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="ranking-table scoreboard-table">
+          <thead id="scoreboardHead">
+            <tr>
+              <th style="width: 60px;">#</th>
+              <th>Thí sinh</th>
+              <th style="width: 70px; text-align: center;">=</th>
+              <th style="width: 90px; text-align: center;">Penalty</th>
+              <!-- Problem Columns dynamically inserted -->
+            </tr>
+          </thead>
+          <tbody id="scoreboardBody">
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--color-text-muted); padding: 40px;">Đang tải bảng điểm...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-copyright">
+        &copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.
+      </div>
+      <div class="footer-links">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/rating.js"></script>
+
+  <script src="/frontend/js/ranking/contest-ranking-api.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/ranking/ranking-table.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/ranking/contest.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+</body>
+</html>

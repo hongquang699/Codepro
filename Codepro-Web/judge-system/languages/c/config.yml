@@ -1,0 +1,6 @@
+name: C11
+extension: .c
+compiled: true
+executable: solution
+time_limit_multiplier: 1.0
+memory_limit_multiplier: 1.0

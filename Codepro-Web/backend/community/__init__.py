@@ -1,0 +1,2 @@
+# Community Subsystem
+default_app_config = 'backend.community.apps.CommunityConfig'

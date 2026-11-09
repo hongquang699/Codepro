@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch Sử Bài Nộp Cuộc Thi | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Contest Header Card -->
+    <div class="contest-hero-card" style="padding: 1.25rem 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <a id="backToDashLink" href="#" style="color: var(--color-primary); text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+            &larr; Quay lại Bảng điều khiển cuộc thi
+          </a>
+          <h1 id="contestTitle" style="font-size: 1.5rem; color: var(--color-text); font-weight: 800; margin-top: 0.35rem;">
+            LỊCH SỬ BÀI NỘP CUỘC THI
+          </h1>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <button id="btnReload" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.45rem 1rem;">
+            🔄 Làm mới
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submissions Table Card -->
+    <div class="card" style="padding: 1.5rem; overflow-x: auto;">
+      <table class="contest-problem-table">
+        <thead>
+          <tr>
+            <th style="width: 100px;">ID</th>
+            <th>Thí sinh</th>
+            <th style="width: 80px; text-align: center;">Task</th>
+            <th>Tên bài</th>
+            <th>Ngôn ngữ</th>
+            <th style="width: 120px; text-align: center;">Điểm số</th>
+            <th style="width: 130px; text-align: center;">Kết quả</th>
+            <th style="width: 100px; text-align: center;">Thời gian</th>
+            <th style="width: 160px; text-align: right;">Thời điểm</th>
+          </tr>
+        </thead>
+        <tbody id="subsTableBody">
+          <tr>
+            <td colspan="9" style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải danh sách bài nộp...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest') || 'hsg-tin-2026';
+    document.getElementById('backToDashLink').href = `/frontend/html/contest/dashboard/index.html?contest=${contestKey}`;
+
+    async function loadSubmissions() {
+      const tbody = document.getElementById('subsTableBody');
+      try {
+        const json = await ContestAPI.getSubmissionsList(contestKey);
+        const subs = json.data || [];
+        if (subs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--color-text-muted); padding: 2.5rem;">Chưa có bài nộp nào trong cuộc thi này.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = subs.map(s => {
+          let resClass = 'prob-status-unattempted';
+          if (s.result === 'AC') resClass = 'prob-status-solved';
+          else if (s.result === 'WA') resClass = 'prob-status-attempted';
+
+          const resUrl = `/frontend/html/contest/submission/result.html?contest=${contestKey}&id=${s.id}`;
+
+          return `
+            <tr>
+              <td>
+                <a href="${resUrl}" style="color: var(--color-primary); font-weight: 700; text-decoration: none; font-size: 1rem;">
+                  #${s.id}
+                </a>
+              </td>
+              <td style="font-weight: 600; color: var(--color-text);">${s.user}</td>
+              <td style="text-align: center;">
+                <span class="prob-letter-badge" style="width: 28px; height: 28px; font-size: 0.9rem;">${s.problem_letter}</span>
+              </td>
+              <td style="color: var(--color-text-secondary); font-weight: 600;">${s.problem_name}</td>
+              <td style="font-size: 0.85rem; color: var(--color-text-muted);">${s.language}</td>
+              <td style="text-align: center; font-weight: 800; font-size: 1.05rem; color: ${s.score > 0 ? '#34d399' : '#f87171'};">
+                ${s.score}
+              </td>
+              <td style="text-align: center;">
+                <span class="prob-status-pill ${resClass}">
+                  ${s.result === 'AC' ? '✓ ACCEPTED' : (s.result || 'JUDGING')}
+                </span>
+              </td>
+              <td style="text-align: center; font-size: 0.85rem; color: var(--color-text-muted);">
+                ${s.time_ms} ms
+              </td>
+              <td style="text-align: right; font-size: 0.8rem; color: var(--color-text-dim);">
+                ${s.date}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #f87171; padding: 2rem;">Lỗi tải bài nộp: ${err.message}</td></tr>`;
+      }
+    }
+
+    document.getElementById('btnReload').onclick = loadSubmissions;
+    loadSubmissions();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

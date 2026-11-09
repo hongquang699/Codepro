@@ -1,0 +1,4 @@
+#!/bin/bash
+SOURCE=$1
+DEST=$2
+g++ -O3 -std=c++17 -Wall $SOURCE -o $DEST

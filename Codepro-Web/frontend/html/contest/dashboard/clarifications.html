@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giải Đáp Thắc Mắc | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <style>
+    .clarif-form {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .clarif-form h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 1rem;
+    }
+    .clarif-form select,
+    .clarif-form textarea {
+      width: 100%;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      color: var(--color-text);
+      padding: 0.65rem 0.9rem;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+      margin-bottom: 0.75rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .clarif-form select:focus,
+    .clarif-form textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .clarif-form textarea { resize: vertical; min-height: 80px; }
+    .clarif-submit-btn {
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1.4rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .clarif-submit-btn:hover { background: var(--color-primary-hover); }
+    .clarif-submit-btn:disabled { background: var(--color-surface-hover); cursor: not-allowed; }
+
+    .clarif-item {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .clarif-item.answered { border-left: 3px solid #22c55e; }
+    .clarif-item.pending  { border-left: 3px solid #f59e0b; }
+    .clarif-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+    .clarif-problem-tag {
+      background: #1d4ed833;
+      color: var(--color-primary);
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .clarif-status {
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+    .clarif-status.answered { color: #22c55e; }
+    .clarif-status.pending  { color: #f59e0b; }
+    .clarif-question {
+      color: var(--color-text);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    .clarif-answer {
+      background: var(--color-bg-secondary);
+      border-left: 3px solid #22c55e;
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      color: #d1fae5;
+      font-size: 0.9rem;
+    }
+    .clarif-answer .answer-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #22c55e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--color-text-muted);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--color-card); border: 1px solid var(--color-border);
+      border-radius: 8px; padding: 0.75rem 1.25rem;
+      color: var(--color-text); font-size: 0.9rem; font-weight: 600;
+      z-index: 999; animation: slideIn 0.3s ease;
+      display: none;
+    }
+    .toast.show { display: block; }
+    @keyframes slideIn { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Header -->
+    <div class="contest-hero-card" style="padding: 1.25rem 1.75rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <a id="backToDashLink" href="#" style="color: var(--color-primary); text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+            &larr; Quay lại Bảng điều khiển
+          </a>
+          <h1 style="font-size: 1.5rem; color: var(--color-text); font-weight: 800; margin-top: 0.3rem;">
+            💬 GIẢI ĐÁP THẮC MẮC
+          </h1>
+        </div>
+        <div id="contestBadge" style="background: #1e40af33; border: 1px solid var(--color-primary); border-radius: 6px; padding: 0.4rem 1rem; color: var(--color-primary); font-size: 0.85rem; font-weight: 700;">
+          Đang tải...
+        </div>
+      </div>
+    </div>
+
+    <!-- Ask form (for logged-in participants) -->
+    <div id="askFormSection" class="clarif-form" style="display:none;">
+      <h3>✉️ Đặt câu hỏi cho Ban tổ chức</h3>
+      <select id="selectProblem">
+        <option value="">-- Chọn bài (nếu liên quan đến bài cụ thể) --</option>
+      </select>
+      <textarea id="questionText" placeholder="Nhập câu hỏi của bạn..." rows="3"></textarea>
+      <button class="clarif-submit-btn" id="submitClarif" onclick="submitQuestion()">
+        Gửi câu hỏi
+      </button>
+    </div>
+
+    <!-- My clarifications -->
+    <div id="myClarifSection" style="display:none; margin-bottom: 2rem;">
+      <div class="section-title">📨 Câu hỏi của bạn</div>
+      <div id="myClarifList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+    </div>
+
+    <!-- Public clarifications -->
+    <div>
+      <div class="section-title"><cp-icon name="bell" size="sm"></cp-icon> Giải đáp công khai</div>
+      <div id="publicClarifList" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="text-align: center; color: var(--color-text-muted); padding: 1.5rem;">Đang tải...</div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest') || 'hsg-tin-2026';
+    const username = localStorage.getItem('username');
+    const token = localStorage.getItem('token');
+
+    document.getElementById('backToDashLink').href =
+      `/contests/${contestKey}`;
+
+    function showToast(msg, color = '#22c55e') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.borderColor = color;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function renderClarif(c) {
+      const isAnswered = !!c.answer;
+      return `
+        <div class="clarif-item ${isAnswered ? 'answered' : 'pending'}">
+          <div class="clarif-meta">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              ${c.problem_label ? `<span class="clarif-problem-tag">Bài ${c.problem_label}</span>` : '<span class="clarif-problem-tag" style="background: #33415533; color: var(--color-text-muted);">Tổng quát</span>'}
+              <span>${c.created_at ? new Date(c.created_at).toLocaleString('vi-VN') : ''}</span>
+            </div>
+            <span class="clarif-status ${isAnswered ? 'answered' : 'pending'}">
+              ${isAnswered ? '✓ Đã trả lời' : '⏳ Chờ trả lời'}
+            </span>
+          </div>
+          <div class="clarif-question">❓ ${c.content || c.question}</div>
+          ${isAnswered ? `
+            <div class="clarif-answer">
+              <div class="answer-label">Trả lời từ BTC</div>
+              ${c.answer}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    async function loadData() {
+      // Load contest info
+      try {
+        const dash = await ContestAPI.getDashboard(contestKey);
+        document.title = `Giải đáp | ${dash.contest?.name || contestKey}`;
+        document.getElementById('contestBadge').textContent = dash.contest?.name || contestKey;
+
+        // Populate problem selector
+        const sel = document.getElementById('selectProblem');
+        (dash.problems || []).forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.label || p.id;
+          opt.textContent = `Bài ${p.label} – ${p.name}`;
+          sel.appendChild(opt);
+        });
+      } catch(e) {}
+
+      // Show ask form if logged in
+      if (username && token) {
+        document.getElementById('askFormSection').style.display = 'block';
+      }
+
+      // Load clarifications
+      try {
+        const data = await ContestAPI.getClarifications(contestKey);
+        const list = data.results || data || [];
+
+        // Public (answered) clarifs
+        const publicItems = list.filter(c => c.is_public || c.answer);
+        const publicContainer = document.getElementById('publicClarifList');
+        if (publicItems.length === 0) {
+          publicContainer.innerHTML = `<div class="empty-state"><div class="icon"><cp-icon name="send" size="sm"></cp-icon> </div><div>Chưa có giải đáp công khai nào.</div></div>`;
+        } else {
+          publicContainer.innerHTML = publicItems.map(renderClarif).join('');
+        }
+
+        // My clarifs (private)
+        if (username) {
+          const mine = list.filter(c => !c.is_public && c.user === username);
+          if (mine.length > 0) {
+            document.getElementById('myClarifSection').style.display = 'block';
+            document.getElementById('myClarifList').innerHTML = mine.map(renderClarif).join('');
+          }
+        }
+      } catch(e) {
+        document.getElementById('publicClarifList').innerHTML = `<div class="empty-state"><div class="icon"><cp-icon name="send" size="sm"></cp-icon> </div><div>Chưa có câu hỏi & giải đáp nào trong cuộc thi này.</div></div>`;
+      }
+    }
+
+    async function submitQuestion() {
+      const btn = document.getElementById('submitClarif');
+      const question = document.getElementById('questionText').value.trim();
+      const problem = document.getElementById('selectProblem').value;
+
+      if (!question) {
+        showToast('Vui lòng nhập nội dung câu hỏi.', '#ef4444');
+        return;
+      }
+      if (!token) {
+        showToast('Bạn cần đăng nhập để đặt câu hỏi.', '#f59e0b');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Đang gửi...';
+
+      try {
+        await ContestAPI.askClarification(contestKey, { content: question, problem_label: problem });
+        document.getElementById('questionText').value = '';
+        document.getElementById('selectProblem').value = '';
+        showToast('✓ Câu hỏi đã được gửi! Ban tổ chức sẽ phản hồi sớm.');
+        setTimeout(loadData, 800);
+      } catch(e) {
+        showToast('Gửi thất bại. Vui lòng thử lại.', '#ef4444');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Gửi câu hỏi';
+      }
+    }
+
+    loadData();
+    // Auto-refresh every 30s
+    setInterval(loadData, 30000);
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

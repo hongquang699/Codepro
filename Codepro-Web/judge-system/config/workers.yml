@@ -1,0 +1,148 @@
+# Worker Pool Configuration
+workers:
+  - id: "worker-1"
+    name: "Judge Worker Node 01 (Primary Cluster Lead)"
+    host: "127.0.0.1"
+    capacity: 2
+    max_memory_mb: 2048
+    role: "General Purpose & Cluster Lead"
+    supported_languages:
+      - cpp
+      - c
+      - python
+      - pypy
+      - java
+      - rust
+      - go
+      - javascript
+      - typescript
+      - kotlin
+      - csharp
+      - pascal
+    enabled: true
+    priority: 10
+
+  - id: "worker-2"
+    name: "Judge Worker Node 02 (Secondary Fast Executor)"
+    host: "127.0.0.1"
+    capacity: 2
+    max_memory_mb: 2048
+    role: "Secondary Fast Executor"
+    supported_languages:
+      - cpp
+      - c
+      - python
+      - pypy
+      - java
+      - rust
+      - go
+      - javascript
+      - typescript
+      - kotlin
+      - csharp
+      - pascal
+    enabled: true
+    priority: 9
+
+  - id: "worker-3"
+    name: "Judge Worker Node 03 (High-Perf C++/Rust Engine)"
+    host: "127.0.0.1"
+    capacity: 4
+    max_memory_mb: 4096
+    role: "High-Performance Compiled Languages (C++, C, Rust)"
+    supported_languages:
+      - cpp
+      - c
+      - rust
+      - go
+    enabled: true
+    priority: 15
+
+  - id: "worker-4"
+    name: "Judge Worker Node 04 (General Purpose Runner)"
+    host: "127.0.0.1"
+    capacity: 2
+    max_memory_mb: 2048
+    role: "General Purpose Runner"
+    supported_languages:
+      - cpp
+      - c
+      - python
+      - pypy
+      - java
+      - rust
+      - go
+      - javascript
+      - typescript
+      - kotlin
+      - csharp
+      - pascal
+    enabled: true
+    priority: 8
+
+  - id: "worker-5"
+    name: "Judge Worker Node 05 (Python & Java Heavy Sandbox)"
+    host: "127.0.0.1"
+    capacity: 4
+    max_memory_mb: 4096
+    role: "Interpreted & Managed Languages (Python, Java, Kotlin, JS/TS)"
+    supported_languages:
+      - python
+      - pypy
+      - java
+      - kotlin
+      - javascript
+      - typescript
+      - csharp
+    enabled: true
+    priority: 12
+
+  - id: "worker-6"
+    name: "Judge Worker Node 06 (Contest Fast-Lane Priority)"
+    host: "127.0.0.1"
+    capacity: 3
+    max_memory_mb: 2048
+    role: "Contest Priority Fast-Lane Node"
+    supported_languages:
+      - cpp
+      - c
+      - python
+      - pypy
+      - java
+      - rust
+      - go
+      - javascript
+      - typescript
+      - kotlin
+      - csharp
+      - pascal
+    enabled: true
+    priority: 20
+
+  - id: "worker-7"
+    name: "Judge Worker Node 07 (High-Availability Backup & Scale Node)"
+    host: "127.0.0.1"
+    capacity: 4
+    max_memory_mb: 4096
+    role: "High-Availability Backup & Auto-Scaling Node"
+    supported_languages:
+      - cpp
+      - c
+      - python
+      - pypy
+      - java
+      - rust
+      - go
+      - javascript
+      - typescript
+      - kotlin
+      - csharp
+      - pascal
+    enabled: true
+    priority: 7
+
+dispatcher:
+  poll_interval_ms: 200
+  heartbeat_timeout_sec: 30
+  load_balancing: "least_busy" # "round_robin" or "least_busy"
+

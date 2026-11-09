@@ -1,0 +1,6 @@
+language: python
+compiler: compiler.sh
+runner: runner.sh
+file_extension: python
+default_time_limit: 2
+default_memory_limit: 256

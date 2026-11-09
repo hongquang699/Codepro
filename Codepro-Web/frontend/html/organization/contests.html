@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuộc thi Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div id="orgHeaderTarget"></div>
+
+    <div class="org-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h3 class="org-panel-title">🏆 Cuộc Thi Của Tổ Chức (<span id="contestsCount">0</span>)</h3>
+
+        <div style="display:flex;gap:.5rem;">
+          <button onclick="filterContests('all')" id="flt-all" class="btn-org-cta" style="padding:.4rem .9rem;font-size:.82rem;">Tất cả</button>
+          <button onclick="filterContests('RUNNING')" id="flt-running" class="btn-org-outline" style="padding:.4rem .9rem;font-size:.82rem;">Đang diễn ra</button>
+          <button onclick="filterContests('UPCOMING')" id="flt-upcoming" class="btn-org-outline" style="padding:.4rem .9rem;font-size:.82rem;">Sắp diễn ra</button>
+          <button onclick="filterContests('FINISHED')" id="flt-finished" class="btn-org-outline" style="padding:.4rem .9rem;font-size:.82rem;">Đã kết thúc</button>
+        </div>
+      </div>
+
+      <div id="contestsListContainer" style="display:flex;flex-direction:column;gap:1rem;">
+        <div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải danh sách kỳ thi...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    let allContests = [];
+    let currentFilter = 'all';
+
+    function filterContests(status) {
+      currentFilter = status;
+      ['all', 'running', 'upcoming', 'finished'].forEach(k => {
+        const btn = document.getElementById(`flt-${k}`);
+        if (btn) {
+          if (k.toUpperCase() === status.toUpperCase() || (k === 'all' && status === 'all')) {
+            btn.className = 'btn-org-cta';
+          } else {
+            btn.className = 'btn-org-outline';
+          }
+        }
+      });
+      renderList();
+    }
+
+    function renderList() {
+      const container = document.getElementById('contestsListContainer');
+      let filtered = allContests;
+      if (currentFilter !== 'all') {
+        filtered = allContests.filter(c => c.status === currentFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Không có kỳ thi nào trong mục này.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        const statusBadge = c.status === 'RUNNING'
+          ? '<span style="background: rgba(16,185,129,.15);color: #10b981;border: 1px solid #10b981;padding:3px 10px;border-radius:9999px;font-size:.75rem;font-weight:700;">ĐANG DIỄN RA</span>'
+          : (c.status === 'UPCOMING'
+            ? '<span style="background: color-mix(in srgb, var(--color-primary) 15%, transparent);color: var(--color-primary);border: 1px solid var(--color-primary);padding:3px 10px;border-radius:9999px;font-size:.75rem;font-weight:700;">SẮP MỞ</span>'
+            : '<span style="background: rgba(148,163,184,.15);color: var(--color-text-muted);border: 1px solid #64748b;padding:3px 10px;border-radius:9999px;font-size:.75rem;font-weight:700;">ĐÃ KẾT THÚC</span>');
+
+        return `
+          <div class="card" style="padding:1.5rem;border-radius:12px;background: var(--color-surface);border: 1px solid var(--color-card-border);display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;">
+            <div style="flex:1;min-width:280px;">
+              <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.4rem;">
+                <h4 style="font-size:1.15rem;font-weight:800;color: var(--color-text);margin:0;">${c.name}</h4>
+                ${statusBadge}
+                ${c.is_rated ? '<span style="background: rgba(239,68,68,.12);color: #ef4444;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">RATED</span>' : ''}
+              </div>
+              <p style="font-size:.88rem;color: var(--color-text-secondary);margin-bottom:.65rem;line-height:1.5;">
+                ${c.description || 'Kỳ thi lập trình thuật toán chính thức do tổ chức phát động.'}
+              </p>
+              <div style="display:flex;align-items:center;gap:1.25rem;font-size:.82rem;color: var(--color-text-muted);flex-wrap:wrap;">
+                <span>⏱️ Thời lượng: <strong>${c.duration_minutes} phút</strong></span>
+                <span>📝 <strong>${c.problems_count}</strong> bài toán</span>
+                <span>👥 <strong>${c.participants_count}</strong> thí sinh tham gia</span>
+                <span>📅 Bắt đầu: ${new Date(c.start_time).toLocaleDateString('vi-VN')} ${new Date(c.start_time).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:.75rem;align-items:center;">
+              <a href="/contests/${c.key}/scoreboard" class="btn-org-outline" style="padding:.6rem 1.1rem;">
+                Bảng điểm
+              </a>
+              <a href="/contests/${c.key}" class="btn-org-cta" style="padding:.6rem 1.4rem;">
+                Xem kỳ thi &rarr;
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    (async () => {
+      const slug = OrgAPI.getOrgSlugFromUrl();
+      const orgRes = await OrgAPI.getOrg(slug);
+      let orgData = null;
+      if (orgRes.status === 200 && orgRes.data) {
+        orgData = orgRes.data;
+        OrgAPI.renderHeader(orgData, 'contests');
+      }
+
+      const res = await OrgAPI.getContests(slug);
+      const container = document.getElementById('contestsListContainer');
+
+      // If user is NOT a member of this organization:
+      if (res.requires_membership || res.is_member === false) {
+        document.getElementById('contestsCount').textContent = `Khóa (${res.total_contests || 0})`;
+        const filterBar = document.querySelector('.org-panel > div:first-child > div:last-child');
+        if (filterBar) filterBar.style.display = 'none';
+
+        const orgName = (orgData && (orgData.short_name || orgData.name)) || res.organization_name || 'Tổ chức';
+
+        container.innerHTML = `
+          <div class="card" style="text-align:center;padding:3.5rem 2rem;border-radius:16px;background: linear-gradient(180deg, color-mix(in srgb, var(--color-card) 70%, transparent) 0%, color-mix(in srgb, var(--color-card) 95%, transparent) 100%);border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);box-shadow:0 12px 32px -4px rgba(0,0,0,0.5);">
+            <div style="width:76px;height:76px;border-radius:50%;background: color-mix(in srgb, var(--color-accent) 15%, transparent);border: 2px solid color-mix(in srgb, var(--color-accent) 40%, transparent);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem auto;color: #c4b5fd;">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h3 style="font-size:1.55rem;font-weight:800;color: var(--color-text);margin-bottom:0.75rem;">
+              🔒 Cuộc Thi Nội Bộ Của Tổ Chức
+            </h3>
+            <p style="font-size:0.96rem;color: var(--color-text-muted);max-width:540px;margin:0 auto 2rem auto;line-height:1.65;">
+              Các cuộc thi này là quyền lợi dành riêng cho thành viên của <strong>${orgName}</strong>. Danh sách bài thi và bảng xếp hạng chỉ hiển thị khi bạn là thành viên chính thức.
+            </p>
+            <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;align-items:center;">
+              <button onclick="OrgAPI.handleJoin('${slug}')" class="btn-org-cta" style="padding:0.75rem 2.2rem;font-size:1rem;border-radius:10px;box-shadow:0 4px 16px color-mix(in srgb, var(--color-primary) 45%, transparent);cursor:pointer;">
+                <cp-icon name="plus" size="sm"></cp-icon> Tham Gia Tổ Chức Để Mở Khóa
+              </button>
+              <a href="/organizations/${slug}/overview" class="btn-org-outline" style="padding:0.75rem 1.6rem;font-size:1rem;border-radius:10px;text-decoration:none;">
+                Quay lại Tổng quan
+              </a>
+            </div>
+            <div style="margin-top:1.75rem;font-size:0.82rem;color: var(--color-text-dim);">
+              💡 Sau khi bấm tham gia, các cuộc thi nội bộ sẽ tự động xuất hiện ngay lập tức.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // User IS a member:
+      allContests = res.data || [];
+      document.getElementById('contestsCount').textContent = allContests.length;
+
+      // Add a member badge indicator
+      const hdr = document.querySelector('.org-panel-title');
+      if (hdr && res.member_role) {
+        hdr.innerHTML = `🏆 Cuộc Thi Của Tổ Chức (<span id="contestsCount">${allContests.length}</span>) <span style="font-size:.76rem;font-weight:700;padding:3px 10px;border-radius:9999px;background: rgba(16,185,129,.15);color: #10b981;border: 1px solid rgba(16,185,129,.3);margin-left:.75rem;">✓ ĐÃ MỞ KHÓA CHO THÀNH VIÊN</span>`;
+      }
+
+      renderList();
+    })();
+  </script>
+</body>
+</html>

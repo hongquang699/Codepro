@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ Coder | Coding Platform</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problems/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/contests/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/submissions/index.html">Submissions</a></li>
+        <li><a href="/frontend/html/courses/index.html">Khóa học</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/forum/index.html">Thảo luận</a></li>
+        <li><a href="/frontend/html/blog/index.html">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <div id="profileCard" class="card" style="margin-bottom: 2rem;">
+      <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+        <div id="userAvatar" style="width: 90px; height: 90px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: #fff;">
+          U
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            <h1 id="userName" style="margin: 0; font-size: 2rem;">Coder</h1>
+            <span id="userRank" style="padding: 2px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">Rank</span>
+          </div>
+          <p style="color: var(--color-text-muted); margin: 0;">Tổ chức: <strong id="userOrg" style="color: #fff;">-</strong></p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+        <div>
+          <div style="color: var(--color-text-muted); font-size: 0.85rem;">Rating CodeProOJ</div>
+          <div id="userRating" style="font-size: 1.75rem; font-weight: 800; color: var(--color-primary);">1500</div>
+        </div>
+        <div>
+          <div style="color: var(--color-text-muted); font-size: 0.85rem;">Tổng điểm tích lũy</div>
+          <div id="userPoints" style="font-size: 1.75rem; font-weight: 800; color: #10b981;">0</div>
+        </div>
+        <div>
+          <div style="color: var(--color-text-muted); font-size: 0.85rem;">Bài toán đã giải (AC)</div>
+          <div id="userSolved" style="font-size: 1.75rem; font-weight: 800; color: #f59e0b;">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Submissions of User -->
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <div style="padding: 1.25rem; border-bottom: 1px solid var(--color-border);">
+        <h2 style="margin: 0; font-size: 1.25rem;">Lịch sử Nộp bài của Thí sinh</h2>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 80px;">Mã #</th>
+            <th>Bài tập</th>
+            <th style="width: 120px;">Ngôn ngữ</th>
+            <th style="width: 100px;">Kết quả</th>
+            <th style="width: 90px;">Điểm</th>
+            <th style="width: 160px;">Thời điểm</th>
+          </tr>
+        </thead>
+        <tbody id="userSubsBody">
+          <!-- Populated dynamically by frontend/js/user/profile.js -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer style="background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 2rem 0; margin-top: auto;">
+    <div class="container" style="display: flex; justify-content: space-between; color: var(--color-text-muted); font-size: 0.875rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/user/profile.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

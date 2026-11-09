@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Quản Trị Hệ Thống | CodeProOJ Admin - CodeProOJ Standard</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-content { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 14px; width: 100%; max-width: 550px; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border-subtle); }
+    .btn-act-danger { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.3); }
+    .btn-act-danger:hover { background: #ef4444; color: #fff; }
+    .sc-teal::after { background: #14b8a6; }
+    .sc-red::after { background: #ef4444; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin/menu" class="admin-nav-item" style="color: var(--color-danger);background: rgba(220,38,38,0.12);border: 1px solid rgba(220,38,38,0.25);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Menu Quản Trị (Hub)
+      </a>
+      <a href="/admin" class="admin-nav-item active">
+        <cp-icon name="dashboard" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+        <span class="nav-badge" id="navJudgeBadge" style="background: #10b981;color: #fff;">7 Online</span>
+      </a>
+      <a href="/admin/security" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+        <span class="nav-badge" id="navShieldBadge" style="background: var(--color-primary);color: #fff;">WAF ON</span>
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="code" size="sm"></cp-icon> Kho bài tập (Problems)
+        <span class="nav-badge" id="navProblemCount">0</span>
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+        <span class="nav-badge" id="navContestCount">0</span>
+      </a>
+      <a href="/admin/contests/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Tạo kỳ thi mới
+      </a>
+      <a href="/admin/anti-cheat" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bot chống gian lận
+      </a>
+      <a href="/admin/blogs" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết
+        <span class="nav-badge" id="navBlogCount">0</span>
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/organizations" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Quản lý Tổ chức
+        <span class="nav-badge" id="navOrgCount">0</span>
+      </a>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+        <span class="nav-badge" id="navUserCount">0</span>
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+
+      <div class="sidebar-footer">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>CodeProOJ v2.4</div>
+          <div id="maintIndicator" style="font-size:.7rem;padding:.15rem .4rem;border-radius:4px;background: #065f46;color: #34d399;">LIVE</div>
+        </div>
+        <div style="font-size:.72rem;color: var(--color-text-dim);margin-top:4px;">Sandbox Protocol: REST/HTTP:9999</div>
+      </div>
+    </aside>
+
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="admin-main">
+      <!-- Topbar -->
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1>Bảng Điều Khiển Quản Trị (Admin Portal)</h1>
+          <p>Giám sát máy chấm, quản lý kho bài tập, kỳ thi và phân quyền thành viên theo chuẩn CodeProOJ.</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="pulse-pill">
+            <span class="live-dot"></span>
+            <span id="judgeStatusPill">Judge Server ONLINE</span>
+          </div>
+          <a href="/admin/menu" class="btn-top" style="background: rgba(220, 38, 38, 0.2); color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.4); text-decoration: none;" title="Mở Menu Quản Trị Hệ Thống">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Menu Admin
+          </a>
+          <a href="/admin/organizations" class="btn-top" style="background: color-mix(in srgb, var(--color-accent) 20%, transparent); color: #c4b5fd; border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent); text-decoration: none;" title="Quản lý Tổ chức">
+            <cp-icon name="shield" size="sm"></cp-icon> Quản trị Tổ chức
+          </a>
+          <button onclick="openAnnounceModal()" class="btn-top btn-top-secondary"><cp-icon name="bell" size="sm"></cp-icon> Thông báo toàn sàn</button>
+          <a href="/frontend/html/home/index.html" class="btn-top btn-top-secondary" target="_blank"><cp-icon name="globe" size="sm"></cp-icon> Xem Trang chủ</a>
+        </div>
+      </div>
+
+      <!-- Quick Action Bar -->
+      <div style="background: var(--color-card);border: 1px solid var(--color-border-subtle);border-radius:12px;padding:.85rem 1.25rem;margin-bottom:1.5rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:.8rem;font-weight:700;color: var(--color-text-muted);margin-right:.5rem;">THAO TÁC NHANH:</span>
+        <a href="/admin/organizations" class="btn-act" style="background: #581c87;color: #f3e8ff;border-color: #7e22ce;text-decoration:none;"><cp-icon name="shield" size="sm"></cp-icon> Quản trị Tổ chức</a>
+        <a href="/admin/problems/create" class="btn-act" style="background: var(--color-primary);color: #fff;border-color: var(--color-primary);"><cp-icon name="plus" size="sm"></cp-icon> Tạo bài tập mới</a>
+        <a href="/admin/contests/create" class="btn-act" style="background: var(--color-bg-secondary);color: #fff;"><cp-icon name="trophy" size="sm"></cp-icon> Tạo kỳ thi mới</a>
+        <a href="/admin/anti-cheat" class="btn-act" style="background: #17335d;color: #dbeafe;border-color: #315689;"><cp-icon name="shield" size="sm"></cp-icon> Bot chống gian lận</a>
+        <button onclick="openAnnounceModal()" class="btn-act"><cp-icon name="bell" size="sm"></cp-icon> Cập nhật Banner thông báo</button>
+        <button onclick="flushSystemCache()" class="btn-act">🧹 Xóa Cache hệ thống</button>
+        <button onclick="toggleMaintenance()" id="maintToggleBtn" class="btn-act btn-act-danger"><cp-icon name="shield" size="sm"></cp-icon> Bật Bảo trì</button>
+      </div>
+
+      <!-- Stat Cards (6 Cards) -->
+      <div class="stat-row">
+        <div class="stat-card sc-blue">
+          <div class="sc-hdr"><span><cp-icon name="users" size="sm"></cp-icon> Tổng thành viên</span><span>USERS</span></div>
+          <div class="sc-val" id="statUsers">—</div>
+          <div class="sc-sub">Tài khoản đăng ký trên hệ thống</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="sc-hdr"><span><cp-icon name="book" size="sm"></cp-icon> Kho bài tập</span><span>PROBLEMS</span></div>
+          <div class="sc-val" id="statProblems">—</div>
+          <div class="sc-sub" id="statProbSub">Đã xuất bản / Bản nháp</div>
+        </div>
+        <div class="stat-card sc-teal">
+          <div class="sc-hdr"><span><cp-icon name="trophy" size="sm"></cp-icon> Kỳ thi diễn ra</span><span>CONTESTS</span></div>
+          <div class="sc-val" id="statContests">—</div>
+          <div class="sc-sub" id="statContestSub">0 kỳ thi đang mở thi</div>
+        </div>
+        <div class="stat-card sc-yellow">
+          <div class="sc-hdr"><span><cp-icon name="document" size="sm"></cp-icon> Bài nộp hôm nay</span><span>SUBMISSIONS</span></div>
+          <div class="sc-val" id="statTodaySubs">—</div>
+          <div class="sc-sub" id="statAcRate">Tỉ lệ AC: —%</div>
+        </div>
+        <div class="stat-card sc-purple">
+          <div class="sc-hdr"><span><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</span><span>WORKERS</span></div>
+          <div class="sc-val" id="statWorkers" style="color: var(--color-accent);">7 Nodes</div>
+          <div class="sc-sub" id="statQueueText">Hàng đợi: 0 bài chờ</div>
+        </div>
+        <div class="stat-card sc-red">
+          <div class="sc-hdr"><span><cp-icon name="send" size="sm"></cp-icon> Khiếu nại / Hỏi</span><span>TICKETS</span></div>
+          <div class="sc-val" id="statClarif" style="color: #f87171;">0</div>
+          <div class="sc-sub">Thắc mắc thí sinh cần trả lời</div>
+        </div>
+      </div>
+
+      <!-- Grid 2 columns: Judge status & Rejudge Tools -->
+      <div class="admin-grid-2">
+        <!-- Live Judge Nodes -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="judge" size="sm"></cp-icon> Trạng thái Cụm Máy chấm Judge</h3>
+            <a href="/admin/judge" style="color: var(--color-primary);font-size:.8rem;text-decoration:none;font-weight:600;">Xem chi tiết &rarr;</a>
+          </div>
+          <div class="panel-bdy">
+            <div id="judgeNodesList" style="display:flex;flex-direction:column;gap:.6rem;max-height:300px;overflow-y:auto;padding-right:.25rem;">
+              <!-- Rendered via JS -->
+            </div>
+
+            <div style="margin-top:1rem;display:flex;justify-content:space-between;font-size:.82rem;color: var(--color-text-muted);padding-top:.75rem;border-top: 1px solid var(--color-border-subtle);">
+              <span>Cổng dịch vụ: <strong style="color: #fff;">9999</strong></span>
+              <span>Hàng đợi: <strong style="color: #34d399;" id="statQueueSize">0 bài chờ</strong></span>
+              <span>Tổng lượt nộp: <strong style="color: var(--color-primary);" id="statTotalSubs">—</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Universal Rejudge & Bulk Tools -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span>🔄</span> Công Cụ Chấm Lại (CodeProOJ Rejudge Center)</h3>
+          </div>
+          <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+            <!-- Rejudge by ID -->
+            <div style="background: #0b1120;border: 1px solid var(--color-border-subtle);border-radius:10px;padding:1rem;">
+              <div style="font-size:.82rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.4rem;">1. CHẤM LẠI THEO MÃ BÀI NỘP (SUBMISSION ID)</div>
+              <div style="display:flex;gap:.5rem;">
+                <input type="number" id="rejudgeInput" placeholder="Nhập ID bài nộp (ví dụ: 15)" style="flex:1;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.45rem .75rem;font-size:.85rem;outline: none;">
+                <button onclick="handleRejudgeSingle()" class="btn-top btn-top-primary" style="padding:.45rem 1rem;font-size:.85rem;">🔄 Rejudge</button>
+              </div>
+            </div>
+
+            <!-- Rejudge by Problem Code -->
+            <div style="background: #0b1120;border: 1px solid var(--color-border-subtle);border-radius:10px;padding:1rem;">
+              <div style="font-size:.82rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.4rem;">2. CHẤM LẠI TOÀN BỘ BÀI TẬP (REJUDGE PROBLEM)</div>
+              <div style="display:flex;gap:.5rem;">
+                <input type="text" id="rejudgeProbInput" placeholder="Nhập mã bài (ví dụ: SUMA, MAXSUM)" style="flex:1;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.45rem .75rem;font-size:.85rem;text-transform:uppercase;outline: none;">
+                <button onclick="handleRejudgeProblem()" class="btn-top btn-top-secondary" style="padding:.45rem 1rem;font-size:.85rem;background: var(--color-primary);color: #fff;border-color: var(--color-primary);"><cp-icon name="bolt" size="sm"></cp-icon> Rejudge All</button>
+              </div>
+            </div>
+
+            <!-- Rejudge Contest -->
+            <div style="background: #0b1120;border: 1px solid var(--color-border-subtle);border-radius:10px;padding:1rem;">
+              <div style="font-size:.82rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.4rem;">3. CHẤM LẠI KỲ THI (REJUDGE CONTEST)</div>
+              <div style="display:flex;gap:.5rem;">
+                <input type="text" id="rejudgeContestInput" placeholder="Nhập mã kỳ thi (slug, ví dụ: hsg-tin-2026)" style="flex:1;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.45rem .75rem;font-size:.85rem;outline: none;">
+                <button onclick="handleRejudgeContest()" class="btn-top btn-top-secondary" style="padding:.45rem 1rem;font-size:.85rem;background: var(--color-accent);color: #fff;border-color: var(--color-accent);"><cp-icon name="trophy" size="sm"></cp-icon> Rejudge Contest</button>
+              </div>
+            </div>
+
+            <div id="rejudgeMsg" style="font-size:.82rem;padding:.5rem;border-radius:6px;display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Submissions Table -->
+      <div class="panel-box" style="margin-bottom:1.5rem;">
+        <div class="panel-hdr">
+          <h3><cp-icon name="document" size="sm"></cp-icon> Luồng bài nộp mới nhất toàn hệ thống (Live Submissions)</h3>
+          <a href="/admin/submissions" style="color: var(--color-primary);font-size:.8rem;text-decoration:none;font-weight:600;">Xem tất cả bài nộp &rarr;</a>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-tbl">
+            <thead>
+              <tr>
+                <th style="width:70px;">Mã #</th>
+                <th>Thí sinh</th>
+                <th>Bài toán</th>
+                <th>Phán quyết</th>
+                <th>Điểm</th>
+                <th>Thời gian</th>
+                <th>Bộ nhớ</th>
+                <th>Ngôn ngữ</th>
+                <th>Thời điểm</th>
+                <th style="text-align:center;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="recentSubsTbody">
+              <tr><td colspan="10" style="text-align:center;padding:2.5rem;color: var(--color-text-dim);">Đang tải dữ liệu bài nộp...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Clarifications / Q&A Box -->
+      <div class="panel-box">
+        <div class="panel-hdr">
+          <h3><span><cp-icon name="send" size="sm"></cp-icon> </span> Thắc mắc &amp; Khiếu nại từ thí sinh (Clarifications)</h3>
+          <span style="font-size:.8rem;color: var(--color-text-muted);" id="clarifCountLabel">0 câu hỏi</span>
+        </div>
+        <div class="panel-bdy" id="clarifPanelBdy">
+          <div id="clarifList" style="display:flex;flex-direction:column;gap:.75rem;">
+            <div style="text-align:center;padding:1.5rem;color: var(--color-text-dim);font-size:.85rem;">Không có thắc mắc nào chưa giải quyết.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Announcement Modal -->
+  <div class="modal-overlay" id="announceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="margin:0;font-size:1.1rem;color: var(--color-text);"><cp-icon name="bell" size="sm"></cp-icon> Cập nhật Thông Báo Toàn Sàn</h3>
+        <button onclick="closeAnnounceModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.25rem;cursor:pointer;">&times;</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div>
+          <label style="display:block;font-size:.8rem;font-weight:600;color: var(--color-text-muted);margin-bottom:.35rem;">Nội dung banner thông báo</label>
+          <textarea id="announceText" rows="3" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.6rem;font-size:.85rem;box-sizing:border-box;outline: none;" placeholder="Nhập nội dung thông báo..."></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <input type="checkbox" id="announceActive" checked>
+          <label for="announceActive" style="font-size:.85rem;color: var(--color-text-secondary);cursor:pointer;">Hiển thị banner cho tất cả người dùng</label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.5rem;">
+          <button onclick="closeAnnounceModal()" class="btn-top btn-top-secondary">Hủy</button>
+          <button onclick="saveAnnouncement()" class="btn-top btn-top-primary">Lưu &amp; Phát sóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/admin/dashboard.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

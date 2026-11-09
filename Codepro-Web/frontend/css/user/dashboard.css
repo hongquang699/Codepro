@@ -1,0 +1,10 @@
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1.25rem; }
+.stat-val { font-size: 2rem; font-weight: 800; color: #fff; }
+.stat-lbl { color: var(--color-text-muted); font-size: 0.875rem; }
+.streak-heatmap { display: flex; gap: 4px; overflow-x: auto; padding: 1rem 0; }
+.heat-cell { width: 14px; height: 14px; border-radius: 2px; background: var(--color-surface-hover); }
+.heat-cell.level-1 { background: #0e4429; }
+.heat-cell.level-2 { background: #006d32; }
+.heat-cell.level-3 { background: #26a641; }
+.heat-cell.level-4 { background: #39d353; }

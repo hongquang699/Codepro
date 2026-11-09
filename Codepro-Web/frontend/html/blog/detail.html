@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Bài Viết | CodeProOJ Blog</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <style>
+    .article-container { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 4rem 1rem; }
+    .article-header { border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .article-title { font-size: 2.3rem; font-weight: 800; color: var(--color-text); line-height: 1.3; margin-bottom: 1rem; }
+    .article-meta { display: flex; align-items: center; gap: 1rem; color: var(--color-text-muted); font-size: 0.9rem; flex-wrap: wrap; }
+    .article-content { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 3rem; }
+    .article-content h2 { font-size: 1.5rem; color: var(--color-text); margin: 2rem 0 1rem 0; }
+    .article-content p { margin-bottom: 1.25rem; }
+    .article-content pre { background: var(--color-bg); border: 1px solid var(--color-border-subtle); border-radius: 8px; padding: 1.25rem; overflow-x: auto; font-family: "JetBrains Mono", monospace; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .article-content code { color: var(--color-primary); }
+    .comment-card { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/contests">Cuộc thi</a></li>
+        <li><a href="/ranking">Xếp hạng</a></li>
+        <li><a href="/submissions">Bài nộp</a></li>
+        <li><a href="/forum">Diễn đàn</a></li>
+        <li><a href="/blog" class="active">Blog</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/login" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/register" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="article-container">
+    <div style="margin-bottom:1rem;font-size:0.85rem;color: var(--color-text-dim);">
+      <a href="/blog" style="color: var(--color-primary);text-decoration:none;">&larr; Quay lại Blog</a>
+    </div>
+
+    <article class="article-header">
+      <h1 class="article-title" id="artTitle">Đang tải bài viết...</h1>
+      <div class="article-meta">
+        <span id="artAuthor">Tác giả: ...</span> &bull;
+        <span id="artDate">Ngày đăng: ...</span> &bull;
+        <span id="artReadTime">⏱️ 8 phút đọc</span>
+      </div>
+    </article>
+
+    <div class="article-content" id="artContent">
+      <p>Đang nạp nội dung bài viết...</p>
+    </div>
+
+    <!-- Author Box -->
+    <div class="card" style="margin-bottom:3rem;background: var(--color-card);border: 1px solid var(--color-border-subtle);padding:1.5rem;display:flex;gap:1.25rem;align-items:center;">
+      <div style="width:60px;height:60px;border-radius:50%;background: var(--color-primary);color: #fff;font-weight:800;font-size:1.6rem;display:flex;align-items:center;justify-content:center;" id="authorBoxAvatar">?</div>
+      <div>
+        <h3 style="margin:0 0 0.35rem 0;color: var(--color-text);" id="authorBoxName">Tác giả</h3>
+        <p style="margin:0;font-size:0.88rem;color: var(--color-text-muted);">
+          Cộng tác viên nội dung &amp; Ban chuyên môn thuật toán CodeProOJ.
+        </p>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <section>
+      <h3 style="color: var(--color-text);font-size:1.3rem;margin-bottom:1.25rem;"><cp-icon name="send" size="sm"></cp-icon> Bình luận &amp; Thảo luận (<span id="commentCount">2</span>)</h3>
+      
+      <!-- New comment input -->
+      <div class="card" style="margin-bottom:1.5rem;background: var(--color-card);">
+        <textarea id="commentText" rows="3" class="form-input" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.75rem;color: #fff;outline: none;" placeholder="Viết bình luận của bạn (Hỗ trợ Markdown)..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:0.75rem;">
+          <button class="btn btn-primary" onclick="postComment()">Gửi bình luận</button>
+        </div>
+      </div>
+
+      <div id="commentsList">
+        <div class="comment-card">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.85rem;">
+            <strong style="color: var(--color-primary);">@quang_pro</strong>
+            <span style="color: var(--color-text-dim);">Hôm qua lúc 14:20</span>
+          </div>
+          <p style="margin:0;color: var(--color-text-secondary);font-size:0.95rem;line-height:1.5;">
+            Bài viết rất chi tiết và dễ hiểu! Kỹ thuật tối ưu DP này áp dụng rất tốt cho bài SUMA trong contest vừa rồi.
+          </p>
+        </div>
+
+        <div class="comment-card">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.85rem;">
+            <strong style="color: var(--color-primary);">@nam_hsg</strong>
+            <span style="color: var(--color-text-dim);">2 ngày trước</span>
+          </div>
+          <p style="margin:0;color: var(--color-text-secondary);font-size:0.95rem;line-height:1.5;">
+            Cảm ơn tác giả nhiều ạ, mong chờ phần tiếp theo về DP trên cây.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/frontend/vendor/dompurify/purify.min.js"></script>
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || window.location.pathname.split('/').pop() || 'tong-quan-quy-hoach-dong-hsg';
+
+    const mockDetails = {
+      title: "Tổng quan các dạng bài Quy hoạch động thường gặp trong đề thi HSG Quốc gia",
+      author: "admin",
+      date: "28/09/2026",
+      body: `
+        <p>Quy hoạch động (Dynamic Programming - DP) là một trong những phương pháp giải thuật quan trọng bậc nhất trong lập trình thi đấu từ cấp Tỉnh, HSG Quốc gia (CodeProOJ / VOI) cho tới ICPC.</p>
+        <h2>1. Bản chất của Quy hoạch động</h2>
+        <p>Quy hoạch động dựa trên 2 tính chất cốt lõi:</p>
+        <ul>
+          <li><strong>Cấu trúc con tối ưu (Optimal Substructure):</strong> Lời giải tối ưu của bài toán lớn được tạo thành từ lời giải tối ưu của các bài toán con nhỏ hơn.</li>
+          <li><strong>Các bài toán con gối nhau (Overlapping Subproblems):</strong> Trong quá trình đệ quy, các trạng thái bài toán lặp đi lặp lại nhiều lần. Bằng cách lưu trữ kết quả (Memoization hoặc Tabulation), ta giảm độ phức tạp từ hàm mũ xuống đa thức.</li>
+        </ul>
+        <h2>2. Ví dụ: Bài toán Cái Túi (0/1 Knapsack)</h2>
+        <p>Cho $N$ đồ vật, mỗi vật có khối lượng $W_i$ và giá trị $V_i$. Tìm giá trị lớn nhất có thể bỏ vào túi có sức chứa tối đa $M$.</p>
+        <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, m;
+    if (!(cin &gt;&gt; n &gt;&gt; m)) return 0;
+
+    vector&lt;long long&gt; dp(m + 1, 0);
+
+    for (int i = 0; i &lt; n; ++i) {
+        int w; long long v;
+        cin &gt;&gt; w &gt;&gt; v;
+        for (int j = m; j &gt;= w; --j) {
+            dp[j] = max(dp[j], dp[j - w] + v);
+        }
+    }
+
+    cout &lt;&lt; dp[m] &lt;&lt; "\\n";
+    return 0;
+}</code></pre>
+        <h2>3. Lời khuyên khi luyện tập</h2>
+        <p>Hãy bắt đầu từ các bài tập cơ bản về DP dãy con tăng dài nhất (LIS), xâu con chung dài nhất (LCS), sau đó tiến lên DP trên đồ thị DAG, DP chữ số và DP bao lồi (Convex Hull Trick).</p>
+      `
+    };
+
+    async function loadPostDetail() {
+      try {
+        const res = await fetch(`/api/v2/blog/${slug}`);
+        const json = await res.json();
+        if (json.status === 200 && (json.data?.object || json.data)) {
+          const d = json.data.object || json.data;
+          renderArticle(d.title, d.author_name || d.author || 'Admin', d.publish_on ? new Date(d.publish_on).toLocaleDateString('vi-VN') : '2026', d.body);
+        } else {
+          renderArticle(mockDetails.title, mockDetails.author, mockDetails.date, mockDetails.body);
+        }
+      } catch (err) {
+        renderArticle(mockDetails.title, mockDetails.author, mockDetails.date, mockDetails.body);
+      }
+    }
+
+    function renderArticle(title, author, date, body) {
+      document.title = `${title} | CodeProOJ Blog`;
+      document.getElementById('artTitle').textContent = title;
+      document.getElementById('artAuthor').textContent = `Tác giả: @${author}`;
+      document.getElementById('artDate').textContent = `Ngày đăng: ${date}`;
+      document.getElementById('authorBoxName').textContent = `@${author}`;
+      document.getElementById('authorBoxAvatar').textContent = (author || 'A').charAt(0).toUpperCase();
+
+      if (body && !body.trim().startsWith('<') && (body.includes('#') || body.includes('```') || body.includes('\n'))) {
+        let md = body
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/### (.*?)\n/g, '<h3>$1</h3>')
+          .replace(/## (.*?)\n/g, '<h2>$1</h2>')
+          .replace(/# (.*?)\n/g, '<h1>$1</h1>')
+          .replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\n\n/g, '<br><br>')
+          .replace(/\n/g, '<br>');
+        document.getElementById('artContent').innerHTML = md;
+      } else {
+        // Article bodies are user-authored HTML; never render them unsanitized.
+        const content = document.getElementById('artContent');
+        if (window.DOMPurify) content.innerHTML = window.DOMPurify.sanitize(body || '', { USE_PROFILES: { html: true } });
+        else content.textContent = body || '';
+      }
+    }
+
+    function postComment() {
+      const txt = document.getElementById('commentText').value.trim();
+      if (!txt) return alert('Vui lòng nhập nội dung bình luận!');
+      const newComment = document.createElement('div');
+      newComment.className = 'comment-card';
+      newComment.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.85rem;">
+          <strong style="color: var(--color-primary);">@ban</strong>
+          <span style="color: var(--color-text-dim);">Vừa xong</span>
+        </div>
+        <p style="margin:0;color: var(--color-text-secondary);font-size:0.95rem;line-height:1.5;">${txt}</p>
+      `;
+      document.getElementById('commentsList').prepend(newComment);
+      document.getElementById('commentText').value = '';
+      alert('Đã gửi bình luận thành công!');
+    }
+
+    // Check user auth
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+      const u = Auth.getUser();
+      document.getElementById('navAuth').innerHTML = `
+        <a href="/profile/${u.username}" class="btn btn-secondary"><cp-icon name="user" size="sm"></cp-icon> @${u.username}</a>
+        <button onclick="Auth.logout()" class="btn btn-danger" style="margin-left:0.5rem;">Đăng xuất</button>
+      `;
+    }
+
+    loadPostDetail();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

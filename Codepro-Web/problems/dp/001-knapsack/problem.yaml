@@ -1,0 +1,19 @@
+id: 1001
+code: KNAPSACK
+title: Bài toán cái túi (0/1 Knapsack)
+time_limit: 2
+memory_limit: 256
+difficulty: 1400
+
+languages:
+  - cpp
+  - python
+  - java
+  - rust
+
+tags:
+  - dp
+  - knapsack
+  - classic
+
+points: 100

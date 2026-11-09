@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông Báo Kỳ Thi | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">📢 Thông Báo Chính Thức Của Ban Tổ Chức</h3>
+          <div>
+            <button onclick="openCreateAnnModal()" class="ca-btn ca-btn-primary">
+              <cp-icon name="plus" size="sm"></cp-icon> Phát Hành Thông Báo
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th>Tiêu Đề</th>
+                <th>Nội Dung</th>
+                <th style="text-align:center;">Người Đăng</th>
+                <th style="text-align:center;">Ghim</th>
+                <th style="text-align:center;">Thời Điểm</th>
+                <th style="text-align:right;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="annsTbody">
+              <tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải thông báo...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create Ann Modal -->
+  <div class="ca-modal-overlay" id="createAnnModal">
+    <div class="ca-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">📢 Phát Hành Thông Báo Kỳ Thi</h3>
+        <button onclick="closeCreateAnnModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitCreateAnn();">
+        <div class="ca-form-group">
+          <label class="ca-form-label">Tiêu đề thông báo *</label>
+          <input type="text" id="new_ann_title" required class="ca-input" placeholder="Ví dụ: Đính chính testcase bài B...">
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Nội dung thông báo *</label>
+          <textarea id="new_ann_content" required class="ca-textarea" rows="5" placeholder="Chi tiết thông báo tới toàn thể thí sinh..."></textarea>
+        </div>
+        <div class="ca-form-group">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;">
+            <input type="checkbox" id="new_ann_pinned" style="width:16px;height:16px;">
+            <span style="font-size:.88rem;color: var(--color-text);">Ghim thông báo lên đầu trang</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeCreateAnnModal()" class="ca-btn ca-btn-secondary">Hủy</button>
+          <button type="submit" class="ca-btn ca-btn-primary">Phát hành ngay</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('announcements', contestKey);
+    ContestAdminUI.renderHeader('Thông Báo Kỳ Thi', `Phát hành thông báo khẩn và cập nhật kỳ thi ${contestKey}`);
+
+    async function loadAnnouncements() {
+      const res = await ContestAdminAPI.getAnnouncements(contestKey);
+      const tbody = document.getElementById('annsTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có thông báo nào trong kỳ thi.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(a => `
+        <tr>
+          <td><strong style="color: #fff;">${a.title}</strong></td>
+          <td style="color: var(--color-text-secondary);max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.content}</td>
+          <td style="text-align:center;color: var(--color-primary);font-weight:600;">${a.author}</td>
+          <td style="text-align:center;">
+            ${a.is_pinned ? '<span style="color: #ef4444;font-weight:800;">📌 Ghim</span>' : '<span style="color: var(--color-text-dim);">—</span>'}
+          </td>
+          <td style="text-align:center;font-size:.78rem;color: var(--color-text-muted);">${a.created_at}</td>
+          <td style="text-align:right;">
+            <button onclick="deleteAnn(${a.id}, '${a.title.replace(/'/g, "\\'")}')" class="ca-btn ca-btn-danger" style="padding:.25rem .55rem;font-size:.76rem;">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openCreateAnnModal() {
+      document.getElementById('createAnnModal').classList.add('open');
+    }
+    function closeCreateAnnModal() {
+      document.getElementById('createAnnModal').classList.remove('open');
+    }
+
+    async function submitCreateAnn() {
+      const title = document.getElementById('new_ann_title').value.trim();
+      const content = document.getElementById('new_ann_content').value.trim();
+      const is_pinned = document.getElementById('new_ann_pinned').checked;
+
+      const res = await ContestAdminAPI.createAnnouncement(contestKey, { title, content, is_pinned });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeCreateAnnModal();
+        loadAnnouncements();
+      }
+    }
+
+    async function deleteAnn(id, title) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa thông báo "${title}"?`)) return;
+      const res = await ContestAdminAPI.deleteAnnouncement(contestKey, id);
+      alert(res.message || res.error);
+      loadAnnouncements();
+    }
+
+    loadAnnouncements();
+  </script>
+</body>
+</html>

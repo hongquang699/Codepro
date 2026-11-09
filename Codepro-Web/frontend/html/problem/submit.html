@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Nộp bài trực tiếp | CodeProOJ - TMath Style</title>
+  
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/components/editor.css">
+  <link rel="stylesheet" href="/frontend/css/problem/submit.css">
+  <style>
+    .breadcrumb-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1.25rem;
+    }
+    .breadcrumb-row a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+    .breadcrumb-row a:hover {
+      color: var(--color-primary);
+    }
+    .breadcrumb-row .sep {
+      color: #475569;
+    }
+    .btn-spin {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Global Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html" class="active">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/submissions">Bài nộp</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="submit-wide-container" style="padding-top: 1.5rem; padding-bottom: 3.5rem;">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-row">
+      <a href="/frontend/html/home/index.html">Trang chủ</a>
+      <span class="sep">/</span>
+      <a href="/frontend/html/problem/index.html">Bài tập</a>
+      <span class="sep">/</span>
+      <a href="#" id="bcProblemLink">Đang tải...</a>
+      <span class="sep">/</span>
+      <span style="color: var(--color-text-secondary);font-weight:600;">Nộp bài</span>
+    </div>
+
+    <!-- Problem Header Bar & Sub-Nav Tabs (TMath Style) -->
+    <div class="problem-header-bar">
+      <div class="prob-title-row">
+        <div>
+          <h1 class="prob-title-main" id="probTitleDisplay">
+            <span id="probNameText">Nộp bài giải</span>
+            <span class="prob-code-badge" id="probCodeBadge">...</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- TMath Sub-navigation Tabs -->
+      <nav class="tmath-tabs">
+        <a href="#" class="tmath-tab-link" id="tabLinkStatement">
+          <span><cp-icon name="document" size="sm"></cp-icon> </span> Chi tiết
+        </a>
+        <a href="#" class="tmath-tab-link active" id="tabLinkSubmit">
+          <cp-icon name="rocket" size="sm"></cp-icon> Nộp bài
+        </a>
+        <a href="#" class="tmath-tab-link" id="tabLinkSubmissions">
+          <cp-icon name="document" size="sm"></cp-icon> Bài nộp
+        </a>
+        <a href="#" class="tmath-tab-link" id="tabLinkRank">
+          <cp-icon name="trophy" size="sm"></cp-icon> Bảng xếp hạng
+        </a>
+      </nav>
+    </div>
+
+    <!-- Feedback Banner -->
+    <div id="feedbackBanner" class="feedback-banner">
+      <span id="feedbackIcon">ℹ️</span>
+      <span id="feedbackMsg"></span>
+    </div>
+
+    <!-- 2-Column TMath Submit Layout -->
+    <div class="tmath-submit-layout">
+      <!-- ══════════════ LEFT COLUMN: Submission Form ══════════════ -->
+      <div>
+        <div class="submit-panel-card">
+          <div class="submit-panel-header">
+            <h2><cp-icon name="rocket" size="sm"></cp-icon> Gửi Lời Giải Thuật Toán</h2>
+            <div class="judge-node-indicator">
+              <span class="status-dot-pulse"></span>
+              <span id="judgeStatusText">CỤM MÁY CHẤM ONLINE</span>
+            </div>
+          </div>
+
+          <div class="submit-panel-body">
+            <form id="submissionForm">
+              <!-- Field Row: Problem & Language -->
+              <div class="field-row">
+                <div class="form-field">
+                  <label class="form-label">
+                    <span>Mã bài tập:</span>
+                  </label>
+                  <input type="text" id="inputProblemCode" class="input-control" placeholder="Mã bài (vd: APLUS)" style="background: #05070e;color: var(--color-primary);font-weight:700;">
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label" for="selectLanguage">
+                    <span>Ngôn ngữ lập trình:</span>
+                  </label>
+                  <select id="selectLanguage" class="input-control" required>
+                    <option value="CPP17" selected>C++17 (GNU G++ 11.2 / 16.1)</option>
+                    <option value="CPP20">C++20 (GNU G++ 11.2)</option>
+                    <option value="C11">C11 (GNU GCC)</option>
+                    <option value="PY3">Python 3 (CPython 3.12)</option>
+                    <option value="PYPY3">PyPy 3</option>
+                    <option value="JAVA17">Java 17 (OpenJDK)</option>
+                    <option value="RUST">Rust 2021</option>
+                    <option value="GO">Go 1.22</option>
+                    <option value="PAS">Free Pascal (FPC)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Method Switcher: Editor vs File Upload -->
+              <div class="method-switch-bar">
+                <div class="method-pills">
+                  <button type="button" class="method-btn active" id="btnMethodEditor" onclick="switchInputMethod('editor')">
+                    📝 Trình soạn thảo mã
+                  </button>
+                  <button type="button" class="method-btn" id="btnMethodUpload" onclick="switchInputMethod('upload')">
+                    📁 Tải tệp lên
+                  </button>
+                </div>
+
+                <div style="font-size:0.8rem;color: var(--color-text-dim);" id="editorStats">
+                  <span id="statLineCount">1 dòng</span> • <span id="statCharCount">0 ký tự</span>
+                </div>
+              </div>
+
+              <!-- Professional Code IDE Frame -->
+              <div class="ide-frame" id="editorContainer">
+                <!-- IDE Top Toolbar -->
+                <div class="ide-toolbar">
+                  <div class="ide-toolbar-left">
+                    <span class="ide-lang-pill">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                      <span id="activeLangLabel">C++17 (GNU G++)</span>
+                    </span>
+
+                    <span class="ide-autosave-badge" id="ideAutosaveBadge">
+                      <span class="ide-autosave-dot"></span> Đã lưu nháp
+                    </span>
+                  </div>
+
+                  <div class="ide-toolbar-right">
+                    <!-- Theme Selector -->
+                    <select id="ideThemeSelect" class="ide-select" title="Giao diện IDE">
+                      <option value="vs-dark" selected>🌙 VS Dark</option>
+                      <option value="vs">☀️ Sáng (Light)</option>
+                      <option value="hc-black">🖤 High Contrast</option>
+                    </select>
+
+                    <!-- Font Size Selector -->
+                    <select id="ideFontSizeSelect" class="ide-select" title="Cỡ chữ">
+                      <option value="12">12px</option>
+                      <option value="13">13px</option>
+                      <option value="14" selected>14px</option>
+                      <option value="16">16px</option>
+                      <option value="18">18px</option>
+                    </select>
+
+                    <button type="button" class="ide-btn" id="btnIdeFormat" title="Tự động căn lề (Format)">
+                      ⚡ Định dạng
+                    </button>
+                    <button type="button" class="ide-btn" id="btnIdeTemplate" title="Tải lại code mẫu mặc định">
+                      📋 Mã mẫu
+                    </button>
+                    <button type="button" class="ide-btn" id="btnIdeCopy" title="Sao chép toàn bộ code">
+                      📑 Sao chép
+                    </button>
+                    <button type="button" class="ide-btn" id="btnIdeClear" title="Xóa toàn bộ code">
+                      🗑 Xóa
+                    </button>
+                    <button type="button" class="ide-btn btn-fullscreen" id="btnIdeFullscreen" title="Mở rộng toàn màn hình (Zen Mode)">
+                      ⛶ Toàn màn hình
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Main Monaco Editor Container -->
+                <div class="ide-editor-container">
+                  <div id="monacoEditor"></div>
+
+                  <!-- Fallback Gutter + Textarea (active if Monaco is unavailable) -->
+                  <div class="ide-fallback-wrapper" id="ideFallbackWrapper" style="display:none;">
+                    <div class="ide-fallback-gutter" id="editorGutter">1</div>
+                    <textarea id="sourceCodeArea" class="ide-fallback-textarea" spellcheck="false" placeholder="// Viết lời giải thuật toán của bạn tại đây..."></textarea>
+                  </div>
+                </div>
+
+                <!-- IDE Bottom Status Bar -->
+                <div class="ide-status-bar">
+                  <div class="ide-status-left">
+                    <span class="ide-status-item" id="ideCursorPos">Ln 1, Col 1</span>
+                    <span class="ide-status-item hide-on-mobile" id="ideStatsStatus">1 dòng, 0 ký tự</span>
+                  </div>
+                  <div class="ide-status-right">
+                    <span class="ide-status-item hide-on-mobile" id="ideStatusLang">C++17 (GNU G++)</span>
+                    <span class="ide-status-item hide-on-mobile">UTF-8</span>
+                    <span class="ide-status-item hide-on-mobile">Dấu cách: 4</span>
+                    <span class="ide-hotkey-hint">Ctrl + Enter để Nộp bài</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload Dropzone (Hidden by default) -->
+              <div class="upload-dropzone" id="uploadDropzone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📂</div>
+                <div style="font-weight:700;color: #fff;font-size:1rem;margin-bottom:0.35rem;">
+                  Nhấn để chọn tệp hoặc kéo thả mã nguồn vào đây
+                </div>
+                <div style="font-size:0.82rem;color: var(--color-text-muted);">
+                  Hỗ trợ: .cpp, .c, .py, .java, .rs, .go, .pas (Tối đa 64 KB)
+                </div>
+                <input type="file" id="fileInput" style="display:none;" accept=".cpp,.c,.py,.java,.rs,.go,.pas,.txt">
+              </div>
+
+              <!-- Custom Test Section (Collapsible Accordion) -->
+              <div class="custom-test-card">
+                <div class="custom-test-header" onclick="toggleCustomTest()">
+                  <span>🧪 Chạy thử với dữ liệu tùy chỉnh</span>
+                  <span id="customTestToggleIcon">▼</span>
+                </div>
+                <div class="custom-test-body" id="customTestBody">
+                  <p>Chạy thử với đầu vào tùy chỉnh chưa được hỗ trợ. Nút nộp bài bên dưới sẽ chấm mã nguồn bằng bộ testcase của đề.</p>
+                </div>
+              </div>
+
+              <!-- Submit Action Row -->
+              <div class="submit-action-row">
+                <button type="button" id="btnSubmitSolution" class="btn-tmath-submit" onclick="window.doSubmitSolution(event)">
+                  <cp-icon name="rocket" size="sm"></cp-icon> 🚀 Gửi Bài Giải (Submit)
+                </button>
+                <div style="font-size:0.8rem;color: var(--color-text-muted);">
+                  Nhấn <kbd style="background: var(--color-card);padding:2px 6px;border-radius:4px;color: var(--color-text-secondary);">Ctrl + Enter</kbd> để nộp nhanh
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ RIGHT COLUMN: Specs & Tips Sidebar ══════════════ -->
+      <aside>
+        <!-- Specs Card -->
+        <div class="sidebar-specs-card">
+          <div class="specs-hdr">
+            <cp-icon name="bolt" size="sm"></cp-icon> THÔNG SỐ KỸ THUẬT BÀI TOÁN
+          </div>
+          <div class="specs-bdy">
+            <div class="spec-item">
+              <span class="spec-label">Thời gian chạy:</span>
+              <span class="spec-val" id="specTimeLimit" style="color: #f59e0b;">1.0s</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Bộ nhớ tối đa:</span>
+              <span class="spec-val" id="specMemoryLimit" style="color: var(--color-accent);">256 MB</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Thang điểm:</span>
+              <span class="spec-val" id="specPoints" style="color: #10b981;">100 điểm</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Kiểu vào/ra:</span>
+              <span class="spec-val" style="color: var(--color-primary);">Standard I/O</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Kích thước code:</span>
+              <span class="spec-val">&lt; 64 KB</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Kiểu chấm:</span>
+              <span class="spec-val" id="specChecker">Standard Checker</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Máy chấm:</span>
+              <span class="spec-val" style="color: #34d399;">codeprooj-judge-node :9999</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Progress Card -->
+        <div class="sidebar-specs-card">
+          <div class="specs-hdr">
+            <cp-icon name="document" size="sm"></cp-icon> BÀI LÀM CỦA BẠN
+          </div>
+          <div class="specs-bdy">
+            <div class="spec-item">
+              <span class="spec-label">Kết quả cao nhất:</span>
+              <span id="userBestVerdict" style="font-weight:700;color: var(--color-text-muted);">Chưa nộp</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Lần nộp gần nhất:</span>
+              <span id="userLastSubmitted" style="font-size:0.8rem;color: var(--color-text-secondary);">—</span>
+            </div>
+            <a href="#" id="linkViewMySubs" class="btn-view-history" style="margin-top:0.6rem;">
+              <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Xem lịch sử bài nộp của bạn</span>
+              <span class="btn-arrow">&rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Rules & Tips (TMath Style) -->
+        <div class="sidebar-specs-card">
+          <div class="specs-hdr">
+            <span><cp-icon name="sparkles" size="sm"></cp-icon> </span> MẸO &amp; QUY ĐỊNH NỘP BÀI
+          </div>
+          <div class="specs-bdy" style="font-size:0.82rem;color: var(--color-text-muted);line-height:1.6;">
+            <div>• <strong>Nhập/Xuất chuẩn:</strong> Dùng <code>cin/cout</code> (C++) hoặc <code>sys.stdin</code> (Python). Không đọc/ghi file trừ khi đề bài yêu cầu.</div>
+            <div style="margin-top:0.4rem;">• <strong>Tối ưu C++:</strong> Thêm <code>ios_base::sync_with_stdio(0); cin.tie(0);</code> ở đầu hàm <code>main()</code> để tránh bị TLE do I/O chậm.</div>
+            <div style="margin-top:0.4rem;">• <strong>Giá trị trả về:</strong> Hàm <code>main()</code> phải trả về <code>return 0;</code> để tránh nhận lỗi RTE (Runtime Error).</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer style="background: var(--color-surface);border-top: 1px solid var(--color-border);padding:1.75rem 0;margin-top:2rem;">
+    <div class="container" style="display:flex;justify-content:space-between;color: var(--color-text-muted);font-size:0.875rem;flex-wrap:wrap;gap:0.75rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn TMath &amp; CodeProOJ.</div>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script src="/frontend/js/components/code-ide.js"></script>
+  <script>
+    // Templates matching TMath Coding & CodeProOJ
+    const TEMPLATES = {
+      CPP17: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    // TODO: Viết lời giải thuật toán ở đây
+
+    return 0;
+}`,
+      CPP20: `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    // TODO: Viết lời giải thuật toán ở đây
+
+    return 0;
+}`,
+      C11: `#include <stdio.h>
+
+int main() {
+    // TODO: Viết lời giải thuật toán ở đây
+
+    return 0;
+}`,
+      PY3: `import sys
+
+def main():
+    input = sys.stdin.readline
+    # TODO: Viết lời giải thuật toán ở đây
+    pass
+
+if __name__ == '__main__':
+    main()`,
+      JAVA17: `import java.util.*;
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        // TODO: Viết lời giải thuật toán ở đây
+    }
+}`,
+      RUST: `use std::io::{self, BufRead};
+
+fn main() {
+    let stdin = io::stdin();
+    // TODO: Viết lời giải thuật toán ở đây
+}`,
+      GO: `package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+)
+
+func main() {
+    // TODO: Viết lời giải thuật toán ở đây
+}`,
+      PAS: `program Solution;
+begin
+    // TODO: Viết lời giải thuật toán ở đây
+end.`
+    };
+
+    TEMPLATES.PYPY3 = `def main():
+    # Viết lời giải ở đây
+    pass
+
+if __name__ == '__main__':
+    main()`;
+
+    const LANG_LABELS = {
+      CPP17: 'C++17 (GNU G++)',
+      CPP20: 'C++20 (GNU G++)',
+      C11: 'C11 (GNU GCC)',
+      PY3: 'Python 3 (CPython)',
+      PYPY3: 'PyPy 3',
+      JAVA17: 'Java 17 (OpenJDK)',
+      RUST: 'Rust 2021',
+      GO: 'Go 1.22',
+      PAS: 'Free Pascal (FPC)'
+    };
+
+    function getSubmitHeaders() {
+      const csrfMatch = document.cookie.match(/(?:^|;\s*)(?:csrftoken|csrf_token)=([^;]+)/);
+      const csrf = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
+      const token = localStorage.getItem('token');
+      return {
+        'Content-Type': 'application/json',
+        ...(csrf ? { 'X-CSRFToken': csrf } : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      };
+    }
+
+    // Extract problem code from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let problemCode = urlParams.get('code') || urlParams.get('problem') || '';
+    const contestCode = urlParams.get('contest') || '';
+
+    // Handle path like /problem/a01a000001/submit
+    if (!problemCode) {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const probIdx = parts.indexOf('problem') !== -1 ? parts.indexOf('problem') : parts.indexOf('problems');
+      if (probIdx !== -1 && parts[probIdx + 1] && parts[probIdx + 1] !== 'submit') {
+        problemCode = parts[probIdx + 1];
+      }
+    }
+    if (!problemCode) problemCode = 'APLUS';
+
+    let currentProblem = null;
+
+    async function loadProblemData() {
+      try {
+        const inp = document.getElementById('inputProblemCode');
+        if (inp) inp.value = problemCode;
+        const b = document.getElementById('probCodeBadge');
+        if (b) b.textContent = problemCode;
+
+        // Update tabs links safely
+        const detailUrl = `/problems/${problemCode}`;
+        const submitUrl = `/problem/${problemCode}/submit`;
+        const subsUrl = `/submissions?problem=${problemCode}`;
+        const rankUrl = `/ranking?problem=${problemCode}`;
+
+        const setLink = (id, url) => {
+          const el = document.getElementById(id);
+          if (el) el.href = url;
+        };
+
+        setLink('tabLinkStatement', detailUrl);
+        setLink('tabLinkSubmit', submitUrl);
+        setLink('tabLinkSubmissions', subsUrl);
+        setLink('tabLinkRank', rankUrl);
+        setLink('bcProblemLink', detailUrl);
+        setLink('linkViewMySubs', `/submissions/my?problem=${problemCode}`);
+
+        try {
+          const resp = await fetch(`/api/v2/problem/${encodeURIComponent(problemCode)}`);
+          if (resp.ok) {
+            const json = await resp.json();
+            currentProblem = json?.data?.object;
+            if (currentProblem) {
+              document.title = `Nộp bài cho: ${currentProblem.name} | CodeProOJ`;
+              const nameEl = document.getElementById('probNameText');
+              if (nameEl) nameEl.textContent = currentProblem.name;
+              const bcEl = document.getElementById('bcProblemLink');
+              if (bcEl) bcEl.textContent = currentProblem.name;
+              const tl = document.getElementById('specTimeLimit');
+              if (tl) tl.textContent = `${currentProblem.time_limit || 1.0}s`;
+              const ml = document.getElementById('specMemoryLimit');
+              if (ml) ml.textContent = `${currentProblem.memory_limit || 256} MB`;
+              const pt = document.getElementById('specPoints');
+              if (pt) pt.textContent = `${currentProblem.points || 100} điểm`;
+              const chk = document.getElementById('specChecker');
+              if (chk && currentProblem.checker_type) chk.textContent = currentProblem.checker_type;
+            }
+          }
+        } catch (err) {
+          console.warn('Lỗi tải thông tin bài toán:', err);
+        }
+
+        // Initialize Professional CodeIDE
+        if (window.CodeIDE && typeof window.CodeIDE.init === 'function') {
+          const langSel = document.getElementById('selectLanguage');
+          window.CodeIDE.init({
+            containerId: 'monacoEditor',
+            fallbackTextareaId: 'sourceCodeArea',
+            fallbackGutterId: 'editorGutter',
+            languageSelectId: 'selectLanguage',
+            problemCode: problemCode,
+            defaultLang: (langSel && langSel.value) ? langSel.value : 'CPP17',
+            onSubmit: function() {
+              window.doSubmitSolution();
+            },
+            onCodeChange: function(code) {
+              const lines = code ? code.split('\n').length : 1;
+              const chars = code ? code.length : 0;
+              const statL = document.getElementById('statLineCount');
+              const statC = document.getElementById('statCharCount');
+              if (statL) statL.textContent = `${lines} dòng`;
+              if (statC) statC.textContent = `${chars} ký tự`;
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Lỗi khi loadProblemData:', err);
+      }
+    }
+
+    // Switch Language
+    const selectLanguage = document.getElementById('selectLanguage');
+    const activeLangLabel = document.getElementById('activeLangLabel');
+
+    if (selectLanguage) {
+      selectLanguage.addEventListener('change', () => {
+        const selected = selectLanguage.value;
+        if (activeLangLabel) activeLangLabel.textContent = LANG_LABELS[selected] || selected;
+        if (window.CodeIDE && typeof window.CodeIDE.setLanguage === 'function') {
+          window.CodeIDE.setLanguage(selected);
+        }
+      });
+    }
+
+    // Switch between Editor & Upload
+    function switchInputMethod(method) {
+      const btnEditor = document.getElementById('btnMethodEditor');
+      const btnUpload = document.getElementById('btnMethodUpload');
+      const editor = document.getElementById('editorContainer');
+      const upload = document.getElementById('uploadDropzone');
+
+      if (method === 'upload') {
+        if (btnEditor) btnEditor.classList.remove('active');
+        if (btnUpload) btnUpload.classList.add('active');
+        if (editor) editor.style.display = 'none';
+        if (upload) upload.style.display = 'flex';
+      } else {
+        if (btnUpload) btnUpload.classList.remove('active');
+        if (btnEditor) btnEditor.classList.add('active');
+        if (upload) upload.style.display = 'none';
+        if (editor) editor.style.display = 'block';
+      }
+    }
+
+    // File Drag & Drop
+    const dropzone = document.getElementById('uploadDropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    if (dropzone && fileInput) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+        }, false);
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) handleFile(files[0]);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+      });
+    }
+
+    function handleFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const extMap = {
+        'cpp': 'CPP17', 'cc': 'CPP17', 'cxx': 'CPP17',
+        'c': 'C11',
+        'py': 'PY3',
+        'java': 'JAVA17',
+        'rs': 'RUST',
+        'go': 'GO',
+        'pas': 'PAS'
+      };
+      if (extMap[ext] && selectLanguage) {
+        selectLanguage.value = extMap[ext];
+        if (activeLangLabel) activeLangLabel.textContent = LANG_LABELS[extMap[ext]];
+        if (window.CodeIDE) window.CodeIDE.setLanguage(extMap[ext]);
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (window.CodeIDE && typeof window.CodeIDE.setValue === 'function') {
+          window.CodeIDE.setValue(e.target.result);
+        } else {
+          const ta = document.getElementById('sourceCodeArea');
+          if (ta) ta.value = e.target.result;
+        }
+        switchInputMethod('editor');
+        showFeedback('success', `Đã tải tệp "${file.name}" (${(file.size / 1024).toFixed(1)} KB) thành công vào IDE!`);
+      };
+      reader.readAsText(file);
+    }
+
+    // Toggle Custom Test Accordion
+    function toggleCustomTest() {
+      const body = document.getElementById('customTestBody');
+      const icon = document.getElementById('customTestToggleIcon');
+      if (!body) return;
+      if (body.style.display === 'block') {
+        body.style.display = 'none';
+        if (icon) icon.textContent = '▼';
+      } else {
+        body.style.display = 'block';
+        if (icon) icon.textContent = '▲';
+      }
+    }
+
+    // Global Form Submission & Button Action
+    window.doSubmitSolution = async function(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
+
+      const btn = document.getElementById('btnSubmitSolution');
+
+      // 1. Get code
+      let code = '';
+      if (window.CodeIDE && typeof window.CodeIDE.getValue === 'function') {
+        try {
+          code = window.CodeIDE.getValue();
+        } catch (err) {
+          console.warn('CodeIDE getValue error:', err);
+        }
+      }
+      if (!code) {
+        const ta = document.getElementById('sourceCodeArea');
+        if (ta && ta.value) code = ta.value;
+      }
+      if (!code || !code.trim()) {
+        const selLang = document.getElementById('selectLanguage');
+        const langVal = selLang ? selLang.value : 'CPP17';
+        code = TEMPLATES[langVal] || '';
+      }
+
+      code = (code || '').trim();
+
+      if (!code) {
+        showFeedback('error', 'Mã nguồn không được để trống! Hãy viết hoặc dán mã vào trình soạn thảo.');
+        alert('Mã nguồn không được để trống! Hãy viết hoặc dán mã vào trình soạn thảo.');
+        return;
+      }
+
+      const langSelect = document.getElementById('selectLanguage');
+      const lang = langSelect ? langSelect.value : 'CPP17';
+
+      let user = '';
+      try {
+        const uObj = JSON.parse(localStorage.getItem('user') || '{}');
+        if (uObj.username) user = uObj.username;
+      } catch (e) {}
+      if (!user) {
+        user = localStorage.getItem('username') || '';
+      }
+      if (!user) {
+        showFeedback('error', 'Vui lòng đăng nhập trước khi nộp bài.');
+        setTimeout(() => {
+          window.location.href = `/frontend/html/auth/login.html?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        }, 1000);
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="btn-spin"></span> Đang gửi máy chấm...`;
+      }
+
+      showFeedback('info', 'Đang nộp bài lên hệ thống máy chấm...');
+
+      try {
+        const payload = {
+          problem: problemCode || 'APLUS',
+          language: lang,
+          source: code,
+          user: user
+        };
+        if (contestCode) payload.contest = contestCode;
+
+        const resp = await fetch('/api/v2/submit', {
+          method: 'POST',
+          headers: getSubmitHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const json = await resp.json();
+
+        if (resp.ok && json.data && json.data.submission_id) {
+          const subId = json.data.submission_id;
+          const verdict = json.data.result || 'Pending';
+          showFeedback('success', `Nộp bài thành công! Mã bài nộp: #${subId} (${verdict}). Đang chuyển sang trang kết quả...`);
+
+          const targetUrl = contestCode ? `/contests/${contestCode}/submissions/${subId}` : `/submissions/${subId}`;
+          // Navigate directly
+          window.location.href = targetUrl;
+        } else {
+          const errMsg = json.error?.message || json.message || 'Không thể nộp bài';
+          showFeedback('error', 'Lỗi nộp bài: ' + errMsg);
+          alert('Lỗi nộp bài: ' + errMsg);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<cp-icon name="rocket" size="sm"></cp-icon> 🚀 Gửi Bài Giải (Submit)`;
+          }
+        }
+      } catch (err) {
+        showFeedback('error', 'Lỗi kết nối tới máy chủ nộp bài: ' + err.message);
+        alert('Lỗi kết nối máy chủ nộp bài: ' + err.message);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<cp-icon name="rocket" size="sm"></cp-icon> 🚀 Gửi Bài Giải (Submit)`;
+        }
+      }
+    };
+
+    // Attach form submit event
+    const submissionForm = document.getElementById('submissionForm');
+    if (submissionForm) {
+      submissionForm.onsubmit = function(e) {
+        if (e) e.preventDefault();
+        window.doSubmitSolution(e);
+        return false;
+      };
+    }
+
+    function showFeedback(type, msg) {
+      const banner = document.getElementById('feedbackBanner');
+      const icon = document.getElementById('feedbackIcon');
+      const msgEl = document.getElementById('feedbackMsg');
+      if (!banner) return;
+      banner.className = `feedback-banner ${type}`;
+      banner.style.display = 'flex';
+      if (icon) icon.textContent = type === 'success' ? '✅' : (type === 'info' ? 'ℹ️' : '⚠️');
+      if (msgEl) msgEl.textContent = msg;
+      banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadProblemData);
+    } else {
+      loadProblemData();
+    }
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

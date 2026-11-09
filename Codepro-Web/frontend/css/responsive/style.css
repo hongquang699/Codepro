@@ -1,0 +1,12 @@
+/* Responsive Breakpoints & Container Rules */
+@media (min-width: 1200px) {
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+}
+
+@media (max-width: 1199px) and (min-width: 768px) {
+  .container { width: 95%; margin: 0 auto; padding: 0 1rem; }
+}
+
+@media (max-width: 767px) {
+  .container { width: 100%; padding: 0 0.85rem; }
+}

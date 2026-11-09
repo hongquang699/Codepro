@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Tổng Quan Giảng Dạy | Cổng Giáo Viên &amp; Nhà Trường (Teacher Hub)</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/teacher/teacher.css">
+  <style>
+    .teacher-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .teacher-sidebar { background: var(--color-bg-secondary); border-right: 1px solid var(--color-border); padding: 1.5rem 1rem; }
+    .teacher-main { padding: 2rem; background: var(--color-bg); overflow-y: auto; }
+    .teacher-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 0.35rem; }
+    .teacher-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .teacher-nav-item.active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="teacher-layout">
+    <aside class="teacher-sidebar">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;padding-left:0.5rem;">
+        <span style="font-size:1.75rem;">🎓</span>
+        <div>
+          <div style="font-weight:800;color: #fff;font-size:1.1rem;">TEACHER HUB</div>
+          <div style="font-size:0.75rem;color: #34d399;">Quản lý Lớp học &amp; Đào tạo</div>
+        </div>
+      </div>
+      <a href="/frontend/html/teacher/index.html" class="teacher-nav-item active"><cp-icon name="chart" size="sm"></cp-icon> Tổng quan lớp học</a>
+      <a href="/frontend/html/teacher/classes.html" class="teacher-nav-item "><cp-icon name="users" size="sm"></cp-icon> Danh sách Lớp</a>
+      <a href="/frontend/html/teacher/assignments.html" class="teacher-nav-item "><cp-icon name="edit" size="sm"></cp-icon> Bài tập &amp; Bài tập về nhà</a>
+      <a href="/frontend/html/teacher/students.html" class="teacher-nav-item "><span>🧑‍🎓</span> Học sinh &amp; Điểm số</a>
+      <a href="/frontend/html/teacher/statistics.html" class="teacher-nav-item "><span>📈</span> Thống kê &amp; Tiến độ</a>
+      <a href="/frontend/html/teacher/contests.html" class="teacher-nav-item "><cp-icon name="trophy" size="sm"></cp-icon> Kỳ thi Nội bộ</a>
+      <a href="/frontend/html/teacher/problems.html" class="teacher-nav-item "><span>📁</span> Kho Đề riêng</a>
+      <a href="/" class="teacher-nav-item" style="margin-top:3rem;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="teacher-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <h1 style="font-size:1.75rem;color: var(--color-text);font-weight:800;">Bảng Tổng Quan Giảng Dạy</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Không gian giảng dạy thuật toán &amp; bồi dưỡng học sinh giỏi</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Mở form tạo bài tập mới');" style="padding:0.6rem 1.25rem;"><cp-icon name="plus" size="sm"></cp-icon> Giao Bài Tập Mới</button>
+      </div>
+      
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="card" style="padding:1.5rem;">
+    <div style="color: var(--color-text-muted); font-size:0.9rem;">Lớp đang phụ trách</div>
+    <div style="font-size:2rem; font-weight:800; color: var(--color-primary); margin:0.5rem 0;">4 Lớp</div>
+    <div style="color: var(--color-text-dim); font-size:0.85rem;">124 học sinh đang theo học</div>
+  </div>
+  <div class="card" style="padding:1.5rem;">
+    <div style="color: var(--color-text-muted); font-size:0.9rem;">Bài tập đã giao tuần này</div>
+    <div style="font-size:2rem; font-weight:800; color: #34d399; margin:0.5rem 0;">18 Bài</div>
+    <div style="color: var(--color-text-dim); font-size:0.85rem;">89% học sinh đã nộp bài</div>
+  </div>
+  <div class="card" style="padding:1.5rem;">
+    <div style="color: var(--color-text-muted); font-size:0.9rem;">Điểm AC trung bình</div>
+    <div style="font-size:2rem; font-weight:800; color: #f59e0b; margin:0.5rem 0;">76.5 / 100</div>
+    <div style="color: var(--color-text-dim); font-size:0.85rem;">Tăng +4.2 điểm so với tuần trước</div>
+  </div>
+  <div class="card" style="padding:1.5rem;">
+    <div style="color: var(--color-text-muted); font-size:0.9rem;">Kỳ thi tuyển chọn sắp tới</div>
+    <div style="font-size:2rem; font-weight:800; color: #a855f7; margin:0.5rem 0;">2 Ngày</div>
+    <div style="color: var(--color-text-dim); font-size:0.85rem;">Thi khảo sát HSG Tỉnh 2026</div>
+  </div>
+</div>
+
+<div class="card" style="padding:1.5rem;">
+  <h3 style="color: var(--color-text); margin-bottom:1rem;"><cp-icon name="book" size="sm"></cp-icon> Danh Sách Lớp Học Đang Giảng Dạy</h3>
+  <table class="table" style="width:100%;">
+    <thead>
+      <tr><th>Mã lớp</th><th>Tên lớp</th><th>Sĩ số</th><th>Chủ đề hiện tại</th><th>Mã mời</th><th>Thao tác</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>TIN10A</strong></td>
+        <td>10 Chuyên Tin - Khóa 2025-2028</td>
+        <td>32 HS</td>
+        <td>Quy hoạch động cơ bản &amp; Ba lô</td>
+        <td><code>TIN10A_2026</code></td>
+        <td><a href="/frontend/html/teacher/classes.html" class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.85rem;">Vào lớp</a></td>
+      </tr>
+      <tr>
+        <td><strong>TIN11A</strong></td>
+        <td>11 Chuyên Tin - Đội tuyển HSG</td>
+        <td>28 HS</td>
+        <td>Cây phân đoạn (Segment Tree) &amp; BIT</td>
+        <td><code>VOI11_PRO</code></td>
+        <td><a href="/frontend/html/teacher/classes.html" class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.85rem;">Vào lớp</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

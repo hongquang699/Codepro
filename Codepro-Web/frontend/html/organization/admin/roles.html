@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vai trò &amp; Cấp bậc | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              🛡️ Quản Lý Vai Trò &amp; Cấp Bậc (Roles)
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Danh sách các vai trò nội bộ và số lượng thành viên đang nắm giữ.
+            </p>
+          </div>
+          <div>
+            <a id="btnGoPermissions" href="#" class="btn-org-cta" style="font-size:.84rem;">
+              Ma trận Phân quyền &rarr;
+            </a>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Tên Vai trò</th>
+                <th style="text-align:center;">Màu hiển thị</th>
+                <th style="text-align:center;">Số thành viên</th>
+                <th style="text-align:center;">Mặc định khi vào</th>
+                <th>Quyền hạn cấp</th>
+              </tr>
+            </thead>
+            <tbody id="rolesTbody">
+              <tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách vai trò...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'roles');
+    document.getElementById('btnGoPermissions').href = `/organizations/${slug}/admin/permissions`;
+
+    async function loadRoles() {
+      const res = await OrgAPI.getAdminRoles(slug);
+      const tbody = document.getElementById('rolesTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Không có vai trò nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(r => `
+        <tr>
+          <td>
+            <strong style="color: ${r.color};font-size:.95rem;">${r.name}</strong>
+          </td>
+          <td style="text-align:center;">
+            <span style="display:inline-block;width:18px;height:18px;border-radius:4px;background: ${r.color};border: 1px solid var(--color-border);vertical-align:middle;"></span>
+            <span style="font-size:.78rem;color: var(--color-text-muted);margin-left:4px;">${r.color}</span>
+          </td>
+          <td style="text-align:center;font-weight:700;">
+            ${r.member_count}
+          </td>
+          <td style="text-align:center;">
+            ${r.is_default ? '<span style="color: #10b981;font-weight:700;">✓ Mặc định</span>' : '<span style="color: var(--color-text-dim);">—</span>'}
+          </td>
+          <td>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;">
+              ${r.permissions.map(p => `<span style="font-size:.72rem;background: var(--color-bg);border: 1px solid var(--color-border);padding:1px 6px;border-radius:4px;color: var(--color-primary);">${p}</span>`).join('')}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    loadRoles();
+  </script>
+</body>
+</html>

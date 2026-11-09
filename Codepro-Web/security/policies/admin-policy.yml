@@ -1,0 +1,19 @@
+# CODING_OJ Admin Security Policy
+version: 1.0
+access_control:
+  require_staff: true
+  require_superuser_for_destructive: true
+  session_lifetime_minutes: 30
+  strict_ip_match: true
+
+privileged_actions:
+  require_password_confirmation:
+    - delete_problem
+    - delete_user
+    - bulk_rejudge
+    - wipe_submissions
+    - change_system_config
+  audit_logging:
+    log_all_admin_requests: true
+    log_request_body: false # avoid logging passwords
+    log_headers: true

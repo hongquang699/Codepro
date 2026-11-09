@@ -1,0 +1,4 @@
+#!/bin/bash
+SOURCE=$1
+DEST=$2
+fpc -O2 $SOURCE -o$DEST

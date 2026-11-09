@@ -1,0 +1,6 @@
+name: Kotlin 1.9
+extension: .kt
+compiled: true
+executable: Solution.jar
+time_limit_multiplier: 2.0
+memory_limit_multiplier: 2.0

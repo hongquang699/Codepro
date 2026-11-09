@@ -1,0 +1,32 @@
+<form id="loginForm" class="auth-form">
+  <div class="auth-form-group">
+    <label class="auth-label" for="username">Username / Email</label>
+    <div class="auth-input-wrap">
+      <input type="text" id="username" class="auth-input" placeholder="Tên đăng nhập hoặc email" required autocomplete="username" autofocus>
+    </div>
+  </div>
+
+  <div class="auth-form-group">
+    <div class="auth-row-between">
+      <label class="auth-label" for="password">Mật khẩu</label>
+    </div>
+    <div class="auth-input-wrap">
+      <input type="password" id="password" class="auth-input" placeholder="••••••••••••••" required autocomplete="current-password">
+      <button type="button" id="togglePasswordBtn" class="auth-input-icon" aria-label="Hiện mật khẩu">
+        <i data-icon="eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="auth-row-between login-extra-row">
+    <label class="auth-checkbox-group">
+      <input type="checkbox" id="rememberMe" checked>
+      <span>Ghi nhớ đăng nhập</span>
+    </label>
+    <a href="/forgot-password" class="auth-link" style="font-size: 0.85rem;">Quên mật khẩu?</a>
+  </div>
+
+  <button type="submit" id="loginSubmitBtn" class="auth-btn-primary">
+    <span>ĐĂNG NHẬP</span>
+  </button>
+</form>

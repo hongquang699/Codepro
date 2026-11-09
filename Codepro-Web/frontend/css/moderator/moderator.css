@@ -1,0 +1,97 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - MODERATOR PORTAL STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.mod-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+@media (max-width: 900px) {
+  .mod-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mod-sidebar {
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border-subtle);
+  padding: 1.5rem 1rem;
+}
+
+.mod-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: 1.5rem;
+}
+
+.mod-badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.45rem;
+  background: #f59e0b;
+  color: #000;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.mod-main {
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+}
+
+.mod-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.mod-action-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-mod-approve {
+  background: #065f46;
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-mod-reject {
+  background: #7f1d1d;
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.diff-box {
+  background: #050811;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-height: 350px;
+  overflow-y: auto;
+}

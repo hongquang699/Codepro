@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổ chức &amp; Câu lạc bộ | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1.25rem;">
+      <div>
+        <h1 style="font-size:2rem;font-weight:800;color: var(--color-text, var(--color-text));margin:0;display:flex;align-items:center;gap:.6rem;letter-spacing:-0.02em;">
+          🏛️ Tổ Chức &amp; Cộng Đồng Thuật Toán
+        </h1>
+        <p style="color: var(--color-text-muted, var(--color-text-muted));font-size:.92rem;margin-top:6px;line-height:1.5;">
+          Khám phá các tổ chức chuyên môn, trường chuyên, câu lạc bộ lập trình thi đấu và kỳ thi Olympic Tin học.
+        </p>
+      </div>
+
+      <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="orgSearchInput" class="org-search-input" placeholder="Tìm kiếm tổ chức theo tên, mã viết tắt...">
+        <button id="btnCreateOrg" onclick="openCreateOrgModal()" class="btn-org-cta" style="display:none;padding:.65rem 1.25rem;font-size:.88rem;align-items:center;gap:6px;cursor:pointer;">
+          <cp-icon name="plus" size="sm"></cp-icon> Tạo tổ chức mới
+        </button>
+      </div>
+    </div>
+
+    <!-- Organizations Grid -->
+    <div id="orgsGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:1.5rem;">
+      <div style="text-align:center;padding:3rem;color: var(--color-text-muted, var(--color-text-muted));grid-column:1/-1;">Đang tải danh sách tổ chức...</div>
+    </div>
+  </main>
+
+  <!-- Modal Tạo Tổ Chức Mới (Dành cho Giáo viên & Admin) -->
+  <div class="org-modal-overlay" id="createOrgModal">
+    <div class="org-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom: 1px solid var(--color-border-subtle, var(--color-border-subtle));padding-bottom:.75rem;">
+        <div>
+          <h3 style="margin:0;color: var(--color-text, #fff);font-size:1.2rem;">🏛️ Khởi Tạo Tổ Chức Mới</h3>
+          <div style="font-size:.78rem;color: var(--color-text-muted, var(--color-text-muted));margin-top:2px;">Dành riêng cho Giáo viên (Teacher) và Quản trị viên hệ thống</div>
+        </div>
+        <button type="button" onclick="closeCreateOrgModal()" style="background: none;border: none;color: var(--color-text-muted, var(--color-text-muted));font-size:1.6rem;line-height:1;cursor:pointer;padding:4px 8px;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitCreateOrg();">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label class="org-admin-label">Tên tổ chức / CLB *</label>
+            <input type="text" id="new_org_name" required class="org-admin-input" placeholder="Ví dụ: CLB Tin Học THPT Chuyên">
+          </div>
+          <div>
+            <label class="org-admin-label">Mã Slug URL *</label>
+            <input type="text" id="new_org_slug" required class="org-admin-input" placeholder="clb-tinhoc (không dấu, viết thường)">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label class="org-admin-label">Tên viết tắt *</label>
+            <input type="text" id="new_org_short_name" required class="org-admin-input" placeholder="CPOJ-CLB">
+          </div>
+          <div>
+            <label class="org-admin-label">Website hoặc Fanpage</label>
+            <input type="url" id="new_org_website" class="org-admin-input" placeholder="https://...">
+          </div>
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Mô tả giới thiệu tổ chức</label>
+          <textarea id="new_org_desc" class="org-admin-textarea" style="height:75px;resize:vertical;" placeholder="Giới thiệu về mục tiêu hoạt động, thành viên và các kỳ thi..."></textarea>
+        </div>
+        <div style="margin-bottom:1.25rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;color: var(--color-text-secondary, var(--color-text-secondary));font-size:.85rem;cursor:pointer;">
+            <input type="checkbox" id="new_org_is_open" checked style="width:16px;height:16px;accent-color:var(--color-primary);">
+            <span><strong>Mở đăng ký tự do:</strong> Người dùng có thể bấm tham gia ngay không cần chờ duyệt</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;border-top: 1px solid var(--color-border-subtle, var(--color-border-subtle));padding-top:1rem;">
+          <button type="button" onclick="closeCreateOrgModal()" class="btn-org-outline">Hủy</button>
+          <button type="submit" id="btnSubmitNewOrg" class="btn-org-cta">Xác nhận tạo tổ chức</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Use the current server session for system administrators; retain the teacher role for the same account.
+    const hasAuthSession = Auth.getToken() || /(?:^|;\s*)(?:sessionid|cp_session)=/.test(document.cookie);
+    if (hasAuthSession) fetch('/api/v1/auth/me', { credentials: 'include', headers: { Accept: 'application/json' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        const current = result?.user;
+        if (!result?.authenticated || !current) return;
+        window.__cpVerifiedUser = current;
+        if (typeof window.initNavbar === 'function') window.initNavbar();
+        const cached = typeof Auth !== 'undefined' ? Auth.getUser() : null;
+        const isTeacher = cached?.id === current.id && cached.role === 'teacher';
+        if (current.is_staff === true || current.is_superuser === true || isTeacher) {
+          document.getElementById('btnCreateOrg').style.display = 'inline-flex';
+        }
+      }).catch(() => {});
+
+    function openCreateOrgModal() {
+      const modal = document.getElementById('createOrgModal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        const inp = document.getElementById('new_org_name');
+        if (inp) inp.focus();
+      }, 50);
+    }
+
+    function closeCreateOrgModal() {
+      const modal = document.getElementById('createOrgModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on backdrop click
+    document.getElementById('createOrgModal').addEventListener('click', (e) => {
+      if (e.target.id === 'createOrgModal') {
+        closeCreateOrgModal();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeCreateOrgModal();
+      }
+    });
+
+    // Auto-generate slug from organization name
+    document.getElementById('new_org_name').addEventListener('input', (e) => {
+      const slugInp = document.getElementById('new_org_slug');
+      if (!slugInp.dataset.manual) {
+        slugInp.value = e.target.value.toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+    });
+    document.getElementById('new_org_slug').addEventListener('input', () => {
+      document.getElementById('new_org_slug').dataset.manual = '1';
+    });
+
+    async function submitCreateOrg() {
+      const btn = document.getElementById('btnSubmitNewOrg');
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang tạo tổ chức...';
+
+      const payload = {
+        name: document.getElementById('new_org_name').value.trim(),
+        slug: document.getElementById('new_org_slug').value.trim().toLowerCase(),
+        short_name: document.getElementById('new_org_short_name').value.trim(),
+        website: document.getElementById('new_org_website').value.trim(),
+        description: document.getElementById('new_org_desc').value.trim(),
+        is_open: document.getElementById('new_org_is_open').checked
+      };
+
+      try {
+        const res = await OrgAPI.createOrg(payload);
+        if ((res.status === 200 || res.status === 201) && res.data) {
+          alert('Tạo tổ chức mới thành công! Đang chuyển hướng đến trang quản trị tổ chức...');
+          window.location.href = `/frontend/html/organization/admin/index.html?org=${res.data.slug}`;
+        } else {
+          alert(res.error || res.message || 'Lỗi tạo tổ chức. Vui lòng kiểm tra lại quyền hạn.');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Xác nhận tạo tổ chức';
+      }
+    }
+
+    async function loadOrgs(query = '') {
+      const grid = document.getElementById('orgsGrid');
+      grid.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);grid-column:1/-1;">Đang tải danh sách tổ chức...</div>';
+      
+      try {
+        const res = await OrgAPI.listOrgs(query);
+        if (!res.data || res.data.length === 0) {
+          grid.innerHTML = `
+            <div style="text-align:center;padding:3.5rem 1rem;color: var(--color-text-muted);grid-column:1/-1;background: var(--color-surface);border: 1px dashed var(--color-card-border);border-radius:12px;">
+              <div style="font-size:2rem;margin-bottom:0.5rem;">🔍</div>
+              <div style="font-weight:600;font-size:1rem;color: var(--color-text);">Không tìm thấy tổ chức nào phù hợp</div>
+              <p style="font-size:0.85rem;margin-top:0.35rem;">Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc.</p>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = res.data.map(org => {
+          // Lands inside a JS string in an onerror attribute: drop quotes/backslashes before HTML-escaping.
+          const initial = escapeHtml((org.short_name || org.name || 'O').charAt(0).toUpperCase().replace(/['"\\]/g, '')) || 'O';
+          const orgName = escapeHtml(org.name || '');
+          const shortName = escapeHtml(org.short_name || org.name || '');
+          const desc = escapeHtml(org.about || org.description || 'Cộng đồng chuyên môn và thuật toán thi đấu trên CodeProOJ.');
+          const logoSrc = escapeHtml(org.logo || '/frontend/assets/icons/org-default.svg');
+
+          return `
+            <div class="org-card">
+              <div>
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;">
+                  <div class="org-card-logo">
+                    <img src="${logoSrc}" 
+                         alt="${orgName}" 
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;color: var(--color-primary);background: linear-gradient(135deg,var(--color-card),var(--color-bg-secondary));\\'>${initial}</div>';" 
+                         loading="lazy">
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:.4rem;">
+                      <h3 class="org-card-title" title="${shortName}">
+                        ${shortName}
+                      </h3>
+                      ${org.verified ? `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                          <path d="M9 12L11 14L15 10M12 3L13.91 4.26L16.14 3.73L17.55 5.48L19.78 5.74L20.31 7.97L22.06 9.38L21.53 11.61L22.79 13.52L21.53 15.43L22.06 17.66L20.31 19.07L19.78 21.3L17.55 21.56L16.14 23.31L13.91 22.78L12 24.04L10.09 22.78L7.86 23.31L6.45 21.56L4.22 21.3L3.69 19.07L1.94 17.66L2.47 15.43L1.21 13.52L2.47 11.61L1.94 9.38L3.69 7.97L4.22 5.74L6.45 5.48L7.86 3.73L10.09 4.26L12 3Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.2"/>
+                          <path d="M8.5 12.5L11 15L16 9" stroke="white" stroke-width="2"/>
+                        </svg>
+                      ` : ''}
+                    </div>
+                    <div class="org-card-subtitle" title="${orgName}">
+                      ${orgName}
+                    </div>
+                  </div>
+                </div>
+
+                <p class="org-card-desc" title="${desc}">
+                  ${desc}
+                </p>
+              </div>
+
+              <div>
+                <div class="org-card-meta">
+                  <span>👥 ${(org.member_count || 0).toLocaleString()} thành viên</span>
+                  <span>🏆 ${org.contest_count || 0} kỳ thi</span>
+                  <span>📝 ${org.problem_count || 0} bài tập</span>
+                </div>
+
+                <a href="/organizations/${encodeURIComponent(org.slug)}" class="btn-org-cta" style="width:100%;justify-content:center;box-sizing:border-box;">
+                  Xem Tổ Chức &rarr;
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        grid.innerHTML = `
+          <div style="text-align:center;padding:3rem;color: #ef4444;grid-column:1/-1;">
+            <p>Lỗi kết nối máy chủ khi tải danh sách tổ chức: ${escapeHtml(err.message)}</p>
+            <button onclick="loadOrgs()" class="btn-org-outline" style="margin-top:0.75rem;cursor:pointer;">Thử lại</button>
+          </div>
+        `;
+      }
+    }
+
+    let searchTimeout = null;
+    document.getElementById('orgSearchInput').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadOrgs(e.target.value.trim());
+      }, 250);
+    });
+
+    loadOrgs();
+  </script>
+</body>
+</html>

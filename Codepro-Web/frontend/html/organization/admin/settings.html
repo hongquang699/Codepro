@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              ⚙️ Cài Đặt Hồ Sơ &amp; Thông Tin Tổ Chức
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Quản lý tên gọi, thương hiệu, liên kết website và chính sách gia nhập.
+            </p>
+          </div>
+        </div>
+
+        <form id="settingsForm" onsubmit="event.preventDefault(); saveSettings();">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+            <div class="org-admin-form-group">
+              <label class="org-admin-label">Tên đầy đủ của Tổ chức *</label>
+              <input type="text" id="set_name" class="org-admin-input" required>
+            </div>
+            <div class="org-admin-form-group">
+              <label class="org-admin-label">Tên viết tắt (Short Name / Acronym) *</label>
+              <input type="text" id="set_short_name" class="org-admin-input" required>
+            </div>
+          </div>
+
+          <div class="org-admin-form-group">
+            <label class="org-admin-label">Mô tả ngắn gọn (Slogan / Headline)</label>
+            <input type="text" id="set_description" class="org-admin-input">
+          </div>
+
+          <div class="org-admin-form-group">
+            <label class="org-admin-label">Giới thiệu chi tiết (Markdown / Text)</label>
+            <textarea id="set_about" class="org-admin-textarea" rows="4"></textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+            <div class="org-admin-form-group">
+              <label class="org-admin-label">Website chính thức</label>
+              <input type="url" id="set_website" class="org-admin-input" placeholder="https://...">
+            </div>
+            <div class="org-admin-form-group">
+              <label class="org-admin-label">Đường dẫn Logo (URL / Path)</label>
+              <input type="text" id="set_logo" class="org-admin-input" placeholder="/frontend/assets/icons/org-default.svg">
+            </div>
+          </div>
+
+          <div class="org-admin-form-group">
+            <label style="display:flex;align-items:center;gap:.65rem;cursor:pointer;color: var(--color-text);font-size:.9rem;">
+              <input type="checkbox" id="set_is_open" style="width:18px;height:18px;accent-color:var(--color-primary);">
+              <span><strong>Mở đăng ký tự do:</strong> Người dùng có thể tự bấm tham gia ngay mà không cần phê duyệt</span>
+            </label>
+          </div>
+
+          <div class="org-admin-form-group">
+            <label style="display:flex;align-items:center;gap:.65rem;cursor:pointer;color: var(--color-primary);font-size:.9rem;">
+              <input type="checkbox" id="set_verified" style="width:18px;height:18px;accent-color:#0284c7;">
+              <span><strong>Tích xanh xác minh (Verified Organization):</strong> Hiển thị huy hiệu chính chủ</span>
+            </label>
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top: 1px solid var(--color-border-subtle);display:flex;gap:1rem;">
+            <button type="submit" class="btn-org-cta">
+              <cp-icon name="save" size="sm"></cp-icon> Lưu Thay Đổi
+            </button>
+            <span id="saveStatus" style="display:none;color: #10b981;font-weight:600;font-size:.9rem;align-self:center;">
+              ✓ Đã lưu cài đặt thành công!
+            </span>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'settings');
+
+    async function loadData() {
+      const res = await OrgAPI.getOrg(slug);
+      if (res.data) {
+        const d = res.data;
+        document.getElementById('set_name').value = d.name || '';
+        document.getElementById('set_short_name').value = d.short_name || '';
+        document.getElementById('set_description').value = d.description || '';
+        document.getElementById('set_about').value = d.about || '';
+        document.getElementById('set_website').value = d.website || '';
+        document.getElementById('set_logo').value = d.logo || '';
+        document.getElementById('set_is_open').checked = Boolean(d.is_open);
+        document.getElementById('set_verified').checked = Boolean(d.verified);
+      }
+    }
+
+    async function saveSettings() {
+      const payload = {
+        name: document.getElementById('set_name').value,
+        short_name: document.getElementById('set_short_name').value,
+        description: document.getElementById('set_description').value,
+        about: document.getElementById('set_about').value,
+        website: document.getElementById('set_website').value,
+        logo: document.getElementById('set_logo').value,
+        is_open: document.getElementById('set_is_open').checked,
+        verified: document.getElementById('set_verified').checked
+      };
+
+      const res = await OrgAPI.updateSettings(slug, payload);
+      if (res.status === 200) {
+        const s = document.getElementById('saveStatus');
+        s.style.display = 'inline';
+        setTimeout(() => s.style.display = 'none', 3000);
+      } else {
+        alert(res.error || 'Có lỗi xảy ra khi lưu.');
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

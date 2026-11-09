@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cộng Đồng Lập Trình | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/community/community.css">
+  <link rel="stylesheet" href="/frontend/css/community/feed.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Global Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/frontend/html/problem/index.html" class="nav-link">Bài tập</a>
+        <a href="/frontend/html/contest/index.html" class="nav-link">Cuộc thi</a>
+        <a href="/frontend/html/ranking/index.html" class="nav-link">Xếp hạng</a>
+        <a href="/frontend/html/submission/index.html" class="nav-link">Bài nộp</a>
+        <a href="/frontend/html/community/home/index.html" class="nav-link active">Cộng đồng</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/frontend/html/admin/dashboard.html" class="btn-nav btn-admin">Quản trị</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 3-Column Community Layout -->
+  <div class="comm-layout">
+    <!-- Left Navigation Sidebar -->
+    <aside class="comm-left-sidebar">
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Khám phá</div>
+        <nav class="comm-nav-list">
+          <a href="/frontend/html/community/home/index.html" class="comm-nav-link active">
+            <span>🏠</span> Trang chủ Feed
+          </a>
+          <a href="/frontend/html/community/forum/index.html" class="comm-nav-link">
+            <span><cp-icon name="send" size="sm"></cp-icon> </span> Diễn đàn thảo luận
+          </a>
+          <a href="/frontend/html/community/groups/index.html" class="comm-nav-link">
+            <cp-icon name="users" size="sm"></cp-icon> Nhóm &amp; CLB Tin học
+          </a>
+          <a href="/frontend/html/community/notifications/index.html" class="comm-nav-link">
+            <cp-icon name="bell" size="sm"></cp-icon> Thông báo
+          </a>
+          <a href="/frontend/html/ranking/index.html" class="comm-nav-link">
+            <cp-icon name="trophy" size="sm"></cp-icon> Bảng vàng Rating CodeProOJ
+          </a>
+        </nav>
+      </div>
+
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Soạn thảo</div>
+        <a href="/frontend/html/community/posts/create.html" class="comm-btn-primary" style="width:100%;justify-content:center;">
+          ✍️ Viết bài mới
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="comm-main">
+      <!-- Quick Post Composer -->
+      <section class="comm-composer-box">
+        <input type="text" id="quickPostTitle" placeholder="Tiêu đề bài viết hoặc câu hỏi của bạn..." class="comm-composer-input" style="min-height:auto;margin-bottom:0.6rem;">
+        <textarea id="quickPostContent" placeholder="Bạn đang nghĩ gì? Chia sẻ kinh nghiệm giải thuật, mẹo tối ưu code..." class="comm-composer-input"></textarea>
+        <div class="comm-composer-actions">
+          <span style="font-size:0.8rem;color: var(--color-text-dim);">Hỗ trợ Markdown &amp; KaTeX</span>
+          <button id="btnSubmitQuickPost" class="comm-btn-primary">Đăng bài</button>
+        </div>
+      </section>
+
+      <!-- Posts Feed Container -->
+      <section id="feedList">
+        <div style="color: var(--color-text-muted);padding:2rem;text-align:center;">Đang tải tin tức cộng đồng...</div>
+      </section>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="comm-right-sidebar">
+      <!-- Top Coders -->
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Top Lập Trình Viên</div>
+        <div id="topCodersList">
+          <div style="color: var(--color-text-dim);font-size:0.85rem;">Đang tải bảng xếp hạng...</div>
+        </div>
+      </div>
+
+      <!-- Trending Threads -->
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Thảo luận sôi nổi</div>
+        <div id="trendingThreadsList">
+          <div style="color: var(--color-text-dim);font-size:0.85rem;">Đang tải...</div>
+        </div>
+      </div>
+
+      <!-- Upcoming Contests -->
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Kỳ thi sắp diễn ra</div>
+        <div id="upcomingContestsList">
+          <div style="color: var(--color-text-dim);font-size:0.85rem;">Đang tải...</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Client JavaScript -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/community/api.js"></script>
+  <script src="/frontend/js/community/home.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - LEARNING & ALGORITHM WIKI STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.learning-hero {
+  background: radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--color-accent) 15%, transparent), transparent 50%),
+              radial-gradient(circle at 10% 90%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 50%),
+              #090d16;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: 3.5rem 0;
+  margin-bottom: 2.5rem;
+}
+
+.learning-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.75rem 0;
+}
+
+.learning-hero-sub {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  max-width: 680px;
+  line-height: 1.6;
+}
+
+/* ── Learning Tracks Grid ──────────────────────────────────── */
+.tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.track-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 14px;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.track-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-accent);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+.track-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.track-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.track-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.track-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+  margin-bottom: 0.4rem;
+}
+
+.track-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-card);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.track-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 999px;
+}
+
+/* ── Topic / Chapter Accordion ──────────────────────────────── */
+.chapter-accordion {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.chapter-header {
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.015);
+  border-bottom: 1px solid transparent;
+  transition: background 0.15s;
+}
+
+.chapter-header:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chapter-header.open {
+  border-bottom-color: var(--color-border-subtle);
+}
+
+.lesson-list {
+  padding: 0.5rem 1.5rem 1rem 1.5rem;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-item:hover {
+  color: var(--color-primary);
+}
+
+.lesson-badge-done {
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 700;
+}

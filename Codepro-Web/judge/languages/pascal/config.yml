@@ -1,0 +1,6 @@
+language: pascal
+compiler: compiler.sh
+runner: runner.sh
+file_extension: pascal
+default_time_limit: 2
+default_memory_limit: 256

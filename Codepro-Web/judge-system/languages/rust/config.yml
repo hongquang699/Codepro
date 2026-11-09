@@ -1,0 +1,6 @@
+name: Rust 2021
+extension: .rs
+compiled: true
+executable: solution
+time_limit_multiplier: 1.0
+memory_limit_multiplier: 1.0

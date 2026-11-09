@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuộc thi Trực Tuyến | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container-wide" style="max-width: 1500px; width: 95%; margin: 0 auto; padding-top: 2rem; padding-bottom: 4rem;">
+    <!-- Hero Header -->
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--color-text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem;">
+        🏆 Cuộc thi Lập trình Thi đấu
+      </h1>
+      <p style="color: var(--color-text-muted); font-size: 1rem;">
+        Tham gia tranh tài các kỳ thi chuẩn HSG Quốc gia, CodeProOJ và ICPC với hệ thống máy chấm thời gian thực.
+      </p>
+    </div>
+
+    <!-- Featured Contest Banner: HSG TIN HỌC 2026 -->
+    <div class="contest-hero-card" id="featuredContestCard" style="display: none;">
+      <div class="contest-hero-top">
+        <div class="contest-title-wrap">
+          <span class="contest-badge-status c-status-running" id="featuredBadge">Đang diễn ra</span>
+          <h1 id="featuredName" style="margin-top: 0.5rem;">HSG TIN HỌC 2026</h1>
+          <p id="featuredDesc" style="color: var(--color-text-secondary); max-width: 650px; font-size: 0.95rem;"></p>
+        </div>
+        <div class="contest-timer-card">
+          <div class="contest-timer-label">Thời gian còn lại</div>
+          <div class="contest-timer-digits" id="featuredTimer">--:--:--</div>
+        </div>
+      </div>
+
+      <div class="contest-timeline-wrap">
+        <div class="timeline-info">
+          <span id="featuredStart">Bắt đầu: --:--</span>
+          <span id="featuredEnd">Kết thúc: --:--</span>
+        </div>
+        <div class="timeline-bar-bg">
+          <div class="timeline-bar-fill" id="featuredProgress" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <button id="btnEnterFeatured" class="btn-contest-submit-cta" style="padding: 0.85rem 2rem;">
+          🚀 THAM GIA CUỘC THI
+        </button>
+        <a id="btnScoreboardFeatured" href="#" class="btn-sub-act btn-sub-act-secondary" style="padding: 0.85rem 1.5rem;">
+          📊 Xem Bảng xếp hạng
+        </a>
+      </div>
+    </div>
+
+    <!-- Contest List Table -->
+    <div class="card contest-card-wide" style="margin-top: 2rem; width: 100%; padding: 1.75rem 2rem;">
+      <h3 style="margin-bottom: 1.25rem; font-size: 1.35rem; font-weight: 800; color: var(--color-text);">Tất cả kỳ thi</h3>
+      <table class="contest-problem-table">
+        <thead>
+          <tr>
+            <th>Cuộc thi</th>
+            <th>Bắt đầu</th>
+            <th>Thời lượng</th>
+            <th>Số bài</th>
+            <th>Thí sinh</th>
+            <th>Trạng thái</th>
+            <th style="text-align: right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="contestTableBody">
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Đang tải danh sách cuộc thi...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    (async () => {
+      try {
+        const res = await fetch('/api/v1/contests/');
+        const json = await res.json();
+        const contests = json.data || [];
+
+        if (contests.length > 0) {
+          const featured = contests.find(c => c.key === 'hsg-tin-2026') || contests[0];
+          document.getElementById('featuredContestCard').style.display = 'block';
+          document.getElementById('featuredName').textContent = featured.name;
+          document.getElementById('featuredDesc').textContent = featured.description;
+          document.getElementById('featuredStart').textContent = `Bắt đầu: ${new Date(featured.start_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}`;
+          document.getElementById('featuredEnd').textContent = `Kết thúc: ${new Date(featured.end_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}`;
+
+          // Timer Countdown
+          function updateTimer() {
+            const now = new Date().getTime();
+            const end = new Date(featured.end_time).getTime();
+            const diff = Math.max(0, end - now);
+            const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+            const mins = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            const secs = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+            document.getElementById('featuredTimer').textContent = `${hours}:${mins}:${secs}`;
+          }
+          updateTimer();
+          setInterval(updateTimer, 1000);
+
+          document.getElementById('btnEnterFeatured').onclick = async () => {
+            const user = ContestAPI.getCurrentUser();
+            if (user) {
+              await ContestAPI.registerContest(featured.key);
+            }
+            window.location.href = `/frontend/html/contest/dashboard/index.html?contest=${featured.key}`;
+          };
+
+          document.getElementById('btnScoreboardFeatured').href = `/frontend/html/contest/dashboard/ranking.html?contest=${featured.key}`;
+
+          // Populate Table
+          const tbody = document.getElementById('contestTableBody');
+          tbody.innerHTML = contests.map(c => `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--color-text); font-size: 1rem;">${c.name}</div>
+                <div style="font-size: 0.8rem; color: var(--color-text-muted);">${c.key} • ${c.format.toUpperCase()}</div>
+              </td>
+              <td>${new Date(c.start_time).toLocaleDateString('vi-VN')} ${new Date(c.start_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</td>
+              <td>${c.duration_minutes} phút</td>
+              <td><span class="badge" style="background: var(--color-card); color: var(--color-primary);">${c.problems_count} bài</span></td>
+              <td>${c.participants_count} thí sinh</td>
+              <td>
+                <span class="contest-badge-status c-status-${c.status.toLowerCase()}">${c.status === 'RUNNING' ? 'Đang thi' : (c.status === 'UPCOMING' ? 'Sắp mở' : 'Đã xong')}</span>
+              </td>
+              <td style="text-align: right;">
+                <a href="/frontend/html/contest/dashboard/index.html?contest=${c.key}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+                  Tham gia
+                </a>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error loading contests:', err);
+      }
+    })();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

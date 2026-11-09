@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chuyển hướng Cuộc thi | CodeProOJ</title>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest');
+    if (contestKey) {
+      window.location.replace(`/contests/${contestKey}`);
+    } else {
+      window.location.replace('/contests');
+    }
+  </script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <p>Đang chuyển hướng sang trang thi đấu...</p>
+</body>
+</html>

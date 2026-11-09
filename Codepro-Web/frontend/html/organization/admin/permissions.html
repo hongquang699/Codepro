@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma trận Phân quyền | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              🔒 Ma Trận Phân Quyền Tổ Chức (Permissions Matrix)
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Quy tắc kiểm soát truy cập dựa trên vai trò (Role-Based Access Control) cho từng tính năng.
+            </p>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;font-size:.88rem;">
+            <thead>
+              <tr>
+                <th style="width:240px;">Mã quyền (Permission Token)</th>
+                <th>Mô tả chức năng</th>
+                <th style="text-align:center;color: #ef4444;">Owner</th>
+                <th style="text-align:center;color: var(--color-accent);">Admin</th>
+                <th style="text-align:center;color: var(--color-primary);">Moderator</th>
+                <th style="text-align:center;color: #10b981;">Problem Setter</th>
+                <th style="text-align:center;color: #f59e0b;">Contest Manager</th>
+                <th style="text-align:center;color: var(--color-text-dim);">Member</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>organization.view</code></td>
+                <td>Xem trang tổng quan, danh sách bài tập &amp; thành viên</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+              </tr>
+              <tr>
+                <td><code>organization.edit</code></td>
+                <td>Cập nhật hồ sơ, thương hiệu, website, cấu hình tổ chức</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>member.view</code></td>
+                <td>Xem danh sách và hồ sơ thành viên trong tổ chức</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+              </tr>
+              <tr>
+                <td><code>member.add</code> / <code>invite</code></td>
+                <td>Thêm trực tiếp hoặc gửi lời mời thành viên</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>member.remove</code> / <code>ban</code></td>
+                <td>Xóa hoặc cấm thành viên khỏi tổ chức</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>member.manage</code></td>
+                <td>Thay đổi vai trò (Role) và phân cấp bậc thành viên</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>contest.create</code> / <code>edit</code></td>
+                <td>Gán, khởi tạo và thiết lập cuộc thi thuật toán</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>problem.create</code> / <code>edit</code></td>
+                <td>Gán và quản lý bài tập chuyên đề trong tổ chức</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>blog.create</code> / <code>edit</code></td>
+                <td>Đăng tải và biên tập bài viết, blog tin tức</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+              <tr>
+                <td><code>announcement.create</code></td>
+                <td>Phát hành thông báo chính thức có huy hiệu nổi bật</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #10b981;font-weight:bold;">✓</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+                <td style="text-align:center;color: #ef4444;">✗</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'permissions');
+  </script>
+</body>
+</html>

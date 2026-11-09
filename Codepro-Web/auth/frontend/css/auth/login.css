@@ -1,0 +1,11 @@
+/* frontend/css/auth/login.css */
+@import url('./auth.css');
+
+.login-card {
+  max-width: 440px;
+}
+
+.login-extra-row {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}

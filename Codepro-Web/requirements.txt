@@ -1,0 +1,23 @@
+# Runtime in the backend Docker image: Python 3.12.
+# Stay on the supported Django 6.1 series and receive patch/security releases.
+django>=6.1.1,<6.2
+argon2-cffi>=23.1.0
+djangorestframework>=3.15.1
+django-cors-headers>=4.3.1
+channels>=4.1.0
+channels-redis>=4.2.0
+psycopg2-binary>=2.9.9
+redis>=5.0.4
+celery>=5.4.0
+pydantic>=2.7.1
+fastapi>=0.111.0
+uvicorn>=0.29.0
+pytest>=8.2.0
+pyyaml>=6.0.1
+requests>=2.31.0
+cryptography>=43.0.0
+pymysql>=1.1.0
+gunicorn>=22.0.0
+psutil>=5.9.0
+beautifulsoup4>=4.12.3,<5  # problem import/generation scripts
+boto3>=1.35,<2

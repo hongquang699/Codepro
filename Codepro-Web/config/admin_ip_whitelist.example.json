@@ -1,0 +1,5 @@
+{
+  "enabled": true,
+  "description": "Copy to admin_ip_whitelist.json and configure authorized administrator IP addresses.",
+  "allowed_ips": ["127.0.0.1", "::1"]
+}

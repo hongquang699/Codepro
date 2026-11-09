@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảo Mật &amp; Chống Tấn Công DoS/DDoS | CodeProOJ Security Operations Center</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .sc-red::after { background: #ef4444; }
+    .sc-yellow::after { background: #f59e0b; }
+    .sc-purple::after { background: var(--color-accent); }
+    .sc-cyan::after { background: #06b6d4; }
+    
+    .badge-attack-ddos { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-attack-bot { background: color-mix(in srgb, var(--color-accent) 20%, transparent); color: var(--color-accent); border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent); }
+    .badge-attack-probe { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-attack-fakeip { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+    .badge-attack-warn { background: rgba(148, 163, 184, 0.15); color: var(--color-text-secondary); border: 1px solid rgba(148, 163, 184, 0.3); }
+
+    .mode-btn {
+      flex: 1; min-width: 140px; padding: 1rem; border-radius: 10px; border: 1px solid var(--color-border-subtle); background: var(--color-bg-secondary);
+      cursor: pointer; text-align: left; transition: all 0.2s ease;
+    }
+    .mode-btn:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+    .mode-btn.active-normal { border-color: #10b981; background: rgba(16, 185, 129, 0.1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+    .mode-btn.active-high { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+    .mode-btn.active-under_attack { border-color: #ef4444; background: rgba(239, 68, 68, 0.15); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+    
+    .status-beacon {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }
+    .beacon-green { background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulse-green 1.5s infinite; }
+    .beacon-yellow { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; animation: pulse-yellow 1.5s infinite; }
+    .beacon-red { background: #ef4444; box-shadow: 0 0 12px #ef4444; animation: pulse-red 1s infinite; }
+
+    @keyframes pulse-green { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+    @keyframes pulse-yellow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+    @keyframes pulse-red { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.4); } }
+
+    .ctrl-input {
+      background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; padding: 0.5rem 0.75rem; color: #fff; font-size: 0.85rem; outline: none;
+    }
+    .ctrl-input:focus { border-color: var(--color-primary); }
+    .code-badge { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.8rem; padding: 0.15rem 0.4rem; border-radius: 4px; background: rgba(0,0,0,0.3); color: var(--color-primary); }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+        <span class="nav-badge" id="navJudgeBadge" style="background: #10b981;color: #fff;">7 Online</span>
+      </a>
+      <a href="/admin/security" class="admin-nav-item active">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+        <span class="nav-badge" id="navShieldBadge" style="background: #10b981;color: #fff;">WAF ON</span>
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+      <a href="/admin/contests/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Tạo kỳ thi mới
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+
+      <div class="sidebar-footer">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>WAF Engine: ACTIVE</div>
+          <div id="wafBadge" style="font-size:.7rem;padding:.15rem .4rem;border-radius:4px;background: #065f46;color: #34d399;">PROTECTED</div>
+        </div>
+        <div style="font-size:.72rem;color: var(--color-text-dim);margin-top:4px;">Anti-DDoS Gateway :8888</div>
+      </div>
+    </aside>
+
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="admin-main">
+      <!-- Topbar -->
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1><cp-icon name="shield" size="sm"></cp-icon> Trung Tâm Phòng Thủ &amp; Bảo Mật WAF</h1>
+          <p>Hệ thống lá chắn tự động chống tấn công DoS/DDoS, lọc IP giả mạo, chặn bot scanner và bảo vệ cụm máy chấm.</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="pulse-pill" id="defensePill">
+            <span class="status-beacon beacon-green" id="beaconIndicator"></span>
+            <span id="defenseStatusText">CHẾ ĐỘ: BÌNH THƯỜNG</span>
+          </div>
+          <button onclick="toggleUnderAttackQuick()" id="btnPanic" class="btn-top" style="background: #dc2626;color: #fff;">🚨 BẬT UNDER ATTACK</button>
+          <button onclick="fetchSecurityData()" class="btn-top btn-top-secondary">🔄 Làm mới ngay</button>
+        </div>
+      </div>
+
+      <!-- 4 Stat Cards -->
+      <div class="stat-row">
+        <div class="stat-card sc-blue">
+          <div class="sc-hdr"><span><cp-icon name="shield" size="sm"></cp-icon> Trạng thái WAF</span><span id="cardModeLabel">MODE</span></div>
+          <div class="sc-val" id="statDefenseMode" style="font-size:1.8rem;text-transform:uppercase;">NORMAL</div>
+          <div class="sc-sub" id="statDefenseSub">Giới hạn 120 req/phút • 10 nộp/phút</div>
+        </div>
+        <div class="stat-card sc-red">
+          <div class="sc-hdr"><span>🚫 Chặn Tấn Công DoS</span><span>THROTTLED</span></div>
+          <div class="sc-val" id="statBlockedDDoS" style="color: #f87171;">0</div>
+          <div class="sc-sub">Yêu cầu bị chặn mã HTTP 429</div>
+        </div>
+        <div class="stat-card sc-purple">
+          <div class="sc-hdr"><span>🤖 Chặn Bot &amp; Scanner</span><span>BLOCKED</span></div>
+          <div class="sc-val" id="statBlockedBots" style="color: var(--color-accent);">0</div>
+          <div class="sc-sub" id="statBotsSub">sqlmap, nikto, scrapers &amp; probes</div>
+        </div>
+        <div class="stat-card sc-yellow">
+          <div class="sc-hdr"><span><cp-icon name="lock" size="sm"></cp-icon> IP Đang Bị Phong Tỏa</span><span>JAILED</span></div>
+          <div class="sc-val" id="statActiveJails" style="color: #fbbf24;">0</div>
+          <div class="sc-sub" id="statJailSub">0 tạm khóa, 0 cấm vĩnh viễn</div>
+        </div>
+      </div>
+
+      <!-- DEFENSE MODE SELECTOR & CONTROLS -->
+      <div class="panel-box" style="margin-bottom:1.5rem;">
+        <div class="panel-hdr">
+          <h3><cp-icon name="settings" size="sm"></cp-icon> Cấu Hình Chế Độ Phòng Vệ Thời Gian Thực</h3>
+          <span style="font-size:0.8rem;color: var(--color-text-muted);">Thay đổi sẽ có hiệu lực tức thì trên toàn bộ hệ thống</span>
+        </div>
+        <div class="panel-bdy">
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <!-- Normal Mode -->
+            <div class="mode-btn" id="modeCard_normal" onclick="setDefenseMode('normal')">
+              <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;color: #10b981;margin-bottom:0.35rem;">
+                <span class="status-beacon beacon-green"></span> 1. TIÊU CHUẨN (Normal)
+              </div>
+              <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.4;">
+                Dành cho vận hành hàng ngày. 120 req/m, 10 submissions/m. Tự động tạm giam IP vi phạm 15 phút.
+              </div>
+            </div>
+
+            <!-- High Defense Mode -->
+            <div class="mode-btn" id="modeCard_high" onclick="setDefenseMode('high')">
+              <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;color: #f59e0b;margin-bottom:0.35rem;">
+                <span class="status-beacon beacon-yellow"></span> 2. CẢNH GIÁC CAO (High Defense)
+              </div>
+              <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.4;">
+                Dành cho thời gian diễn ra kỳ thi quan trọng. Giới hạn 45 req/m, 5 submissions/m. Khóa IP vi phạm 30 phút.
+              </div>
+            </div>
+
+            <!-- Under Attack Mode -->
+            <div class="mode-btn" id="modeCard_under_attack" onclick="setDefenseMode('under_attack')">
+              <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;color: #ef4444;margin-bottom:0.35rem;">
+                <span class="status-beacon beacon-red"></span> 3. ĐANG BỊ TẤN CÔNG (Under Attack)
+              </div>
+              <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.4;">
+                Chế độ khẩn cấp. Siết chặt 15 req/m, auto-ban 60 phút lập tức với mọi hành vi spam hoặc dò quét.
+              </div>
+            </div>
+          </div>
+
+          <!-- IP Management bar -->
+          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;padding-top:1rem;border-top: 1px solid var(--color-border-subtle);">
+            <span style="font-size:0.85rem;font-weight:700;color: var(--color-text-secondary);">Quản lý IP thủ công:</span>
+            <input type="text" id="targetIpInput" class="ctrl-input" placeholder="Nhập địa chỉ IPv4 hoặc IPv6..." style="width:230px;">
+            <select id="ipActionSelect" class="ctrl-input">
+              <option value="blacklist_ip">⛔ Cấm vĩnh viễn (Blacklist)</option>
+              <option value="jail_ip"><cp-icon name="lock" size="sm"></cp-icon> Tạm khóa 30 phút (Jail)</option>
+              <option value="whitelist_ip">✅ Tin cậy (Whitelist)</option>
+              <option value="unjail_ip">🔓 Mở khóa (Unjail / Xóa cấm)</option>
+            </select>
+            <input type="text" id="ipReasonInput" class="ctrl-input" placeholder="Lý do xử lý..." style="width:180px;">
+            <button onclick="handleManualIpAction()" class="btn-act" style="background: var(--color-primary);color: #fff;border-color: var(--color-primary);padding:0.45rem 1rem;">Áp dụng</button>
+            <button onclick="clearAllJails()" class="btn-act" style="background: var(--color-surface-hover);color: #f87171;border-color: var(--color-border);margin-left:auto;">🧹 Giải phóng toàn bộ IP đang giam</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 Grids: Live Attack Stream & Active Jails -->
+      <div class="admin-grid-2">
+        <!-- Live Attack Log Stream -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span>🚨</span> Nhật Ký Tấn Công Trực Tiếp (Live Threat Stream)</h3>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:0.75rem;color: #10b981;display:flex;align-items:center;gap:4px;">
+                <span class="live-dot" style="width:6px;height:6px;"></span> Tự động cập nhật 3s
+              </span>
+            </div>
+          </div>
+          <div class="panel-bdy" style="padding:0;max-height:480px;overflow-y:auto;">
+            <table class="admin-tbl">
+              <thead>
+                <tr>
+                  <th style="width:75px;">Thời gian</th>
+                  <th style="width:120px;">IP Nguồn</th>
+                  <th>Hành vi vi phạm</th>
+                  <th>Đích đến</th>
+                  <th style="width:100px;">User-Agent</th>
+                </tr>
+              </thead>
+              <tbody id="attackStreamTbody">
+                <tr><td colspan="5" style="text-align:center;color: var(--color-text-dim);padding:2rem;">Đang tải nhật ký phòng thủ...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Active Jails & Blacklist -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span><cp-icon name="lock" size="sm"></cp-icon> </span> Danh Sách IP Bị Phong Tỏa &amp; Cấm Truy Cập</h3>
+            <span id="jailCountBadge" class="nav-badge" style="background: #ef4444;color: #fff;">0 IP</span>
+          </div>
+          <div class="panel-bdy" style="padding:0;max-height:480px;overflow-y:auto;">
+            <table class="admin-tbl">
+              <thead>
+                <tr>
+                  <th>Địa chỉ IP</th>
+                  <th>Phân loại</th>
+                  <th>Lý do phong tỏa</th>
+                  <th>Còn lại</th>
+                  <th style="text-align:right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="jailListTbody">
+                <tr><td colspan="5" style="text-align:center;color: var(--color-text-dim);padding:2rem;">Không có IP nào đang bị phong tỏa. Hệ thống an toàn!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Architecture Infobox -->
+      <div class="panel-box" style="margin-top:1.5rem;">
+        <div class="panel-hdr">
+          <h3><cp-icon name="shield" size="sm"></cp-icon> Kiến Trúc Lá Chắn Phòng Thủ Toàn Diện (CodeProOJ Security Engine)</h3>
+        </div>
+        <div class="panel-bdy" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:1.25rem;">
+          <div style="background: var(--color-bg);padding:1rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+            <div style="font-weight:700;color: var(--color-primary);margin-bottom:0.4rem;">1. Chống Tấn Công DoS / DDoS (L7)</div>
+            <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.5;">
+              Sử dụng thuật toán <strong>Sliding Window Rate Limiter</strong> với độ trễ siêu thấp (&lt;0.1ms). Kiểm soát tần suất truy cập riêng biệt cho Web UI, API và Submit code.
+            </div>
+          </div>
+          <div style="background: var(--color-bg);padding:1rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+            <div style="font-weight:700;color: #f472b6;margin-bottom:0.4rem;">2. Chống IP Giả &amp; Injection Header</div>
+            <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.5;">
+              Kiểm tra nghiêm ngặt định dạng IPv4/IPv6 chuẩn RFC 791/4291. Tự động từ chối ngay lập tức các request có chèn ký tự lạ, SQL injection hoặc mạo danh Proxy Header.
+            </div>
+          </div>
+          <div style="background: var(--color-bg);padding:1rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+            <div style="font-weight:700;color: var(--color-accent);margin-bottom:0.4rem;">3. Triệt Tiêu Bot &amp; Scanner Tự Động</div>
+            <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.5;">
+              Nhận diện và lập tức chặn đứng công cụ dò quét lỗ hổng: <strong>sqlmap, nikto, acunetix, gobuster, dirbuster, python-requests scrapers</strong>.
+            </div>
+          </div>
+          <div style="background: var(--color-bg);padding:1rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+            <div style="font-weight:700;color: #fbbf24;margin-bottom:0.4rem;">4. Bẫy Thăm Dò Khai Thác (Honeypot)</div>
+            <div style="font-size:0.8rem;color: var(--color-text-muted);line-height:1.5;">
+              Bất kỳ địa chỉ IP nào cố tình truy cập các đường dẫn nhạy cảm như <code>/.env</code>, <code>/wp-login.php</code>, <code>/.git</code>, <code>/actuator</code> sẽ bị đưa ngay vào Jail giam giữ.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    let currentMode = 'normal';
+    let pollInterval = null;
+
+    async function fetchSecurityData() {
+      try {
+        const res = await fetch('/api/v2/admin/security/stats');
+        const json = await res.json();
+        if (json && json.data) {
+          renderSecurityOverview(json.data);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải dữ liệu bảo mật:', err);
+      }
+    }
+
+    function renderSecurityOverview(data) {
+      currentMode = data.mode || 'normal';
+      const stats = data.stats || {};
+
+      // 1. Update Mode
+      const modeNames = {
+        'normal': 'TIÊU CHUẨN',
+        'high': 'CẢNH GIÁC CAO',
+        'under_attack': 'ĐANG BỊ TẤN CÔNG'
+      };
+      const modeSubs = {
+        'normal': 'Giới hạn 120 req/m • 10 nộp/m',
+        'high': 'Giới hạn 45 req/m • 5 nộp/m • Jail 30m',
+        'under_attack': 'Khẩn cấp: 15 req/m • Auto-ban 60m'
+      };
+
+      document.getElementById('statDefenseMode').innerText = currentMode.toUpperCase();
+      document.getElementById('statDefenseSub').innerText = modeSubs[currentMode] || '';
+      document.getElementById('cardModeLabel').innerText = modeNames[currentMode] || 'MODE';
+
+      // Update Topbar beacon & badge
+      const beacon = document.getElementById('beaconIndicator');
+      const pillText = document.getElementById('defenseStatusText');
+      const btnPanic = document.getElementById('btnPanic');
+
+      if (currentMode === 'under_attack') {
+        beacon.className = 'status-beacon beacon-red';
+        pillText.innerText = 'CẢNH BÁO: UNDER ATTACK';
+        pillText.style.color = '#f87171';
+        btnPanic.innerText = '🟢 HẠ VỀ BÌNH THƯỜNG';
+        btnPanic.style.background = '#10b981';
+      } else if (currentMode === 'high') {
+        beacon.className = 'status-beacon beacon-yellow';
+        pillText.innerText = 'CHẾ ĐỘ: CẢNH GIÁC CAO';
+        pillText.style.color = '#fbbf24';
+        btnPanic.innerText = '🚨 BẬT UNDER ATTACK';
+        btnPanic.style.background = '#dc2626';
+      } else {
+        beacon.className = 'status-beacon beacon-green';
+        pillText.innerText = 'CHẾ ĐỘ: TIÊU CHUẨN';
+        pillText.style.color = '#34d399';
+        btnPanic.innerText = '🚨 BẬT UNDER ATTACK';
+        btnPanic.style.background = '#dc2626';
+      }
+
+      // Highlight active mode card
+      ['normal', 'high', 'under_attack'].forEach(m => {
+        const el = document.getElementById(`modeCard_${m}`);
+        if (el) {
+          el.className = 'mode-btn' + (m === currentMode ? ` active-${m}` : '');
+        }
+      });
+
+      // 2. Update Stats
+      document.getElementById('statBlockedDDoS').innerText = (stats.blockedDDoS || 0).toLocaleString();
+      const totalBots = (stats.blockedBots || 0) + (stats.blockedProbes || 0) + (stats.blockedSpoofedIps || 0);
+      document.getElementById('statBlockedBots').innerText = totalBots.toLocaleString();
+      document.getElementById('statBotsSub').innerText = `${stats.blockedBots || 0} bots, ${stats.blockedProbes || 0} probes, ${stats.blockedSpoofedIps || 0} fake IPs`;
+
+      const activeJails = data.activeJails || [];
+      const blacklist = data.blacklist || [];
+      const totalJailed = activeJails.length + blacklist.length;
+      document.getElementById('statActiveJails').innerText = totalJailed;
+      document.getElementById('statJailSub').innerText = `${activeJails.length} tạm khóa, ${blacklist.length} cấm vĩnh viễn`;
+      document.getElementById('jailCountBadge').innerText = `${totalJailed} IP`;
+
+      // 3. Render Live Attack Stream
+      const tbodyAttack = document.getElementById('attackStreamTbody');
+      const attacks = data.recentAttacks || [];
+      if (attacks.length === 0) {
+        tbodyAttack.innerHTML = '<tr><td colspan="5" style="text-align:center;color: var(--color-text-dim);padding:2rem;">Chưa phát hiện hành vi tấn công nào. Hệ thống ổn định!</td></tr>';
+      } else {
+        tbodyAttack.innerHTML = attacks.slice(0, 30).map(att => {
+          let badgeClass = 'badge-attack-warn';
+          let label = att.type;
+          if (att.type.includes('DDOS')) { badgeClass = 'badge-attack-ddos'; label = '⚡ DDoS Flood'; }
+          else if (att.type.includes('SCANNER')) { badgeClass = 'badge-attack-bot'; label = '🤖 Scanner Bot'; }
+          else if (att.type.includes('PROBE')) { badgeClass = 'badge-attack-probe'; label = '🎯 Honeypot Probe'; }
+          else if (att.type.includes('FAKE') || att.type.includes('MALFORMED')) { badgeClass = 'badge-attack-fakeip'; label = '🎭 Fake/Malformed IP'; }
+          else if (att.type.includes('WARNING')) { badgeClass = 'badge-attack-warn'; label = '⚠️ Rate Limit Warn'; }
+
+          const timeStr = att.timestamp ? new Date(att.timestamp).toLocaleTimeString() : 'Vừa xong';
+          const uaShort = (att.userAgent || 'Unknown').substring(0, 32);
+
+          return `
+            <tr>
+              <td style="font-size:0.75rem;color: var(--color-text-muted);">${timeStr}</td>
+              <td><span class="code-badge">${escapeHtml(att.ip)}</span></td>
+              <td><span class="badge-v ${badgeClass}">${label}</span></td>
+              <td style="font-size:0.8rem;color: var(--color-text-secondary);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(att.path)}">${escapeHtml(att.path || '/')}</td>
+              <td style="font-size:0.75rem;color: var(--color-text-dim);" title="${escapeHtml(att.userAgent)}">${escapeHtml(uaShort)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 4. Render Active Jails & Blacklist Table
+      const tbodyJail = document.getElementById('jailListTbody');
+      const allBlockedRows = [];
+
+      // Add blacklisted IPs
+      blacklist.forEach(ip => {
+        allBlockedRows.push({
+          ip: ip,
+          type: 'BLACKLIST (Vĩnh viễn)',
+          reason: 'Quản trị viên chặn thủ công',
+          remaining: 'Vô hạn',
+          isBlacklist: true
+        });
+      });
+
+      // Add Jailed IPs
+      activeJails.forEach(j => {
+        allBlockedRows.push({
+          ip: j.ip,
+          type: 'AUTO-JAIL (Tạm khóa)',
+          reason: j.reason || 'Vượt quá ngưỡng lưu lượng',
+          remaining: `${j.remainingSec}s`,
+          isBlacklist: false
+        });
+      });
+
+      if (allBlockedRows.length === 0) {
+        tbodyJail.innerHTML = '<tr><td colspan="5" style="text-align:center;color: var(--color-text-dim);padding:2rem;">Không có IP nào đang bị phong tỏa. Hệ thống an toàn!</td></tr>';
+      } else {
+        tbodyJail.innerHTML = allBlockedRows.map(row => {
+          return `
+            <tr>
+              <td><span class="code-badge" style="color: #f87171;">${escapeHtml(row.ip)}</span></td>
+              <td><span class="badge-v ${row.isBlacklist ? 'badge-attack-ddos' : 'badge-attack-probe'}">${row.type}</span></td>
+              <td style="font-size:0.8rem;color: var(--color-text-secondary);">${escapeHtml(row.reason)}</td>
+              <td style="font-weight:700;color: #fbbf24;font-size:0.82rem;">${row.remaining}</td>
+              <td style="text-align:right;">
+                <button onclick="unjailIp('${escapeHtml(row.ip)}')" class="btn-act" style="background: rgba(16,185,129,0.15);color: #34d399;border-color: rgba(16,185,129,0.3);">🔓 Mở khóa</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    async function setDefenseMode(mode) {
+      try {
+        const res = await fetch('/api/v2/admin/security/config', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'set_mode', mode: mode })
+        });
+        const json = await res.json();
+        if (json.status === 200) {
+          fetchSecurityData();
+        } else {
+          alert('Không thể đổi chế độ: ' + (json.message || 'Lỗi'));
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới máy chủ WAF');
+      }
+    }
+
+    function toggleUnderAttackQuick() {
+      if (currentMode === 'under_attack') {
+        setDefenseMode('normal');
+      } else {
+        if (confirm('BẬT CHẾ ĐỘ UNDER ATTACK?\n\nTất cả lưu lượng vượt 15 req/phút sẽ bị phong tỏa ngay lập tức. Bạn có chắc chắn?')) {
+          setDefenseMode('under_attack');
+        }
+      }
+    }
+
+    async function handleManualIpAction() {
+      const ip = document.getElementById('targetIpInput').value.trim();
+      const action = document.getElementById('ipActionSelect').value;
+      const reason = document.getElementById('ipReasonInput').value.trim() || 'Admin manual action';
+
+      if (!ip) {
+        alert('Vui lòng nhập địa chỉ IP hợp lệ.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v2/admin/security/config', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action, ip, reason, durationMs: 1800000 })
+        });
+        const json = await res.json();
+        alert(json.message || 'Đã thực hiện xong');
+        document.getElementById('targetIpInput').value = '';
+        fetchSecurityData();
+      } catch (err) {
+        alert('Lỗi khi gửi yêu cầu tới WAF');
+      }
+    }
+
+    async function unjailIp(ip) {
+      try {
+        const res = await fetch('/api/v2/admin/security/config', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'unjail_ip', ip: ip })
+        });
+        const json = await res.json();
+        fetchSecurityData();
+      } catch (err) {
+        alert('Không thể mở khóa IP: ' + err.message);
+      }
+    }
+
+    async function clearAllJails() {
+      if (!confirm('Bạn có chắc chắn muốn giải phóng toàn bộ IP đang bị tạm khóa (Active Jails)?')) return;
+      try {
+        const res = await fetch('/api/v2/admin/security/config', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'clear_jails' })
+        });
+        const json = await res.json();
+        alert(json.message || 'Đã giải phóng toàn bộ Jails');
+        fetchSecurityData();
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchSecurityData();
+      // Poll every 3 seconds for realtime SOC monitor
+      pollInterval = setInterval(fetchSecurityData, 3000);
+    });
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điểm &amp; Xếp Hạng | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <h3 class="ca-panel-title">🏆 Bảng Điểm Trực Tiếp (Live Scoreboard)</h3>
+            <span id="rankFrozenBadge" class="ca-badge ca-badge-running">LIVE</span>
+          </div>
+          <div style="display:flex;gap:.5rem;">
+            <button id="btnToggleFreeze" onclick="toggleFreeze()" class="ca-btn ca-btn-freeze">
+              ❄️ Đóng băng bảng điểm
+            </button>
+            <a id="btnExportCsv" href="#" target="_blank" class="ca-btn ca-btn-secondary">
+              📥 Xuất kết quả (CSV)
+            </a>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="ca-table" id="scoreboardTable">
+            <thead id="scoreboardThead">
+              <tr>
+                <th style="width:70px;text-align:center;">Hạng</th>
+                <th>Thí sinh</th>
+                <th style="text-align:center;">Tổng điểm</th>
+                <th style="text-align:center;">Phạt (Time)</th>
+              </tr>
+            </thead>
+            <tbody id="scoreboardTbody">
+              <tr><td colspan="4" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải bảng điểm...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('ranking', contestKey);
+    ContestAdminUI.renderHeader('Bảng Điểm &amp; Freeze', `Theo dõi bảng điểm và điều phối đóng băng kỳ thi ${contestKey}`);
+
+    document.getElementById('btnExportCsv').href = ContestAdminAPI.getExportUrl(contestKey);
+
+    let isFrozen = false;
+
+    async function loadScoreboard() {
+      const res = await ContestAdminAPI.getRanking(contestKey);
+      if (!res.data) return;
+
+      isFrozen = Boolean(res.data.is_frozen);
+      const frozenBadge = document.getElementById('rankFrozenBadge');
+      const btnFreeze = document.getElementById('btnToggleFreeze');
+
+      if (isFrozen) {
+        frozenBadge.className = 'ca-badge ca-badge-frozen';
+        frozenBadge.innerHTML = '❄️ SCOREBOARD FROZEN';
+        btnFreeze.innerHTML = '☀️ Mở khóa bảng điểm (Unfreeze)';
+        btnFreeze.className = 'ca-btn ca-btn-success';
+      } else {
+        frozenBadge.className = 'ca-badge ca-badge-running';
+        frozenBadge.innerHTML = '● LIVE SCOREBOARD';
+        btnFreeze.innerHTML = '❄️ Đóng băng bảng điểm (Freeze)';
+        btnFreeze.className = 'ca-btn ca-btn-freeze';
+      }
+
+      // Render problem columns
+      const thead = document.getElementById('scoreboardThead');
+      const probCols = res.data.problem_columns || [];
+      thead.innerHTML = `
+        <tr>
+          <th style="width:65px;text-align:center;">Hạng</th>
+          <th style="min-width:180px;">Thí Sinh</th>
+          <th style="text-align:center;width:95px;">Tổng Điểm</th>
+          <th style="text-align:center;width:95px;">Phạt</th>
+          ${probCols.map(p => `
+            <th style="text-align:center;min-width:70px;">
+              <span style="font-size:.9rem;color: var(--color-primary);">${p.prefix}</span>
+              <div style="font-size:.65rem;color: var(--color-text-dim);font-weight:normal;">${p.points}đ</div>
+            </th>
+          `).join('')}
+        </tr>
+      `;
+
+      // Render rows
+      const tbody = document.getElementById('scoreboardTbody');
+      const standings = res.data.standings || [];
+      if (standings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${4 + probCols.length}" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có dữ liệu bảng điểm.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = standings.map(s => `
+        <tr>
+          <td style="text-align:center;font-weight:800;color: var(--color-primary);">#${s.rank}</td>
+          <td>
+            <a href="/profile/${s.user}" target="_blank" style="font-weight:700;color: #fff;text-decoration:none;">${s.user}</a>
+            ${s.is_disqualified ? '<span style="color: #ef4444;font-size:.7rem;margin-left:4px;">(Bị loại)</span>' : ''}
+          </td>
+          <td style="text-align:center;font-weight:800;color: #34d399;font-size:1.05rem;">${s.score}</td>
+          <td style="text-align:center;color: var(--color-text-muted);font-size:.82rem;">${s.penalty}</td>
+          ${probCols.map(p => {
+            const pData = s.problems ? (s.problems[p.prefix] || {}) : {};
+            const points = pData.points || 0;
+            const tries = pData.tries || 0;
+            const isAc = points > 0;
+            return `
+              <td style="text-align:center;background: ${isAc ? 'rgba(16,185,129,.08)' : (tries > 0 ? 'rgba(239,68,68,.08)' : 'transparent')};">
+                ${isAc ? `
+                  <div style="font-weight:800;color: #34d399;">+${points}</div>
+                  <div style="font-size:.68rem;color: var(--color-text-muted);">${tries > 1 ? `${tries} lần` : '1 lần'}</div>
+                ` : (tries > 0 ? `
+                  <div style="font-weight:700;color: #f87171;">-${tries}</div>
+                ` : '<span style="color: #475569;">—</span>')}
+              </td>
+            `;
+          }).join('')}
+        </tr>
+      `).join('');
+    }
+
+    async function toggleFreeze() {
+      const action = isFrozen ? 'unfreeze' : 'freeze';
+      const promptText = isFrozen ? 'mở khóa bảng điểm công khai' : 'đóng băng bảng điểm kỳ thi';
+      if (!confirm(`Xác nhận ${promptText}?`)) return;
+
+      const res = await ContestAdminAPI.toggleFreeze(contestKey, action);
+      alert(res.message || res.error);
+      loadScoreboard();
+    }
+
+    loadScoreboard();
+  </script>
+</body>
+</html>

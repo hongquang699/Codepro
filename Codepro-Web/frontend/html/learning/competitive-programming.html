@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Văn Hóa Lập Trình Thi Đấu | CodePro Wiki - CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/learning/style.css">
+  <style>
+    .hub-hero {
+      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-primary) 25%, transparent) 0%, color-mix(in srgb, var(--color-card) 100%, transparent) 80%);
+      padding: 3.5rem 1rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 2.5rem;
+    }
+    .hub-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-bottom: 0.75rem;
+    }
+    .hub-desc {
+      color: var(--color-text-muted);
+      font-size: 1.1rem;
+      max-width: 750px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .hub-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .hub-card:hover {
+      transform: translateY(-3px);
+      border-color: #38bdf8;
+      box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.15);
+    }
+    .hub-card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+    }
+    .hub-card-desc {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex-grow: 1;
+    }
+    .hub-card-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--color-text-dim);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 0.75rem;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/submission/index.html">Bài nộp</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/learning/index.html" class="active">Wiki / Học thuật</a></li>
+        <li><a href="/frontend/html/community/forum/index.html">Thảo luận</a></li>
+        <li><a href="/frontend/html/blog/index.html">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="hub-hero">
+    <div class="container">
+      <h1 class="hub-title">Văn Hóa Lập Trình Thi Đấu</h1>
+      <p class="hub-desc">Tất cả những gì bạn cần biết về phong trào Competitive Programming tại Việt Nam.</p>
+    </div>
+  </div>
+
+  <main class="container" style="padding-bottom: 4rem;">
+    
+        <div style="margin-bottom: 2.5rem;">
+          <h2 style="font-size: 1.5rem; color: var(--color-text); font-weight: 700; margin-bottom: 1rem; border-left: 4px solid #38bdf8; padding-left: 0.75rem;">Giải thuật Tối ưu & Quy hoạch Động</h2>
+          <div class="hub-grid"><a href="/frontend/html/learning/algorithms/dp.html" class="hub-card">
+              <div class="hub-card-title">Quy hoạch Động (DP)</div>
+              <div class="hub-card-desc">Knapsack, LIS, LCS, Bitmask DP, Tree DP và các kỹ thuật tối ưu hóa.</div>
+              <div class="hub-card-meta"><span>⏱️ 18 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a><a href="/frontend/html/learning/algorithms/greedy.html" class="hub-card">
+              <div class="hub-card-title">Thuật toán Tham lam (Greedy)</div>
+              <div class="hub-card-desc">Lập luận đổi chỗ (Exchange Argument) và bài toán xếp lịch tối ưu.</div>
+              <div class="hub-card-meta"><span>⏱️ 14 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a><a href="/frontend/html/learning/algorithms/searching.html" class="hub-card">
+              <div class="hub-card-title">Tìm kiếm Nhị phân (Binary Search)</div>
+              <div class="hub-card-desc">Chặt nhị phân trên tập kết quả và hàm đơn điệu.</div>
+              <div class="hub-card-meta"><span>⏱️ 12 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a></div>
+        </div>
+        <div style="margin-bottom: 2.5rem;">
+          <h2 style="font-size: 1.5rem; color: var(--color-text); font-weight: 700; margin-bottom: 1rem; border-left: 4px solid #38bdf8; padding-left: 0.75rem;">Đồ thị & Xâu Ký Tự</h2>
+          <div class="hub-grid"><a href="/frontend/html/learning/algorithms/graph.html" class="hub-card">
+              <div class="hub-card-title">Lý thuyết Đồ thị (Graph Theory)</div>
+              <div class="hub-card-desc">BFS, DFS, Dijkstra, Bellman-Ford, Kruskal, Tarjan SCC.</div>
+              <div class="hub-card-meta"><span>⏱️ 20 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a><a href="/frontend/html/learning/algorithms/string.html" class="hub-card">
+              <div class="hub-card-title">Thuật toán Xâu (String Algorithms)</div>
+              <div class="hub-card-desc">Rolling Hash, KMP, Z-Algorithm và Cây tiền tố Trie.</div>
+              <div class="hub-card-meta"><span>⏱️ 16 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a><a href="/frontend/html/learning/algorithms/sorting.html" class="hub-card">
+              <div class="hub-card-title">Sắp xếp & Rời rạc hóa</div>
+              <div class="hub-card-desc">IntroSort, QuickSort, MergeSort và kỹ thuật Coordinate Compression.</div>
+              <div class="hub-card-meta"><span>⏱️ 10 phút</span> <span style="color: var(--color-primary);">Đọc ngay &rarr;</span></div>
+            </a></div>
+        </div>
+  </main>
+
+  <footer style="background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 2.5rem 0; margin-top: auto;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; color: var(--color-text-muted); font-size: 0.875rem; flex-wrap: wrap; gap: 1rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng Chấm Lập trình Thi đấu & Đào tạo Thuật toán Hàng đầu Việt Nam.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/frontend/html/about/index.html" style="color: var(--color-text-muted); text-decoration: none;">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html" style="color: var(--color-text-muted); text-decoration: none;">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html" style="color: var(--color-text-muted); text-decoration: none;">Hỏi đáp (FAQ)</a>
+        <a href="/frontend/html/help/contact.html" style="color: var(--color-text-muted); text-decoration: none;">Liên hệ</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

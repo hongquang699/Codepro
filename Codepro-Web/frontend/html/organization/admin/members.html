@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Thành viên | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              👥 Quản Lý Thành Viên Tổ Chức
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Phân quyền vai trò, quản lý trạng thái, thêm và gỡ thành viên khỏi tổ chức.
+            </p>
+          </div>
+          <div>
+            <button onclick="openAddMemberModal()" class="btn-org-cta" style="font-size:.84rem;">
+              <cp-icon name="plus" size="sm"></cp-icon> Thêm thành viên
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem;">
+          <input type="text" id="memberSearch" placeholder="Tìm kiếm theo username, họ tên..." style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem 1rem;color: #fff;outline: none;min-width:260px;">
+          <select id="roleFilter" style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+            <option value="all">Tất cả vai trò</option>
+            <option value="Owner">Owner</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Moderator">Moderator</option>
+            <option value="Problem Setter">Problem Setter</option>
+            <option value="Contest Manager">Contest Manager</option>
+            <option value="Member">Member</option>
+          </select>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Thành viên</th>
+                <th style="text-align:center;">Vai trò</th>
+                <th style="text-align:center;">Trạng thái</th>
+                <th style="text-align:center;">Rating</th>
+                <th style="text-align:right;">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="adminMembersTbody">
+              <tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách thành viên...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Add Member Modal -->
+  <div class="org-modal-overlay" id="addMemberModal">
+    <div class="org-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">➕ Thêm Thành Viên Vào Tổ Chức</h3>
+        <button onclick="closeAddMemberModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitAddMember();">
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Tên tài khoản (Username) *</label>
+          <input type="text" id="add_username" class="org-admin-input" required placeholder="Nhập username">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Chỉ định Vai trò *</label>
+          <select id="add_role" class="org-admin-select">
+            <option value="Member">Member (Thành viên)</option>
+            <option value="Problem Setter">Problem Setter (Người ra đề)</option>
+            <option value="Contest Manager">Contest Manager (Quản lý kỳ thi)</option>
+            <option value="Moderator">Moderator (Điều hành viên)</option>
+            <option value="Administrator">Administrator (Quản trị viên)</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeAddMemberModal()" class="btn-org-outline">Hủy</button>
+          <button type="submit" class="btn-org-cta">Thêm ngay</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'members');
+
+    function openAddMemberModal() {
+      document.getElementById('addMemberModal').classList.add('open');
+    }
+    function closeAddMemberModal() {
+      document.getElementById('addMemberModal').classList.remove('open');
+    }
+
+    async function loadMembers() {
+      const search = document.getElementById('memberSearch').value;
+      const role = document.getElementById('roleFilter').value;
+      const res = await OrgAPI.getMembers(slug, role, search);
+      const tbody = document.getElementById('adminMembersTbody');
+
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Không tìm thấy thành viên nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(m => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:.65rem;">
+              <div style="width:34px;height:34px;border-radius:50%;background: var(--color-card);display:flex;align-items:center;justify-content:center;font-weight:800;color: var(--color-primary);border: 1px solid var(--color-border);">
+                ${m.username.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <a href="/profile/${m.username}" style="font-weight:700;color: var(--color-primary);text-decoration:none;">${m.username}</a>
+                <div style="font-size:.76rem;color: var(--color-text-muted);">${m.display_name}</div>
+              </div>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <select onchange="changeRole('${m.username}', this.value)" style="background: var(--color-bg-secondary);border: 1px solid var(--color-border);border-radius:6px;padding:3px 8px;color: ${m.role_color};font-weight:700;font-size:.8rem;outline: none;">
+              <option value="Owner" ${m.role_name === 'Owner' ? 'selected' : ''}>Owner</option>
+              <option value="Administrator" ${m.role_name === 'Administrator' ? 'selected' : ''}>Administrator</option>
+              <option value="Moderator" ${m.role_name === 'Moderator' ? 'selected' : ''}>Moderator</option>
+              <option value="Problem Setter" ${m.role_name === 'Problem Setter' ? 'selected' : ''}>Problem Setter</option>
+              <option value="Contest Manager" ${m.role_name === 'Contest Manager' ? 'selected' : ''}>Contest Manager</option>
+              <option value="Member" ${m.role_name === 'Member' ? 'selected' : ''}>Member</option>
+            </select>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:4px;background: ${m.status === 'active' ? 'rgba(16,185,129,.15);color: #10b981;' : 'rgba(239,68,68,.15);color: #ef4444;'}">
+              ${m.status.toUpperCase()}
+            </span>
+          </td>
+          <td style="text-align:center;font-weight:700;">
+            ${m.rating}
+          </td>
+          <td style="text-align:right;">
+            <button onclick="toggleBan('${m.username}', '${m.status}')" class="btn-org-outline" style="padding:.3rem .65rem;font-size:.78rem;margin-right:.35rem;color: ${m.status === 'active' ? '#f59e0b' : '#10b981'};">
+              ${m.status === 'active' ? 'Cấm' : 'Gỡ cấm'}
+            </button>
+            <button onclick="removeMember('${m.username}')" class="btn-org-outline" style="padding:.3rem .65rem;font-size:.78rem;color: #ef4444;">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function changeRole(username, newRole) {
+      const res = await OrgAPI.updateMember(slug, username, { role: newRole });
+      alert(res.message || res.error);
+      loadMembers();
+    }
+
+    async function toggleBan(username, currentStatus) {
+      const nextStatus = currentStatus === 'active' ? 'banned' : 'active';
+      if (!confirm(`Bạn có chắc chắn muốn ${nextStatus === 'banned' ? 'CẤM' : 'GỠ CẤM'} thành viên ${username}?`)) return;
+      const res = await OrgAPI.updateMember(slug, username, { status: nextStatus });
+      alert(res.message || res.error);
+      loadMembers();
+    }
+
+    async function removeMember(username) {
+      if (!confirm(`Xác nhận xóa ${username} khỏi tổ chức?`)) return;
+      const res = await OrgAPI.removeMember(slug, username);
+      alert(res.message || res.error);
+      loadMembers();
+    }
+
+    async function submitAddMember() {
+      const username = document.getElementById('add_username').value;
+      const role = document.getElementById('add_role').value;
+      const res = await OrgAPI.request(`/${slug}/members/`, {
+        method: 'POST',
+        body: JSON.stringify({ username, role })
+      });
+      alert(res.message || res.error);
+      if (res.status === 200) {
+        closeAddMemberModal();
+        loadMembers();
+      }
+    }
+
+    document.getElementById('memberSearch').addEventListener('input', loadMembers);
+    document.getElementById('roleFilter').addEventListener('change', loadMembers);
+    loadMembers();
+  </script>
+</body>
+</html>

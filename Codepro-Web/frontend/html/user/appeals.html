@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khiếu nại quyết định kỳ thi | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+  <style>
+    .appeals-wrap { max-width: 980px; margin: 2rem auto; padding: 0 1rem; }
+    .appeals-wrap h1 { font-size: 1.7rem; }
+    .appeals-panel { background: var(--color-card); border: 1px solid var(--color-border); border-radius: 14px; padding: 1.25rem; margin: 1rem 0; }
+    .appeals-panel h2 { font-size: 1.1rem; }
+    .appeals-item { border-top: 1px solid var(--color-border); padding: 1rem 0; }
+    .appeals-item:first-of-type { border-top: 0; }
+    .appeals-item p { color: var(--color-text-secondary); margin: .4rem 0; }
+    .appeals-item textarea { width: 100%; min-height: 90px; background: var(--input-bg); color: var(--color-text); border: 1px solid var(--input-border); border-radius: 8px; padding: .7rem; }
+    .appeals-item button { margin-top: .5rem; background: var(--color-primary); color: #fff; border: 0; border-radius: 8px; padding: .6rem 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main class="appeals-wrap">
+    <a href="/settings">← Cài đặt tài khoản</a>
+    <h1>Quyết định và khiếu nại kỳ thi</h1>
+    <p>Chỉ bạn và quản trị viên có quyền mới xem được quyết định của bạn. Hãy nêu lý do cụ thể nếu muốn yêu cầu xem xét lại.</p>
+    <p id="appealsMessage" role="status"></p>
+    <section class="appeals-panel"><h2>Quyết định xử lý</h2><div id="myPenalties">Đang tải...</div></section>
+    <section class="appeals-panel"><h2>Khiếu nại đã gửi</h2><div id="myAppeals">Đang tải...</div></section>
+  </main>
+  <script>
+    (function () {
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      const csrf = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+      const headers = token ? { Authorization: `Token ${token}` } : {};
+      if (csrf) headers['X-CSRFToken'] = decodeURIComponent(csrf[1]);
+      async function request(path, options = {}) {
+        const response = await fetch(`/api/v1/anti-cheat/${path}`, {
+          credentials: 'same-origin', ...options,
+          headers: { ...headers, 'Content-Type': 'application/json' }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || data.error || `HTTP ${response.status}`);
+        return data;
+      }
+      async function load() {
+        const [penalties, appeals] = await Promise.all([request('penalties'), request('appeals')]);
+        const penaltyRoot = document.getElementById('myPenalties');
+        const appealRoot = document.getElementById('myAppeals');
+        penaltyRoot.replaceChildren(); appealRoot.replaceChildren();
+        if (!penalties.penalties.length) penaltyRoot.textContent = 'Không có quyết định xử lý.';
+        for (const penalty of penalties.penalties) {
+          const item = document.createElement('div'); item.className = 'appeals-item';
+          const title = document.createElement('strong');
+          title.textContent = `${penalty.contest} · ${penalty.kind} · #${penalty.id}${penalty.revoked ? ' (đã thu hồi)' : ''}`;
+          item.appendChild(title);
+          const reason = document.createElement('p'); reason.textContent = penalty.reason; item.appendChild(reason);
+          if (!penalty.revoked && !appeals.appeals.some(a => a.penalty_id === penalty.id && a.status === 'OPEN')) {
+            const form = document.createElement('form');
+            const text = document.createElement('textarea'); text.required = true; text.minLength = 10; text.maxLength = 4000;
+            text.placeholder = 'Lý do khiếu nại (ít nhất 10 ký tự)';
+            const submit = document.createElement('button'); submit.type = 'submit'; submit.textContent = 'Gửi khiếu nại';
+            form.append(text, submit);
+            form.addEventListener('submit', async event => {
+              event.preventDefault();
+              try {
+                await request('appeals', { method: 'POST', body: JSON.stringify({ penalty_id: penalty.id, reason: text.value.trim() }) });
+                document.getElementById('appealsMessage').textContent = 'Đã gửi khiếu nại.';
+                await load();
+              } catch (error) { document.getElementById('appealsMessage').textContent = error.message; }
+            });
+            item.appendChild(form);
+          }
+          penaltyRoot.appendChild(item);
+        }
+        if (!appeals.appeals.length) appealRoot.textContent = 'Chưa có khiếu nại.';
+        for (const appeal of appeals.appeals) {
+          const item = document.createElement('div'); item.className = 'appeals-item';
+          const title = document.createElement('strong'); title.textContent = `${appeal.contest} · #${appeal.id} · ${appeal.status}`;
+          const reason = document.createElement('p'); reason.textContent = appeal.reason;
+          const decision = document.createElement('p'); decision.textContent = appeal.decision || 'Đang chờ xem xét.';
+          item.append(title, reason, decision); appealRoot.appendChild(item);
+        }
+      }
+      load().catch(error => { document.getElementById('appealsMessage').textContent = `Không tải được dữ liệu: ${error.message}`; });
+    })();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+</body>
+</html>

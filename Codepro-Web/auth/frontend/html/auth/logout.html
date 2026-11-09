@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng xuất | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/auth/auth.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+      <h2 class="auth-title">Đang đăng xuất...</h2>
+      <p class="auth-subtitle">Cảm ơn bạn đã sử dụng CodeProOJ. Hẹn gặp lại!</p>
+    </div>
+  </div>
+
+  <script src="/frontend/js/auth/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        Auth.logout();
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách bài tập | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <!-- Search filter -->
+    <div style="margin-bottom: 1.25rem;">
+      <input type="text" id="probSearch" class="settings-input" placeholder="Tìm kiếm bài tập theo mã hoặc tên..." oninput="filterChips()" style="max-width: 400px;">
+    </div>
+
+    <!-- Solved Problems Section -->
+    <div class="profile-card">
+      <h3 class="profile-card-title">
+        <span style="color: #10b981;">✅</span> Bài đã giải thành công (Solved Problems) - <span id="solvedCount" style="color: #10b981;">0</span>
+      </h3>
+      <div class="prob-tags-container" id="solvedContainer">
+        <div style="color: var(--color-text-muted); padding: 1rem 0;">Đang tải bài đã giải...</div>
+      </div>
+    </div>
+
+    <!-- Attempted Problems Section -->
+    <div class="profile-card">
+      <h3 class="profile-card-title">
+        <span style="color: #f59e0b;">⏳</span> Bài đã thử nhưng chưa giải được (Attempted) - <span id="attemptedCount" style="color: #f59e0b;">0</span>
+      </h3>
+      <div class="prob-tags-container" id="attemptedContainer">
+        <div style="color: var(--color-text-muted); padding: 1rem 0;">Đang tải bài đã thử...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+    let rawSolved = [];
+    let rawAttempted = [];
+
+    async function init() {
+      let profileLoaded = false;
+      try {
+        const data = await ProfileAPI.getOverview(username);
+        document.title = `Bài tập - ${data.profile.display_name || username} (@${username})`;
+        ProfileAPI.renderHeader('profileHeaderContainer', data, 'problems');
+        profileLoaded = true;
+        const res = await ProfileAPI.getProblems(username);
+        rawSolved = res.solved || [];
+        rawAttempted = res.attempted || [];
+
+        document.getElementById('solvedCount').textContent = rawSolved.length;
+        document.getElementById('attemptedCount').textContent = rawAttempted.length;
+
+        renderChips(rawSolved, 'solvedContainer', '#10b981', 'rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0.3)');
+        renderChips(rawAttempted, 'attemptedContainer', '#f59e0b', 'rgba(245, 158, 11, 0.12)', 'rgba(245, 158, 11, 0.3)');
+      } catch (err) {
+        console.error(err);
+        if (!profileLoaded) document.getElementById('profileHeaderContainer').textContent = `Không tải được hồ sơ: ${err.message}`;
+        document.getElementById('solvedContainer').textContent = 'Không tải được danh sách bài tập.';
+        document.getElementById('attemptedContainer').textContent = 'Không tải được danh sách bài tập.';
+      }
+    }
+
+    function renderChips(list, containerId, color, bg, border) {
+      const c = document.getElementById(containerId);
+      if (list.length === 0) {
+        c.innerHTML = '<div style="color: var(--color-text-muted); padding: 0.5rem 0; font-style: italic;">Chưa có bài tập nào.</div>';
+        return;
+      }
+      c.innerHTML = list.map(p => `
+        <a href="/problems/${p.code}" class="prob-tag-chip" style="background: ${bg}; border-color: ${border}; color: ${color};" title="${p.name}">
+          ${p.code}
+        </a>
+      `).join('');
+    }
+
+    function filterChips() {
+      const q = document.getElementById('probSearch').value.toLowerCase().trim();
+      const filteredS = rawSolved.filter(p => p.code.toLowerCase().includes(q) || (p.name && p.name.toLowerCase().includes(q)));
+      const filteredA = rawAttempted.filter(p => p.code.toLowerCase().includes(q) || (p.name && p.name.toLowerCase().includes(q)));
+      renderChips(filteredS, 'solvedContainer', '#10b981', 'rgba(16, 185, 129, 0.12)', 'rgba(16, 185, 129, 0.3)');
+      renderChips(filteredA, 'attemptedContainer', '#f59e0b', 'rgba(245, 158, 11, 0.12)', 'rgba(245, 158, 11, 0.3)');
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

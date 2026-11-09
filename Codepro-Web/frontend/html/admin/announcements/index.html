@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Thông Báo Hệ Thống | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/announcements" class="admin-nav-item active"><span><cp-icon name="bell" size="sm"></cp-icon> </span> Quản lý thông báo</a>
+      <a href="/admin/reports" class="admin-nav-item"><span>🚨</span> Báo cáo &amp; Vi phạm</a>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình hệ thống</a>
+
+      <div class="sidebar-footer">
+        <div>CodeProOJ Admin v2.4</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1>Quản Lý Thông Báo Toàn Sàn (Global Announcements)</h1>
+          <p>Phát thông báo khẩn cấp, lịch thi đấu, hoặc bảo trì hiển thị trên trang chủ và tất cả người dùng.</p>
+        </div>
+      </div>
+
+      <!-- Announcement Form -->
+      <div class="panel-box" style="margin-bottom:1.5rem;">
+        <div class="panel-hdr">
+          <h3><cp-icon name="bell" size="sm"></cp-icon> Cấu hình Banner Thông Báo Hiện Tại</h3>
+        </div>
+        <div class="panel-bdy">
+          <form id="annForm" onsubmit="event.preventDefault(); saveAnnouncement();">
+            <div style="margin-bottom:1.25rem;">
+              <label style="display:block;font-size:0.8rem;color: var(--color-text-secondary);font-weight:700;text-transform:uppercase;margin-bottom:0.4rem;">Nội dung thông báo toàn trang</label>
+              <textarea id="annMessage" rows="4" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.75rem 1rem;color: #fff;font-size:0.95rem;line-height:1.5;outline: none;" placeholder="Ví dụ: Chào mừng kỳ thi HSG Tin 2026! Cụm máy chấm đã được nâng cấp..."></textarea>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color: var(--color-text-secondary);cursor:pointer;">
+                <input type="checkbox" id="annActive" style="width:18px;height:18px;">
+                Bật hiển thị thanh thông báo trên đỉnh website
+              </label>
+
+              <button type="submit" class="btn-top btn-top-primary" style="padding:0.75rem 1.75rem;">
+                💾 Lưu &amp; Phát thông báo ngay
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Preview Banner -->
+      <div class="panel-box">
+        <div class="panel-hdr">
+          <h3>👁️ Xem trước giao diện người dùng (Live Preview)</h3>
+        </div>
+        <div class="panel-bdy">
+          <div id="previewBox" style="background: color-mix(in srgb, var(--color-primary) 15%, transparent);border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);padding:1rem 1.25rem;border-radius:8px;color: var(--color-primary);font-size:0.95rem;display:flex;align-items:center;gap:0.75rem;">
+            <span><cp-icon name="bell" size="sm"></cp-icon> </span>
+            <span id="previewText">...</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    async function loadAnnouncement() {
+      try {
+        const res = await fetch('/api/v2/admin/system');
+        const json = await res.json();
+        if (json.status === 200 && json.data) {
+          const { global_announcement, announcement_active } = json.data;
+          document.getElementById('annMessage').value = global_announcement || '';
+          document.getElementById('annActive').checked = !!announcement_active;
+          updatePreview();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updatePreview() {
+      const msg = document.getElementById('annMessage').value;
+      const active = document.getElementById('annActive').checked;
+      const pBox = document.getElementById('previewBox');
+      const pTxt = document.getElementById('previewText');
+      pTxt.textContent = msg || 'Chưa có thông báo nào được đặt.';
+      pBox.style.opacity = active ? '1' : '0.4';
+    }
+
+    document.getElementById('annMessage').addEventListener('input', updatePreview);
+    document.getElementById('annActive').addEventListener('change', updatePreview);
+
+    async function saveAnnouncement() {
+      const message = document.getElementById('annMessage').value;
+      const active = document.getElementById('annActive').checked;
+      try {
+        const res = await fetch('/api/v2/admin/system', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'set_announcement', message, active })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã lưu thông báo!');
+        loadAnnouncement();
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    loadAnnouncement();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

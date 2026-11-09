@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dòng hoạt động | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <div class="profile-card">
+      <h3 class="profile-card-title"><cp-icon name="bolt" size="sm"></cp-icon> Dòng hoạt động (Activity Timeline)</h3>
+      <div class="activity-list" id="activityList">
+        <div style="color: var(--color-text-muted); padding: 1.5rem 0;">Đang tải hoạt động...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    async function init() {
+      const data = await ProfileAPI.getOverview(username);
+      document.title = `Hoạt động - ${data.profile.display_name || username} (@${username})`;
+      ProfileAPI.renderHeader('profileHeaderContainer', data, 'activity');
+
+      try {
+        const res = await ProfileAPI.getActivity(username);
+        const list = res.results || [];
+        const container = document.getElementById('activityList');
+
+        if (list.length === 0) {
+          container.innerHTML = '<div style="color: var(--color-text-muted); padding: 1rem 0;">Chưa ghi nhận hoạt động nào gần đây.</div>';
+          return;
+        }
+
+        container.innerHTML = list.map(a => {
+          let dotColor = '#3b82f6';
+          if (a.type === 'contest') dotColor = '#f59e0b';
+          else if (a.type === 'achievement') dotColor = '#10b981';
+          else if (a.type === 'blog') dotColor = '#a855f7';
+
+          return `
+            <div class="activity-item">
+              <span class="activity-dot" style="background: ${dotColor};"></span>
+              <div class="activity-title">
+                ${a.link ? `<a href="${a.link}" style="color: var(--color-text); text-decoration:none;">${a.title}</a>` : a.title}
+              </div>
+              <div class="activity-time">🕒 ${a.time_display || 'Vừa xong'}</div>
+              ${a.description ? `<div class="activity-desc">${a.description}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

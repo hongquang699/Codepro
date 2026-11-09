@@ -1,0 +1,6 @@
+name: Free Pascal
+extension: .pas
+compiled: true
+executable: solution
+time_limit_multiplier: 1.2
+memory_limit_multiplier: 1.0

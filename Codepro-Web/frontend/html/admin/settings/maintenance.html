@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảo trì & Sao lưu Dữ liệu | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .settings-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .settings-tab {
+      padding: 0.75rem 1.25rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .settings-tab:hover {
+      color: #fff;
+    }
+    .settings-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: #38bdf8;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .form-hint {
+      color: var(--color-text-dim);
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+    }
+    .btn-save {
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-save:hover {
+      background: var(--color-primary-hover);
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/judge" class="admin-nav-item"><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</a>
+      <a href="/admin/security" class="admin-nav-item"><cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF</a>
+
+      <div class="nav-group-title">Nội dung &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item"><cp-icon name="edit" size="sm"></cp-icon> Kho bài tập</a>
+      <a href="/admin/contests" class="admin-nav-item"><cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi</a>
+
+      <div class="nav-group-title">Cấu hình Hệ thống</div>
+      <a href="/admin/settings" class="admin-nav-item active"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình chung</a>
+      <a href="/admin/announcements" class="admin-nav-item"><span><cp-icon name="bell" size="sm"></cp-icon> </span> Thông báo toàn sàn</a>
+      <a href="/" class="admin-nav-item" style="margin-top:auto;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <h1>Bảo trì & Sao lưu Dữ liệu</h1>
+        <div style="display:flex;gap:1rem;align-items:center;">
+          <span style="color: var(--color-text-muted);font-size:0.9rem;">Quyền: <strong>System Superuser</strong></span>
+        </div>
+      </div>
+
+      <nav class="settings-nav">
+        <a href="/admin/settings" class="settings-tab ">Tổng quan</a>
+        <a href="/admin/settings/security" class="settings-tab ">Bảo mật &amp; WAF</a>
+        <a href="/frontend/html/admin/settings/judge.html" class="settings-tab ">Máy chấm (Judge)</a>
+        <a href="/frontend/html/admin/settings/email.html" class="settings-tab ">Cấu hình Email (SMTP)</a>
+        <a href="/frontend/html/admin/settings/maintenance.html" class="settings-tab active">Bảo trì &amp; Backup</a>
+        <a href="/frontend/html/admin/settings/system.html" class="settings-tab ">Hệ thống &amp; Telemetry</a>
+      </nav>
+
+      
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+  <div class="card" style="padding: 2rem;">
+    <h3 style="color: #ef4444; margin-bottom: 1.25rem; font-size:1.2rem;">🚨 Chế độ Bảo trì (Maintenance Mode)</h3>
+    <p style="color: var(--color-text-muted); font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem;">
+      Khi bật chế độ bảo trì, chỉ có tài khoản Quản trị viên (Superuser) mới có thể truy cập hệ thống. Thí sinh sẽ nhìn thấy màn hình thông báo nâng cấp hạ tầng.
+    </p>
+    <div style="display:flex; align-items:center; gap: 1rem; margin-bottom: 1.5rem;">
+      <label class="switch" style="position:relative; display:inline-block; width:60px; height:34px;">
+        <input type="checkbox" id="chkMaint" onchange="alert(this.checked ? 'Đã kích hoạt chế độ bảo trì toàn sàn!' : 'Đã mở lại hoạt động bình thường cho toàn sàn!');">
+        <span class="slider round" style="position:absolute; cursor:pointer; inset:0; background: var(--color-surface-hover); border-radius:34px; transition:.4s;"></span>
+      </label>
+      <span style="font-weight:700; color: #fff;" id="maintStatus">Trạng thái: Hoạt động bình thường</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Thông điệp bảo trì hiển thị với người dùng</label>
+      <textarea class="form-control" rows="3">Hệ thống đang tiến hành nâng cấp cụm máy chấm và sao lưu dữ liệu định kỳ. Dự kiến hoàn tất trong 30 phút. Xin lỗi vì sự bất tiện này!</textarea>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 2rem;">
+    <h3 style="color: var(--color-primary); margin-bottom: 1.25rem; font-size:1.2rem;">💾 Sao lưu &amp; Dọn dẹp Cơ sở Dữ liệu</h3>
+    <p style="color: var(--color-text-muted); font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem;">
+      Tạo bản sao lưu dữ liệu tức thời và dọn dẹp các bản ghi rác, phiên làm việc hết hạn hoặc cache tạm thời.
+    </p>
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      <button class="btn btn-primary" onclick="alert('Đã tạo bản snapshot cơ sở dữ liệu codeprooj_db_backup.sqlite3 thành công!');" style="padding:0.75rem;">📦 Tạo Bản Sao Lưu Ngay (Instant DB Snapshot)</button>
+      <button class="btn btn-secondary" onclick="alert('Đã xóa 1,248 phiên làm việc hết hạn và làm rỗng cache Redis!');" style="padding:0.75rem;">🧹 Dọn Dẹp Phiên Hết Hạn &amp; Xóa Cache</button>
+      <button class="btn btn-secondary" onclick="alert('Đã thực hiện tối ưu hóa bảng SQLite VACUUM thành công!');" style="padding:0.75rem;"><cp-icon name="bolt" size="sm"></cp-icon> Nén &amp; Chống Phân Mảnh Database (VACUUM)</button>
+    </div>
+  </div>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

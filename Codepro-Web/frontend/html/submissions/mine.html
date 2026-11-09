@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài nộp của tôi | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/mine.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/submission/all.html">Bài nộp</a></li>
+        <li><a href="/frontend/html/submission/mine.html" class="active">Của tôi</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; min-height: 85vh;">
+    <!-- Not logged in state -->
+    <div class="not-logged" id="notLoggedState" style="display:none;">
+      <div class="icon"><cp-icon name="lock" size="sm"></cp-icon> </div>
+      <h2>Bạn chưa đăng nhập</h2>
+      <p>Hãy đăng nhập để xem lịch sử bài nộp của bạn.</p>
+      <a href="/frontend/html/auth/login.html" class="btn btn-primary">Đăng nhập</a>
+    </div>
+
+    <!-- Main content -->
+    <div id="mainContent">
+      <div class="page-header">
+        <h1><cp-icon name="document" size="sm"></cp-icon> Bài nộp của tôi</h1>
+        <div style="color:var(--color-text-muted);font-size:.9rem;margin-top:.25rem;">Lịch sử nộp bài của <strong id="currentUserLabel">...</strong></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="num" id="sTotalSubs">—</div>
+          <div class="lbl">Tổng bài nộp</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="sAcProbs" style="color:#22c55e">—</div>
+          <div class="lbl">Bài đã giải</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="sAcRate" style="color:var(--color-primary)">—</div>
+          <div class="lbl">Tỷ lệ AC</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="sBestLang" style="font-size:1.2rem">—</div>
+          <div class="lbl">Ngôn ngữ chính</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <input type="text" id="filterProblem" placeholder="Bài toán..." style="width:200px;">
+        <select id="filterVerdict">
+          <option value="">Tất cả phán quyết</option>
+          <option value="AC">✅ Accepted</option>
+          <option value="WA">❌ Wrong Answer</option>
+          <option value="TLE">⏱ Time Limit</option>
+          <option value="MLE">💾 Memory Limit</option>
+          <option value="RE">💥 Runtime Error</option>
+          <option value="CE">🔧 Compile Error</option>
+        </select>
+        <select id="filterLang">
+          <option value="">Tất cả ngôn ngữ</option>
+          <option value="CPP17">C++17</option>
+          <option value="PY3">Python 3</option>
+          <option value="JAVA">Java</option>
+        </select>
+        <button onclick="loadMine()" style="padding:.45rem 1rem;border:1px solid var(--color-border);border-radius:8px;cursor:pointer;background:none;color:var(--color-text);font-size:.85rem;">🔄 Làm mới</button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="sub-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Bài toán</th>
+              <th>Phán quyết</th>
+              <th>Điểm</th>
+              <th>Thời gian</th>
+              <th>Bộ nhớ</th>
+              <th>Ngôn ngữ</th>
+              <th>Thời điểm</th>
+            </tr>
+          </thead>
+          <tbody id="mineBody">
+            <tr><td colspan="8" class="empty-state">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/submissions/mine.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS rating_history (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    contest_id BIGINT REFERENCES contests(id) ON DELETE CASCADE,
+    old_rating INT NOT NULL,
+    new_rating INT NOT NULL,
+    changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

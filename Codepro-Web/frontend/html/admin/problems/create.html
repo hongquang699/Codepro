@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Problem Setter Studio | Admin CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/problem_studio.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar" style="border-bottom: 2px solid #dc2626;">
+    <div class="container nav-container">
+      <a href="/admin/problems" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span style="color: #f87171;">CodeProOJ PROBLEM SETTER STUDIO</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/admin/problems" class="btn btn-secondary">&larr; Danh sách đề bài</a>
+        <a href="/admin" class="btn btn-secondary">Admin Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+    <!-- Problem Header Banner -->
+    <div class="card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+          <h1 id="bannerTitle" style="font-size: 1.5rem; margin: 0;">Tạo bài tập mới</h1>
+          <span id="bannerStatus" class="badge badge-pending">DRAFT</span>
+        </div>
+        <p id="bannerSub" style="color: var(--color-text-muted); font-size: 0.85rem; margin: 0;">
+          Nhập thông tin cơ bản để khởi tạo gói Problem Package trên hệ thống.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="quickPublishBtn" onclick="quickPublish()" class="btn btn-primary" style="background: #10b981; display: none; font-weight: 700;">
+          🚀 Publish ra cộng đồng
+        </button>
+        <a id="previewStudentBtn" href="#" target="_blank" class="btn btn-secondary" style="display: none;">
+          👁️ Xem như thí sinh
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; border-bottom: 1px solid var(--color-border); margin-bottom: 1.5rem; overflow-x: auto;">
+      <button onclick="switchTab('basic')" id="tab-basic" class="studio-tab-btn active">1. Thông tin cơ bản</button>
+      <button onclick="switchTab('statement')" id="tab-statement" class="studio-tab-btn">2. Đề bài (Statement)</button>
+      <button onclick="switchTab('testcases')" id="tab-testcases" class="studio-tab-btn">3. Bộ Testcases</button>
+      <button onclick="switchTab('judge')" id="tab-judge" class="studio-tab-btn">4. Checker & Validator</button>
+      <button onclick="switchTab('solution')" id="tab-solution" class="studio-tab-btn">5. Solution chuẩn</button>
+      <button onclick="switchTab('publish')" id="tab-publish" class="studio-tab-btn">6. Preview & Publish</button>
+    </div>
+
+    <!-- TAB 1: BASIC INFORMATION -->
+    <div id="section-basic" class="studio-section active">
+      <div class="card" style="max-width: 800px;">
+        <h2 style="margin-bottom: 1.5rem;">Thông tin cơ bản (Basic Information)</h2>
+        <form id="basicForm" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Mã bài (Code)*</label>
+              <input type="text" id="probCode" placeholder="Ví dụ: SUMA, KNAPSACK" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md); font-family: monospace; font-weight: 700; text-transform: uppercase;" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Tên bài tập (Title)*</label>
+              <input type="text" id="probTitle" placeholder="Ví dụ: Tổng hai số nguyên lớn" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Thời gian (giây)</label>
+              <input type="number" step="0.1" id="probTime" value="1.0" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Bộ nhớ (MB)</label>
+              <input type="number" id="probMemory" value="256" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);" required>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Độ khó</label>
+              <select id="probDifficulty" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);">
+                <option value="easy">Dễ (Easy)</option>
+                <option value="medium" selected>Trung bình (Medium)</option>
+                <option value="hard">Khó (Hard)</option>
+                <option value="expert">Chuyên gia (Expert)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Điểm tối đa</label>
+              <input type="number" id="probPoints" value="100" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);" required>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 600;">Chủ đề / Tags (Cách nhau bởi dấu phẩy)</label>
+            <input type="text" id="probTags" placeholder="dp, math, greedy, implementation" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.65rem 1rem; border-radius: var(--radius-md);">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+            <button type="submit" id="saveBasicBtn" class="btn btn-primary" style="padding: 0.75rem 2rem; font-weight: 700;">
+              💾 Lưu thông tin & Khởi tạo Package
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 2: STATEMENT (MARKDOWN / LATEX) -->
+    <div id="section-statement" class="studio-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <h2 style="margin: 0;">Nội dung Đề bài (Markdown & LaTeX)</h2>
+            <p style="color: var(--color-text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Hỗ trợ Markdown tiêu chuẩn, công thức toán LaTeX ($x^2 + y^2 = z^2$), khối code và bảng.</p>
+          </div>
+          <button onclick="saveStatement()" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-weight: 700;">
+            💾 Lưu đề bài
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--color-text-muted);">Trình soạn thảo Markdown</div>
+            <textarea id="statementMarkdown" class="code-editor-box" style="height: 480px;"></textarea>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--color-text-muted);">Xem trước nội dung (Preview)</div>
+            <div id="statementPreview" style="height: 480px; overflow-y: auto; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1.5rem; line-height: 1.7;">
+              <span style="color: var(--color-text-muted);">Nội dung preview sẽ hiển thị ở đây...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TESTCASES -->
+    <div id="section-testcases" class="studio-section">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+        <div>
+          <div class="card" style="padding: 0; overflow-x: auto; margin-bottom: 1.5rem;">
+            <div style="padding: 1.25rem; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="margin: 0;">Danh sách Testcase trong thư mục <code>cases/</code></h3>
+              <span id="testcasesTotalBadge" class="badge badge-ac">0 tests</span>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Tên test</th>
+                  <th>Input mẫu (.in)</th>
+                  <th>Output mẫu (.out)</th>
+                  <th style="width: 110px;">Dung lượng</th>
+                  <th style="width: 130px;">Điểm / Subtask</th>
+                  <th style="width: 70px; text-align: right;">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="testcasesTableBody">
+                <tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Chưa có testcase nào.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <!-- Add Single Test -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 1rem;">+ Thêm Testcase thủ công</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div>
+                <label style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Tên test (ID)</label>
+                <input type="text" id="manualTestId" placeholder="Ví dụ: 01, 02" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.5rem; border-radius: var(--radius-md); font-family: monospace;">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <label style="font-size: 0.8rem;">Điểm tối đa
+                  <input type="number" id="manualTestPoints" min="0" step="0.5" value="10" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.5rem; border-radius: var(--radius-md);">
+                </label>
+                <label style="font-size: 0.8rem;">Subtask
+                  <input type="number" id="manualTestSubtask" min="1" step="1" value="1" style="width: 100%; background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.5rem; border-radius: var(--radius-md);">
+                </label>
+              </div>
+              <label style="font-size: 0.8rem;"><input type="checkbox" id="manualTestSample"> Test ví dụ (sample)</label>
+              <div>
+                <label style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Dữ liệu vào (Input .in)</label>
+                <textarea id="manualTestIn" style="width: 100%; height: 90px; background: var(--color-bg-secondary); border: 1px solid var(--color-border); color: #fff; font-family: monospace; padding: 0.5rem; border-radius: var(--radius-md); resize: vertical;"></textarea>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Đáp án chuẩn (Output .out)</label>
+                <textarea id="manualTestOut" style="width: 100%; height: 90px; background: var(--color-bg-secondary); border: 1px solid var(--color-border); color: #fff; font-family: monospace; padding: 0.5rem; border-radius: var(--radius-md); resize: vertical;"></textarea>
+              </div>
+              <button onclick="addManualTestcase()" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">
+                Thêm testcase này
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Zip -->
+          <div class="card">
+            <h3 style="margin-bottom: 0.5rem;">Upload hàng loạt (ZIP)</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.8rem; margin-bottom: 1rem;">
+              Nén các file <code>01.in</code>, <code>01.out</code>, <code>02.in</code>, <code>02.out</code> vào một file <code>.zip</code> và tải lên.
+            </p>
+            <input type="file" id="zipUploadInput" accept=".zip" style="display: block; width: 100%; font-size: 0.85rem; margin-bottom: 1rem; color: #fff;">
+            <button onclick="uploadZipTestcases()" class="btn btn-secondary" style="width: 100%;">
+              📦 Giải nén & Nhập vào hệ thống
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: CHECKER & VALIDATOR -->
+    <div id="section-judge" class="studio-section">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Checker -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h3 style="margin: 0;">Trình chấm Checker</h3>
+              <p style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 0.2rem;">So khớp kết quả thí sinh với đáp án chuẩn.</p>
+            </div>
+            <button onclick="saveChecker()" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Lưu Checker</button>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; margin-right: 1rem;">Loại checker:</label>
+            <select id="checkerType" onchange="onCheckerTypeChange()" style="background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.4rem 0.8rem; border-radius: 6px;">
+              <option value="standard">Standard (Bỏ qua khoảng trắng thừa)</option>
+              <option value="float">Số thực sai số 10^-6</option>
+              <option value="custom">Custom Checker (C++ / Testlib)</option>
+            </select>
+          </div>
+          <textarea id="checkerCode" class="code-editor-box" style="height: 320px;"></textarea>
+        </div>
+
+        <!-- Validator -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h3 style="margin: 0;">Trình kiểm tra Validator</h3>
+              <p style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 0.2rem;">Kiểm tra định dạng và giới hạn các file input.</p>
+            </div>
+            <button onclick="saveValidator()" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Lưu Validator</button>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; margin-right: 1rem;">Ngôn ngữ:</label>
+            <select id="validatorLang" style="background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.4rem 0.8rem; border-radius: 6px;">
+              <option value="cpp">C++ (Testlib / IO)</option>
+              <option value="python">Python 3</option>
+            </select>
+          </div>
+          <textarea id="validatorCode" class="code-editor-box" style="height: 320px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: OFFICIAL SOLUTION -->
+    <div id="section-solution" class="studio-section">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0;">Lời giải mẫu (Official Solution)</h2>
+            <p style="color: var(--color-text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+              Chạy kiểm thử solution với toàn bộ testcase để đảm bảo đạt 100% Accepted trước khi Publish.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button onclick="saveSolution()" class="btn btn-secondary">💾 Lưu Solution</button>
+            <button onclick="runSolutionVerification()" id="runSolBtn" class="btn btn-primary" style="background: var(--color-primary); font-weight: 700;">
+              ⚡ Chạy kiểm thử với toàn bộ testcases
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+          <label style="font-size: 0.85rem; font-weight: 600;">File solution:</label>
+          <select id="solutionFilename" onchange="onSolutionFileChange()" style="background: var(--color-card); border: 1px solid var(--color-border); color: #fff; padding: 0.4rem 0.8rem; border-radius: 6px;">
+            <option value="official.py">official.py (Python 3)</option>
+            <option value="official.cpp">official.cpp (C++17)</option>
+          </select>
+        </div>
+
+        <textarea id="solutionCode" class="code-editor-box" style="height: 300px;"></textarea>
+      </div>
+
+      <!-- Solution Test Results -->
+      <div id="solutionResultsCard" class="card" style="display: none; padding: 0; overflow-x: auto;">
+        <div style="padding: 1.25rem; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0;">Kết quả kiểm thử Solution</h3>
+          <span id="solutionOverallBadge" class="badge badge-ac">100% AC</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Testcase</th>
+              <th style="width: 120px;">Trạng thái</th>
+              <th style="width: 140px;">Thời gian</th>
+              <th>Nhận xét (Feedback)</th>
+            </tr>
+          </thead>
+          <tbody id="solutionResultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 6: PREVIEW & PUBLISH CHECKLIST -->
+    <div id="section-publish" class="studio-section">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+        <div>
+          <!-- Live Preview Box -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 style="margin: 0;">Giao diện Thí sinh (Student View Preview)</h2>
+              <span class="badge badge-pending">Live Simulation</span>
+            </div>
+            <div id="publishPreviewBody" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 2rem; line-height: 1.8;">
+              <h1 id="prevHeadTitle" style="color: var(--color-primary); margin-bottom: 0.5rem;">SUMA: Tổng hai số</h1>
+              <div style="display: flex; gap: 1.5rem; color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                <span>Giới hạn thời gian: <strong id="prevHeadTime">1.0s</strong></span>
+                <span>Giới hạn bộ nhớ: <strong id="prevHeadMem">256 MB</strong></span>
+                <span>Điểm: <strong id="prevHeadPoints" style="color: #10b981;">100</strong></span>
+              </div>
+              <div id="prevContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Checklist Card -->
+          <div class="card" style="border-top: 4px solid var(--color-primary);">
+            <h3 style="margin-bottom: 1rem;">Kiểm tra điều kiện xuất bản (Publish Checklist)</h3>
+            <ul id="publishChecklist" style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem;">
+              <li>Đang kiểm tra...</li>
+            </ul>
+
+            <div style="margin-top: 2rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+              <button id="finalPublishBtn" onclick="executePublish()" class="btn btn-primary" style="width: 100%; background: #10b981; padding: 0.8rem; font-size: 1rem; font-weight: 700;">
+                🚀 Xuất bản Đề bài (Publish Problem)
+              </button>
+              <button id="finalUnpublishBtn" onclick="executeUnpublish()" class="btn btn-secondary" style="width: 100%; margin-top: 0.75rem; display: none;">
+                Ẩn tạm thời khỏi kho bài tập
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 2rem 0; margin-top: auto;">
+    <div class="container" style="display: flex; justify-content: space-between; color: var(--color-text-muted); font-size: 0.875rem;">
+      <div>&copy; 2026 Coding Platform Admin Portal. CodeProOJ Problem Setter Engine.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/admin/problems">Quản lý bài tập</a>
+        <a href="/frontend/html/home/index.html">Trang chủ</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/admin/problem_studio.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

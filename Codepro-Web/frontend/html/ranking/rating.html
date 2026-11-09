@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng xếp hạng Rating - CodeProOJ / Codeforces</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking-table.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/rating.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/footer.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="ranking-page">
+  <!-- Reusable CodeProOJ Top Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container"></div>
+  </nav>
+
+  <div class="ranking-container">
+    <div class="ranking-nav-actions" style="margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <a href="/" class="ranking-back-link" title="Quay về Trang chủ CodeProOJ">
+        <i class="fi fi-rr-arrow-left"></i>
+        <i class="fi fi-rr-home"></i>
+        <span>Quay về Trang chủ</span>
+      </a>
+      <div class="ranking-breadcrumb" style="font-size: 0.88rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 6px;">
+        <a href="/" style="color: var(--color-text-muted); text-decoration: none;"><i class="fi fi-rr-home"></i> Trang chủ</a>
+        <span>/</span>
+        <a href="/frontend/html/ranking/index.html" style="color: var(--color-text-muted); text-decoration: none;">Bảng xếp hạng</a>
+      </div>
+    </div>
+
+    <header class="ranking-header">
+      <div class="ranking-title-group">
+        <h1><i class="fi fi-rr-bolt"></i> Bảng xếp hạng Elo / Codeforces Rating</h1>
+        <p>Bảng phân hạng trình độ lập trình viên theo hệ thống tính điểm Elo & Codeforces chuẩn quốc tế.</p>
+      </div>
+
+      <nav class="ranking-tabs">
+        <a href="/frontend/html/ranking/index.html" class="ranking-tab"><i class="fi fi-rr-trophy"></i> Tổng thể</a>
+        <a href="/frontend/html/ranking/rating.html" class="ranking-tab active"><i class="fi fi-rr-bolt"></i> Rating</a>
+        <a href="/frontend/html/ranking/country.html" class="ranking-tab"><i class="fi fi-rr-globe"></i> Quốc gia</a>
+        <a href="/frontend/html/ranking/school.html" class="ranking-tab"><i class="fi fi-rr-graduation-cap"></i> Trường học</a>
+        <a href="/frontend/html/ranking/organization.html" class="ranking-tab"><i class="fi fi-rr-building"></i> Tổ chức</a>
+      </nav>
+    </header>
+
+    <main class="ranking-card">
+      <div class="ranking-controls">
+        <select id="tierFilter" class="ranking-select">
+          <option value="">Tất cả danh hiệu (Tiers)</option>
+          <option value="Legendary Grandmaster">Legendary Grandmaster (≥ 3000)</option>
+          <option value="Grandmaster">Grandmaster (2600 - 2999)</option>
+          <option value="Master">Master (2200 - 2599)</option>
+          <option value="Candidate Master">Candidate Master (1900 - 2199)</option>
+          <option value="Expert">Expert (1600 - 1899)</option>
+          <option value="Specialist">Specialist (1400 - 1599)</option>
+          <option value="Pupil">Pupil (1200 - 1399)</option>
+          <option value="Newbie">Newbie (&lt; 1200)</option>
+        </select>
+        <div style="position: relative; display: inline-flex; align-items: center;">
+          <i class="fi fi-rr-search" style="position: absolute; left: 12px; color: var(--color-text-muted);"></i>
+          <input type="text" id="searchUser" class="ranking-input" style="padding-left: 36px;" placeholder="Tìm thí sinh...">
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">#</th>
+              <th>Thí sinh</th>
+              <th style="width: 140px;">Current Rating</th>
+              <th style="width: 130px;">Max Rating</th>
+              <th style="width: 170px;">Danh hiệu (Tier)</th>
+              <th style="width: 120px;">Số kỳ thi</th>
+            </tr>
+          </thead>
+          <tbody id="ratingTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 40px;">Đang tải danh sách rating...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="rankingPagination"></div>
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-copyright">
+        &copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.
+      </div>
+      <div class="footer-links">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/ranking/rating-api.js"></script>
+  <script src="/frontend/js/ranking/ranking-table.js"></script>
+  <script src="/frontend/js/ranking/pagination.js"></script>
+  <script src="/frontend/js/ranking/rating.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+</body>
+</html>

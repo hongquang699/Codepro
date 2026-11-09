@@ -1,0 +1,165 @@
+/**
+ * CodeProOJ - Flaticon Vector Icons & Stickers Engine
+ * Official Flaticon (flaticon.com) Regular Rounded vector icons
+ */
+
+/* Flaticon Uicons CDN Official Links (flaticon.com) */
+@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
+
+/* Base Flaticon Icon Styles */
+i.fi, span.fi, [class^="fi-rr-"], [class*=" fi-rr-"], 
+[class^="fi-sr-"], [class*=" fi-sr-"],
+[class^="fi-br-"], [class*=" fi-br-"],
+[class^="fi-brands-"], [class*=" fi-brands-"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.15em;
+  line-height: 1;
+  font-style: normal;
+  speak: none;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+/* Sizing Utilities */
+.fi-xs, .cp-icon-xs { font-size: 0.75rem !important; }
+.fi-sm, .cp-icon-sm { font-size: 0.875rem !important; }
+.fi-md, .cp-icon-md { font-size: 1rem !important; }
+.fi-lg, .cp-icon-lg { font-size: 1.25rem !important; }
+.fi-xl, .cp-icon-xl { font-size: 1.5rem !important; }
+.fi-2xl { font-size: 2rem !important; }
+
+/* Semantic Colors */
+.fi-primary, .cp-icon-primary { color: var(--color-primary) !important; }
+.fi-success, .cp-icon-success { color: #34d399 !important; }
+.fi-warning, .cp-icon-warning { color: #fbbf24 !important; }
+.fi-danger,  .cp-icon-danger  { color: #f87171 !important; }
+.fi-purple,  .cp-icon-purple  { color: var(--color-accent) !important; }
+.fi-muted    { color: var(--color-text-muted) !important; }
+
+/* Interactive Hover effects */
+.nav-link:hover i.fi,
+.admin-nav-item:hover i.fi,
+.btn-hero:hover i.fi,
+.btn-hub-nav:hover i.fi {
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* Custom Element <cp-icon> styling */
+cp-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Admin Sidebar Icon Containers */
+.admin-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  font-size: 1.05rem;
+}
+.admin-nav-item.active .admin-nav-icon,
+.admin-nav-item:hover .admin-nav-icon {
+  color: var(--color-primary);
+}
+
+/* Inline & Wrapped Icons */
+.cp-inline-icon {
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-right: 0.35em;
+  font-size: 1.05em;
+}
+
+.cp-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Standalone / Only-child icons - zero margin, perfect center */
+.cp-single-icon,
+.cp-inline-icon:only-child,
+.cp-icon-wrap:only-child,
+*:only-child > .cp-inline-icon,
+*:only-child > i.fi,
+*:only-child > span.fi,
+.achievement-icon i,
+.achievement-icon .cp-inline-icon,
+.cp-icon-box > i.fi,
+.cp-icon-box > .cp-inline-icon {
+  margin: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+/* Flexbox centered containers containing icons */
+[style*="justify-content: center"] > i.fi,
+[style*="justify-content: center"] > .cp-inline-icon,
+[style*="justify-content:center"] > i.fi,
+[style*="justify-content:center"] > .cp-inline-icon,
+[style*="align-items: center"] > i.fi:only-child,
+[style*="align-items: center"] > .cp-inline-icon:only-child,
+[style*="align-items:center"] > i.fi:only-child,
+[style*="align-items:center"] > .cp-inline-icon:only-child {
+  margin: 0 !important;
+  margin-right: 0 !important;
+  vertical-align: 0 !important;
+}
+
+.spin-icon, .fi-spin {
+  animation: cp-spin 1s linear infinite !important;
+  display: inline-flex !important;
+}
+
+@keyframes cp-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Backward compatibility for legacy SVG icons (.cp-icon) */
+.cp-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.15em;
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, stroke 0.15s ease;
+}
+
+/* Flaticon Vector Search Input styling */
+.search-input,
+.input-with-search-icon,
+.filter-search-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 0.8rem center !important;
+  background-size: 15px 15px !important;
+  padding-left: 2.35rem !important;
+}
+
+.search-input:focus,
+.input-with-search-icon:focus,
+.filter-search-input:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+}
+

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thống Kê Kỹ Năng & Tiến Độ | Cổng Giáo Viên &amp; Nhà Trường (Teacher Hub)</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/teacher/teacher.css">
+  <style>
+    .teacher-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .teacher-sidebar { background: var(--color-bg-secondary); border-right: 1px solid var(--color-border); padding: 1.5rem 1rem; }
+    .teacher-main { padding: 2rem; background: var(--color-bg); overflow-y: auto; }
+    .teacher-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 0.35rem; }
+    .teacher-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .teacher-nav-item.active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="teacher-layout">
+    <aside class="teacher-sidebar">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;padding-left:0.5rem;">
+        <span style="font-size:1.75rem;">🎓</span>
+        <div>
+          <div style="font-weight:800;color: #fff;font-size:1.1rem;">TEACHER HUB</div>
+          <div style="font-size:0.75rem;color: #34d399;">Quản lý Lớp học &amp; Đào tạo</div>
+        </div>
+      </div>
+      <a href="/frontend/html/teacher/index.html" class="teacher-nav-item "><cp-icon name="chart" size="sm"></cp-icon> Tổng quan lớp học</a>
+      <a href="/frontend/html/teacher/classes.html" class="teacher-nav-item "><cp-icon name="users" size="sm"></cp-icon> Danh sách Lớp</a>
+      <a href="/frontend/html/teacher/assignments.html" class="teacher-nav-item "><cp-icon name="edit" size="sm"></cp-icon> Bài tập &amp; Bài tập về nhà</a>
+      <a href="/frontend/html/teacher/students.html" class="teacher-nav-item "><span>🧑‍🎓</span> Học sinh &amp; Điểm số</a>
+      <a href="/frontend/html/teacher/statistics.html" class="teacher-nav-item active"><span>📈</span> Thống kê &amp; Tiến độ</a>
+      <a href="/frontend/html/teacher/contests.html" class="teacher-nav-item "><cp-icon name="trophy" size="sm"></cp-icon> Kỳ thi Nội bộ</a>
+      <a href="/frontend/html/teacher/problems.html" class="teacher-nav-item "><span>📁</span> Kho Đề riêng</a>
+      <a href="/" class="teacher-nav-item" style="margin-top:3rem;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="teacher-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <h1 style="font-size:1.75rem;color: var(--color-text);font-weight:800;">Thống Kê Kỹ Năng & Tiến Độ</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Không gian giảng dạy thuật toán &amp; bồi dưỡng học sinh giỏi</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Mở form tạo bài tập mới');" style="padding:0.6rem 1.25rem;"><cp-icon name="plus" size="sm"></cp-icon> Giao Bài Tập Mới</button>
+      </div>
+      
+<div class="card" style="padding:1.5rem;">
+  <h3 style="color: var(--color-text); margin-bottom:1.5rem;">Phân Tích Tiến Độ Học Tập &amp; Kỹ Năng Giải Thuật</h3>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+    <div style="background: var(--color-bg-secondary); padding:1.5rem; border-radius:8px; border: 1px solid var(--color-border);">
+      <h4 style="color: var(--color-primary); margin-bottom:1rem;">Kỹ năng Thành thạo theo Chủ đề</h4>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.3rem;"><span>C++ Cơ bản &amp; Mảng</span><span>92%</span></div>
+          <div style="height:6px; background: var(--color-card); border-radius:3px;"><div style="width:92%; height:100%; background: #10b981; border-radius:3px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.3rem;"><span>Tìm kiếm &amp; Sắp xếp</span><span>85%</span></div>
+          <div style="height:6px; background: var(--color-card); border-radius:3px;"><div style="width:85%; height:100%; background: #38bdf8; border-radius:3px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.3rem;"><span>Quy hoạch động (DP)</span><span>68%</span></div>
+          <div style="height:6px; background: var(--color-card); border-radius:3px;"><div style="width:68%; height:100%; background: #f59e0b; border-radius:3px;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.3rem;"><span>Cấu trúc Dữ liệu Cây</span><span>54%</span></div>
+          <div style="height:6px; background: var(--color-card); border-radius:3px;"><div style="width:54%; height:100%; background: #a855f7; border-radius:3px;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: var(--color-bg-secondary); padding:1.5rem; border-radius:8px; border: 1px solid var(--color-border);">
+      <h4 style="color: #34d399; margin-bottom:1rem;">Lịch Sử Chấm Bài Của Lớp</h4>
+      <p style="color: var(--color-text-muted); font-size:0.95rem; line-height:1.6;">
+        Trong 30 ngày qua, học sinh đã thực hiện <strong>1,842 lượt nộp bài</strong> với <strong>1,390 lượt Accepted (75.4%)</strong>. Không phát hiện hành vi gian lận mã nguồn bất thường.
+      </p>
+    </div>
+  </div>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

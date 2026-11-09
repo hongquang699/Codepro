@@ -1,0 +1,62 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - FORUM DISCUSSION STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.forum-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.thread-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.thread-card-item {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+}
+
+.thread-card-item:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.thread-vote-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  min-width: 44px;
+}
+
+.thread-vote-num {
+  font-weight: 800;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.thread-cat-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+}

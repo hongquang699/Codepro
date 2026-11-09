@@ -1,0 +1,6 @@
+language: c
+compiler: compiler.sh
+runner: runner.sh
+file_extension: c
+default_time_limit: 2
+default_memory_limit: 256

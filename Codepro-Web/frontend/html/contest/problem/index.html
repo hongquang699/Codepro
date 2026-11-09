@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đề Bài Thi | CodeProOJ Contest</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <!-- Markdown Renderer -->
+  <script src="/frontend/vendor/marked/marked.umd.js"></script>
+  <script src="/frontend/vendor/dompurify/purify.min.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.25rem; padding-bottom: 4rem;">
+    <!-- Contest Top Bar Banner -->
+    <div class="contest-hero-card" style="padding: 1rem 1.75rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <a id="backToDashBtn" href="#" style="color: var(--color-text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+            &larr; <span id="contestNameHeader">HSG TIN HỌC 2026</span>
+          </a>
+          <span style="color: #475569;">|</span>
+          <span class="badge" style="background: var(--color-card); color: var(--color-primary);" id="contestProblemLabel">Bài A</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+          <div style="font-family: monospace; font-size: 1.15rem; font-weight: 800; color: var(--color-primary);" id="topCountdownTimer">
+            --:--:--
+          </div>
+          <a id="btnTopRanking" href="#" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+            🏆 Bảng xếp hạng
+          </a>
+          <a id="btnTopSubmit" href="#" class="btn-contest-submit-cta" style="font-size: 0.85rem; padding: 0.45rem 1.25rem;">
+            🚀 NỘP BÀI
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Column Split: Sidebar Problem Nav + Problem Content -->
+    <div class="problem-layout-split">
+      <!-- Left Sidebar: Problems Navigation (A -> B -> C -> D) -->
+      <aside class="problem-sidebar-card">
+        <div class="problem-sidebar-title">
+          <span>DANH SÁCH BÀI</span>
+          <span style="font-size: 0.75rem; color: var(--color-text-dim);" id="probCountBadge">4 BÀI</span>
+        </div>
+        <div class="problem-nav-list" id="sidebarProblemList">
+          <div style="color: var(--color-text-muted); font-size: 0.85rem; text-align: center; padding: 1rem;">Đang tải...</div>
+        </div>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--contest-border);">
+          <a id="btnMyContestSubs" href="#" style="display: block; color: var(--color-text-muted); font-size: 0.85rem; text-decoration: none; padding: 0.4rem 0.5rem; border-radius: 4px;">
+            📋 Lịch sử nộp bài của tôi
+          </a>
+          <a id="btnClarLink" href="#" style="display: block; color: var(--color-text-muted); font-size: 0.85rem; text-decoration: none; padding: 0.4rem 0.5rem; border-radius: 4px;">
+            💬 Đặt câu hỏi cho bài này
+          </a>
+        </div>
+      </aside>
+
+      <!-- Right Main Content: Problem Statement -->
+      <section class="problem-content-card">
+        <div class="problem-header-bar">
+          <div>
+            <h1 id="problemTitle" style="font-size: 1.75rem; font-weight: 800; color: var(--color-text); letter-spacing: -0.02em;">
+              A. TỔNG HAI SỐ
+            </h1>
+            <div class="problem-limits-row">
+              <span id="problemPoints">Điểm: <strong>100</strong></span>
+              <span>•</span>
+              <span id="problemTimeLimit">Thời gian: <strong>1.0s</strong></span>
+              <span>•</span>
+              <span id="problemMemLimit">Bộ nhớ: <strong>256MB</strong></span>
+              <span>•</span>
+              <span id="problemUserStatus">Trạng thái: <strong style="color: var(--color-text-muted);">Chưa giải</strong></span>
+            </div>
+          </div>
+          <div>
+            <a id="btnStatementSubmit" href="#" class="btn-contest-submit-cta">
+              [ SUBMIT ] Nộp bài
+            </a>
+          </div>
+        </div>
+
+        <!-- Markdown Problem Body -->
+        <article class="statement-body" id="problemBody">
+          Đang tải đề bài...
+        </article>
+
+        <!-- Bottom Submit CTA -->
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--contest-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="color: var(--color-text-muted); font-size: 0.9rem;">
+            Đã sẵn sàng lời giải? Bấm nút nộp bài để biên dịch và chấm điểm tự động.
+          </div>
+          <a id="btnBottomSubmit" href="#" class="btn-contest-submit-cta" style="padding: 0.85rem 2rem;">
+            🚀 TIẾN HÀNH NỘP BÀI
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest') || 'hsg-tin-2026';
+    const problemId = urlParams.get('problem') || 'A';
+
+    document.getElementById('backToDashBtn').href = `/contests/${contestKey}`;
+    document.getElementById('btnTopRanking').href = `/contests/${contestKey}/ranking`;
+    document.getElementById('btnMyContestSubs').href = `/contests/${contestKey}/submissions`;
+    document.getElementById('btnClarLink').href = `/contests/${contestKey}/clarifications`;
+
+    const submitUrl = `/contests/${contestKey}/problems/${problemId}/submit`;
+    document.getElementById('btnTopSubmit').href = submitUrl;
+    document.getElementById('btnStatementSubmit').href = submitUrl;
+    document.getElementById('btnBottomSubmit').href = submitUrl;
+
+    async function loadProblemDetail() {
+      try {
+        const json = await ContestAPI.getProblem(contestKey, problemId);
+        if (!json || !json.data) return;
+        const d = json.data;
+
+        document.getElementById('contestNameHeader').textContent = d.contest.name;
+        document.getElementById('contestProblemLabel').textContent = `Bài ${d.problem.letter} (${d.problem.code})`;
+        document.getElementById('problemTitle').textContent = `${d.problem.letter}. ${d.problem.name.toUpperCase()}`;
+        document.getElementById('problemPoints').innerHTML = `Điểm: <strong>${d.problem.points}</strong>`;
+        document.getElementById('problemTimeLimit').innerHTML = `Thời gian: <strong>${d.problem.time_limit}s</strong>`;
+        document.getElementById('problemMemLimit').innerHTML = `Bộ nhớ: <strong>${d.problem.memory_limit}MB</strong>`;
+
+        let statusText = '○ Chưa giải';
+        let statusColor = '#94a3b8';
+        if (d.problem.user_status === 'solved') {
+          statusText = '✓ Đã giải';
+          statusColor = '#34d399';
+        } else if (d.problem.user_status === 'attempted') {
+          statusText = '● Đã thử';
+          statusColor = '#fbbf24';
+        }
+        document.getElementById('problemUserStatus').innerHTML = `Trạng thái: <strong style="color: ${statusColor};">${statusText}</strong>`;
+
+        // Render Markdown Statement
+        // Statements are written by teachers/org members, so the rendered HTML must be sanitized.
+        if (window.marked && window.DOMPurify) {
+          document.getElementById('problemBody').innerHTML = window.DOMPurify.sanitize(
+            marked.parse(d.problem.description || 'Chưa có nội dung đề bài.'), { USE_PROFILES: { html: true } });
+        } else {
+          document.getElementById('problemBody').textContent = d.problem.description;
+        }
+
+        // Render Sidebar Problems
+        const sidebarContainer = document.getElementById('sidebarProblemList');
+        document.getElementById('probCountBadge').textContent = `${d.sidebar.length} BÀI`;
+
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+        sidebarContainer.innerHTML = d.sidebar.map(item => {
+          let mark = '○';
+          let markColor = '#64748b';
+          if (item.status === 'solved') {
+            mark = '✓';
+            markColor = '#34d399';
+          } else if (item.status === 'attempted') {
+            mark = '●';
+            markColor = '#fbbf24';
+          }
+
+          const isActive = item.letter.toUpperCase() === d.problem.letter.toUpperCase() || item.code.toUpperCase() === d.problem.code.toUpperCase();
+          const pUrl = `/contests/${encodeURIComponent(contestKey)}/problems/${encodeURIComponent(item.letter)}`;
+
+          return `
+            <a href="${pUrl}" class="problem-nav-link ${isActive ? 'active' : ''}">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span style="color: ${markColor}; font-weight: 800;">${mark}</span>
+                <span class="prob-letter-badge" style="width: 24px; height: 24px; font-size: 0.8rem;">${esc(item.letter)}</span>
+                <span style="overflow: hidden; text-overflow: ellipsis;">${esc(item.name)}</span>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">${esc(item.points)}p</span>
+            </a>
+          `;
+        }).join('');
+
+        // Countdown Timer
+        function updateTimer() {
+          const now = new Date().getTime();
+          const end = new Date(d.contest.end_time).getTime();
+          const diff = Math.max(0, end - now);
+          const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+          const mins = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+          const secs = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+          document.getElementById('topCountdownTimer').textContent = `${hours}:${mins}:${secs}`;
+        }
+        updateTimer();
+        setInterval(updateTimer, 1000);
+
+      } catch (e) {
+        console.error('Error loading problem detail:', e);
+      }
+    }
+
+    loadProblemDetail();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

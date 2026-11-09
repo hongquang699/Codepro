@@ -1,0 +1,16 @@
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.data-table th, .data-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+.data-table th { background: var(--table-header-bg, #162032); font-weight: 600; color: var(--color-text-muted); font-size: 0.85rem; }
+.data-table tr:hover td { background: var(--color-surface-hover); }

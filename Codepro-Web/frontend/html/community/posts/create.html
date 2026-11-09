@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soạn Thảo Bài Viết Mới | CodeProOJ Community</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/community/community.css">
+  <link rel="stylesheet" href="/frontend/css/community/feed.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/frontend/html/problem/index.html" class="nav-link">Bài tập</a>
+        <a href="/frontend/html/contest/index.html" class="nav-link">Cuộc thi</a>
+        <a href="/frontend/html/ranking/index.html" class="nav-link">Xếp hạng</a>
+        <a href="/frontend/html/submission/index.html" class="nav-link">Bài nộp</a>
+        <a href="/frontend/html/community/home/index.html" class="nav-link active">Cộng đồng</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/frontend/html/admin/dashboard.html" class="btn-nav btn-admin">Quản trị</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="comm-layout" style="grid-template-columns: 240px 1fr;">
+    <aside class="comm-left-sidebar">
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Menu</div>
+        <nav class="comm-nav-list">
+          <a href="/frontend/html/community/home/index.html" class="comm-nav-link">
+            <span>&larr;</span> Hủy &amp; Về Feed
+          </a>
+        </nav>
+      </div>
+
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Quy định đăng bài</div>
+        <ul style="font-size:0.82rem;color: var(--color-text-muted);line-height:1.6;padding-left:1.1rem;margin:0;">
+          <li>Nội dung liên quan đến giải thuật, lập trình thi đấu, kinh nghiệm học tập.</li>
+          <li>Định dạng code rõ ràng trong khối markdown.</li>
+          <li>Không chia sẻ lời giải trực tiếp khi cuộc thi đang diễn ra.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="comm-main">
+      <div class="comm-card">
+        <h1 style="font-size:1.5rem;color: var(--color-text);font-weight:800;margin-bottom:1.25rem;">✍️ Viết Bài Chia Sẻ Kinh Nghiệm &amp; Thuật Toán</h1>
+
+        <div style="margin-bottom:1.2rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Tiêu đề bài viết:</label>
+          <input type="text" id="postTitle" placeholder="Ví dụ: Hướng dẫn kỹ thuật chặt nhị phân trên tập kết quả..." class="comm-composer-input" style="min-height:auto;">
+        </div>
+
+        <div style="margin-bottom:1.2rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Thẻ phân loại (ngăn cách bởi dấu phẩy):</label>
+          <input type="text" id="postTags" placeholder="cpp, binary-search, algorithms, optimization" class="comm-composer-input" style="min-height:auto;">
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Nội dung bài viết (Markdown &amp; KaTeX):</label>
+          <textarea id="postContent" placeholder="Nhập nội dung bài viết, phân tích thuật toán, code mẫu..." class="comm-composer-input" style="min-height:280px;"></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+          <a href="/frontend/html/community/home/index.html" class="comm-btn-act" style="text-decoration:none;padding:0.6rem 1rem;">Hủy</a>
+          <button id="btnSubmitPost" class="comm-btn-primary">Xuất bản bài viết</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/community/api.js"></script>
+  <script src="/frontend/js/community/post-create.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

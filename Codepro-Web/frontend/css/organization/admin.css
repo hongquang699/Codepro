@@ -1,0 +1,136 @@
+/* Organization Admin Layout & UI */
+
+.org-admin-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .org-admin-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.org-admin-sidebar {
+  background: var(--color-surface, var(--color-bg-secondary));
+  border: 1px solid var(--color-card-border, var(--color-border-subtle));
+  border-radius: var(--radius-md, 10px);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.org-admin-sidebar-title {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted, var(--color-text-muted));
+}
+
+.org-admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, var(--color-text-secondary));
+  text-decoration: none !important;
+  transition: all 0.15s;
+}
+
+.org-admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text, var(--color-text));
+}
+
+.org-admin-nav-item.active {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent));
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.org-admin-content {
+  background: var(--color-surface, var(--color-bg-secondary));
+  border: 1px solid var(--color-card-border, var(--color-border-subtle));
+  border-radius: var(--radius-md, 10px);
+  padding: 1.75rem;
+}
+
+.org-admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border-subtle, var(--color-border-subtle));
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.org-admin-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.org-admin-label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, var(--color-text-secondary));
+  margin-bottom: 0.4rem;
+}
+
+.org-admin-input, .org-admin-select, .org-admin-textarea {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-card-border, var(--color-border));
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  color: var(--color-text, var(--color-text));
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.org-admin-input:focus, .org-admin-select:focus, .org-admin-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+/* Modal */
+.org-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.org-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.org-modal-box {
+  background: var(--color-surface, var(--color-bg-secondary));
+  border: 1px solid var(--color-card-border, var(--color-border));
+  border-radius: 12px;
+  width: 90%;
+  max-width: 520px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}

@@ -1,0 +1,4 @@
+#!/bin/bash
+SOURCE=$1
+DEST=$2
+tsc $SOURCE --outFile $DEST.js

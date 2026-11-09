@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổ chức & Trường học | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <div class="profile-card">
+      <h3 class="profile-card-title"><i class="fi fi-rr-building" style="color: var(--color-primary); margin-right: 0.5rem;"></i> Đơn vị &amp; Tổ chức tham gia (Organizations)</h3>
+      <div id="orgsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem;">
+        <div style="color: var(--color-text-muted);">Đang tải tổ chức...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    async function init() {
+      const data = await ProfileAPI.getOverview(username);
+      document.title = `Tổ chức - ${data.profile.display_name || username} (@${username})`;
+      ProfileAPI.renderHeader('profileHeaderContainer', data, 'organizations');
+
+      try {
+        const res = await ProfileAPI.getOrganizations(username);
+        const list = res.results || [];
+        const grid = document.getElementById('orgsGrid');
+
+        if (list.length === 0) {
+          grid.innerHTML = '<div style="color: var(--color-text-muted); padding: 1.5rem;">Thành viên này chưa liên kết với tổ chức nào.</div>';
+          return;
+        }
+
+        grid.innerHTML = list.map(o => {
+          const isSchool = o.type === 'school';
+          const iconClass = isSchool ? 'fi-rr-graduation-cap' : 'fi-rr-building';
+          const iconColor = isSchool ? '#a855f7' : '#38bdf8';
+          const iconBg = isSchool ? 'rgba(14, 116, 144, 0.12)' : 'rgba(56, 189, 248, 0.12)';
+          const iconBorder = isSchool ? 'rgba(14, 116, 144, 0.25)' : 'rgba(56, 189, 248, 0.25)';
+          return `
+            <div style="background: var(--color-bg-secondary); border: 1px solid var(--profile-border); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1.15rem; align-items: center;">
+              <div style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 12px; background: ${iconBg}; border: 1px solid ${iconBorder}; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                <i class="fi ${iconClass}" style="font-size: 24px; color: ${iconColor}; display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0;"></i>
+              </div>
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-text); line-height: 1.35;">${o.name}</div>
+                <div style="font-size: 0.82rem; color: var(--color-primary); font-weight: 600; margin-top: 0.25rem;">${o.role || 'Thành viên'}</div>
+                <div style="font-size: 0.78rem; color: var(--color-text-muted); text-transform: uppercase; margin-top: 0.35rem; letter-spacing: 0.03em;">Loại: ${isSchool ? 'Trường học' : 'Tổ chức / CLB'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

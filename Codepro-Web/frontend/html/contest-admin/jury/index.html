@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cụm Máy Chấm (Jury &amp; Workers) | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <!-- Workers Overview -->
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">⚙️ Trạng Thái Cụm Máy Chấm (Judge Workers)</h3>
+          <span id="juryOverallBadge" class="ca-badge ca-badge-running">CLUSTER ONLINE</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th>Tên Worker</th>
+                <th style="text-align:center;">Trạng Thái</th>
+                <th style="text-align:center;">Jobs Đang Chạy</th>
+                <th style="text-align:center;">Tải CPU / RAM</th>
+              </tr>
+            </thead>
+            <tbody id="workersTbody">
+              <tr><td colspan="4" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Đang kết nối cụm máy chấm...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live Queue -->
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">⏳ Hàng Đợi Chấm Hiện Tại (Judge Queue)</h3>
+          <span id="juryQueueCount" style="color: var(--color-primary);font-weight:700;font-size:.85rem;">0 jobs</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th>ID Bài Nộp</th>
+                <th>Thí Sinh</th>
+                <th>Mã Đề</th>
+                <th style="text-align:center;">Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody id="queueTbody">
+              <tr><td colspan="4" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Hàng đợi trống.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('jury', contestKey);
+    ContestAdminUI.renderHeader('Cụm Máy Chấm &amp; Jury', `Giám sát hoạt động chấm tự động kỳ thi ${contestKey}`);
+
+    async function loadJury() {
+      const res = await ContestAdminAPI.getJury(contestKey);
+      if (!res.data) return;
+
+      const workers = res.data.workers || [];
+      const tbodyW = document.getElementById('workersTbody');
+      tbodyW.innerHTML = workers.map(w => `
+        <tr>
+          <td><strong style="color: #fff;font-family:monospace;">${w.name}</strong></td>
+          <td style="text-align:center;">
+            <span class="ca-badge ${w.status === 'ONLINE' ? 'ca-badge-running' : 'ca-badge-frozen'}" style="${w.status === 'OFFLINE' ? 'background: rgba(239,68,68,.15);color: #ef4444;' : ''}">
+              ● ${w.status}
+            </span>
+          </td>
+          <td style="text-align:center;font-weight:700;color: var(--color-primary);">${w.jobs}</td>
+          <td style="text-align:center;color: var(--color-text-secondary);">${w.cpu}</td>
+        </tr>
+      `).join('');
+
+      const queue = res.data.recent_queue || [];
+      const tbodyQ = document.getElementById('queueTbody');
+      document.getElementById('juryQueueCount').textContent = `${res.data.queue_count} jobs`;
+
+      if (queue.length === 0) {
+        tbodyQ.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Hàng đợi trống. Tất cả bài nộp đã được chấm hoàn tất.</td></tr>';
+      } else {
+        tbodyQ.innerHTML = queue.map(q => `
+          <tr>
+            <td style="font-family:monospace;font-weight:700;color: var(--color-primary);">#${q.id}</td>
+            <td><strong style="color: #fff;">${q.user}</strong></td>
+            <td><span style="color: var(--color-accent);font-weight:700;">${q.problem}</span></td>
+            <td style="text-align:center;">
+              <span class="ca-badge ca-badge-upcoming">WAITING</span>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    loadJury();
+    setInterval(loadJury, 5000);
+  </script>
+</body>
+</html>

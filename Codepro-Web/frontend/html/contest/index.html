@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuộc thi Trực Tuyến | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container-wide" style="max-width: 1500px; width: 95%; margin: 0 auto; padding-top: 2rem; padding-bottom: 4rem;">
+    <!-- Hero Header -->
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--color-text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem;">
+        <cp-icon name="trophy" size="lg" style="color: #f59e0b;"></cp-icon> Cuộc thi Lập trình Thi đấu
+      </h1>
+      <p style="color: var(--color-text-muted); font-size: 1rem;">
+        Tham gia tranh tài các kỳ thi chuẩn HSG Quốc gia, CodeProOJ và ICPC với hệ thống máy chấm thời gian thực.
+      </p>
+    </div>
+
+    <!-- Featured Contest Banner: HSG TIN HỌC 2026 -->
+    <div class="contest-hero-card" id="featuredContestCard" style="display: none;">
+      <div class="contest-hero-top">
+        <div class="contest-title-wrap">
+          <span class="contest-badge-status c-status-running" id="featuredBadge">Đang diễn ra</span>
+          <h1 id="featuredName" style="margin-top: 0.5rem;">HSG TIN HỌC 2026</h1>
+          <p id="featuredDesc" style="color: var(--color-text-secondary); max-width: 650px; font-size: 0.95rem;"></p>
+        </div>
+        <div class="contest-timer-card">
+          <div class="contest-timer-label">Thời gian còn lại</div>
+          <div class="contest-timer-digits" id="featuredTimer">--:--:--</div>
+        </div>
+      </div>
+
+      <div class="contest-timeline-wrap">
+        <div class="timeline-info">
+          <span id="featuredStart">Bắt đầu: --:--</span>
+          <span id="featuredEnd">Kết thúc: --:--</span>
+        </div>
+        <div class="timeline-bar-bg">
+          <div class="timeline-bar-fill" id="featuredProgress" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <button id="btnEnterFeatured" class="btn-contest-submit-cta" style="padding: 0.85rem 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <cp-icon name="rocket" size="sm"></cp-icon> <span id="btnEnterFeaturedText">THAM GIA CUỘC THI</span>
+        </button>
+        <button id="btnLeaveFeatured" type="button" class="btn" style="display: none; padding: 0.85rem 1.5rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); font-weight: 700; border-radius: 8px; cursor: pointer; align-items: center; gap: 0.5rem;">
+          🚪 RỜI CUỘC THI
+        </button>
+        <a id="btnScoreboardFeatured" href="#" class="btn-sub-act btn-sub-act-secondary" style="padding: 0.85rem 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <cp-icon name="chart" size="sm"></cp-icon> Xem Bảng xếp hạng
+        </a>
+      </div>
+    </div>
+
+    <!-- Contest List Table -->
+    <div class="card contest-card-wide" style="margin-top: 2rem; width: 100%; padding: 1.75rem 2rem;">
+      <h3 style="margin-bottom: 1.25rem; font-size: 1.35rem; font-weight: 800; color: var(--color-text);">Tất cả kỳ thi</h3>
+      <table class="contest-problem-table">
+        <thead>
+          <tr>
+            <th>Cuộc thi</th>
+            <th>Bắt đầu</th>
+            <th>Thời lượng</th>
+            <th>Số bài</th>
+            <th>Thí sinh</th>
+            <th>Trạng thái</th>
+            <th style="text-align: right;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="contestTableBody">
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Đang tải danh sách cuộc thi...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script src="/frontend/js/core/live-sync.js"></script>
+  <script>
+    let featuredTimerId = null;
+    async function loadContestIndex() {
+      clearInterval(featuredTimerId);
+      try {
+        const user = ContestAPI.getCurrentUser();
+        const query = user?.username ? `?user=${encodeURIComponent(user.username)}` : '';
+        const res = await fetch(`/api/v1/contests/${query}`);
+        const json = await res.json();
+        const contests = json.data || [];
+
+        if (contests.length > 0) {
+          const featured = contests.find(c => c.key === 'hsg-tin-2026') || contests[0];
+          document.getElementById('featuredContestCard').style.display = 'block';
+          document.getElementById('featuredName').textContent = featured.name;
+          document.getElementById('featuredDesc').textContent = featured.description;
+          document.getElementById('featuredStart').textContent = `Bắt đầu: ${new Date(featured.start_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}`;
+          document.getElementById('featuredEnd').textContent = `Kết thúc: ${new Date(featured.end_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}`;
+
+          // Timer Countdown
+          function updateTimer() {
+            const now = new Date().getTime();
+            const end = new Date(featured.end_time).getTime();
+            const diff = Math.max(0, end - now);
+            const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+            const mins = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            const secs = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+            document.getElementById('featuredTimer').textContent = `${hours}:${mins}:${secs}`;
+          }
+          updateTimer();
+          featuredTimerId = setInterval(updateTimer, 1000);
+
+          const btnEnterText = document.getElementById('btnEnterFeaturedText');
+          const btnLeaveFeatured = document.getElementById('btnLeaveFeatured');
+
+          if (featured.is_registered) {
+            if (btnEnterText) btnEnterText.textContent = 'VÀO THI';
+            if (btnLeaveFeatured) {
+              btnLeaveFeatured.style.display = 'inline-flex';
+              btnLeaveFeatured.onclick = async () => {
+                if (!confirm(`Bạn có chắc chắn muốn rời khỏi cuộc thi "${featured.name}"?`)) return;
+                try {
+                  const r = await ContestAPI.leaveContest(featured.key);
+                  alert(r.data?.message || 'Đã rời cuộc thi thành công!');
+                  window.location.reload();
+                } catch(e) {
+                  alert('Lỗi: ' + e.message);
+                }
+              };
+            }
+          } else {
+            if (btnEnterText) btnEnterText.textContent = 'THAM GIA CUỘC THI';
+            if (btnLeaveFeatured) btnLeaveFeatured.style.display = 'none';
+          }
+
+          document.getElementById('btnEnterFeatured').onclick = async () => {
+            if (!user) {
+              window.location.href = `/frontend/html/auth/login.html?next=${encodeURIComponent(window.location.href)}`;
+              return;
+            }
+            if (!featured.is_registered) {
+              const regRes = await ContestAPI.registerContest(featured.key);
+              if (regRes.error && regRes.error.code === 'ALREADY_IN_ANOTHER_CONTEST') {
+                const switchContest = confirm(
+                  `Bạn đang tham gia cuộc thi "${regRes.error.active_contest_name}".\n\nMỗi thí sinh chỉ được tham gia 1 cuộc thi tại một thời điểm.\n\nBạn có muốn rời khỏi cuộc thi đó để chuyển sang tham gia cuộc thi "${featured.name}" không?`
+                );
+                if (switchContest && regRes.error.active_contest_key) {
+                  await ContestAPI.leaveContest(regRes.error.active_contest_key);
+                  const retry = await ContestAPI.registerContest(featured.key);
+                  if (retry.status === 200 || retry.data) {
+                    alert('Chuyển cuộc thi thành công!');
+                  } else {
+                    alert('Lỗi: ' + (retry.error?.message || 'Không thể tham gia'));
+                    return;
+                  }
+                } else {
+                  return;
+                }
+              } else if (regRes.status !== 200 && !regRes.data) {
+                alert('Không thể tham gia: ' + (regRes.error?.message || 'Đã có lỗi xảy ra'));
+                return;
+              }
+            }
+            window.location.href = `/frontend/html/contest/dashboard/index.html?contest=${featured.key}`;
+          };
+
+          document.getElementById('btnScoreboardFeatured').href = `/frontend/html/contest/dashboard/ranking.html?contest=${featured.key}`;
+
+          // Populate Table
+          const tbody = document.getElementById('contestTableBody');
+          tbody.innerHTML = contests.map(c => {
+            let actionBtnText = 'Tham gia';
+            let actionBtnClass = 'btn btn-primary';
+            if (c.is_registered) {
+              actionBtnText = 'Vào thi';
+            } else if (c.is_other_active) {
+              actionBtnText = 'Chuyển thi';
+              actionBtnClass = 'btn btn-outline';
+            }
+
+            return `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--color-text); font-size: 1rem;">${c.name}</div>
+                <div style="font-size: 0.8rem; color: var(--color-text-muted);">${c.key} • ${c.format.toUpperCase()}</div>
+              </td>
+              <td>${new Date(c.start_time).toLocaleDateString('vi-VN')} ${new Date(c.start_time).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</td>
+              <td>${c.duration_minutes} phút</td>
+              <td><span class="badge" style="background: var(--color-card); color: var(--color-primary);">${c.problems_count} bài</span></td>
+              <td>${c.participants_count} thí sinh</td>
+              <td>
+                <span class="contest-badge-status c-status-${c.status.toLowerCase()}">${c.status === 'RUNNING' ? 'Đang thi' : (c.status === 'UPCOMING' ? 'Sắp mở' : 'Đã xong')}</span>
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <a href="/frontend/html/contest/dashboard/index.html?contest=${c.key}" class="${actionBtnClass}" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+                  ${actionBtnText}
+                </a>
+                ${c.is_registered ? `
+                  <button onclick="leaveContestFromTable('${c.key}', '${c.name.replace(/'/g, "\\'")}')" class="btn" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 0.82rem; padding: 0.4rem 0.75rem; margin-left: 0.35rem; border-radius: 6px; cursor: pointer; font-weight: 600;" title="Rời cuộc thi">
+                    🚪 Rời thi
+                  </button>
+                ` : ''}
+              </td>
+            </tr>
+          `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error loading contests:', err);
+      }
+    }
+    loadContestIndex();
+    window.addEventListener('codeprooj:invalidate', event => {
+      if (event.detail?.topics?.includes('contests')) loadContestIndex();
+    });
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+  <script>
+    window.leaveContestFromTable = async function(key, name) {
+      if (!confirm(`Bạn có chắc chắn muốn rời khỏi cuộc thi "${name}" không?\n\nSau khi rời, bạn sẽ được gỡ khỏi danh sách thí sinh và bảng xếp hạng.`)) {
+        return;
+      }
+      try {
+        const res = await ContestAPI.leaveContest(key);
+        if (res.status === 200 || res.data) {
+          alert(res.data?.message || 'Đã rời khỏi cuộc thi thành công!');
+          window.location.reload();
+        } else {
+          alert('Không thể rời cuộc thi: ' + (res.error?.message || 'Đã có lỗi xảy ra.'));
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ: ' + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

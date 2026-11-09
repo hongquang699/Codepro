@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hỏi Đáp &amp; Đính Chính (Clarifications) | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">💬 Thắc Mắc &amp; Khiếu Nại Từ Thí Sinh</h3>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="width:75px;">ID</th>
+                <th>Thí Sinh</th>
+                <th>Bài Tập</th>
+                <th>Câu Hỏi</th>
+                <th>Câu Trả Lời</th>
+                <th style="text-align:center;">Phạm Vi</th>
+                <th style="text-align:center;">Trạng Thái</th>
+                <th style="text-align:right;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="clarsTbody">
+              <tr><td colspan="8" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải thắc mắc...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Answer Modal -->
+  <div class="ca-modal-overlay" id="answerModal">
+    <div class="ca-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 id="answerModalTitle" style="margin:0;color: var(--color-text);font-size:1.15rem;">💬 Trả Lời Thắc Mắc</h3>
+        <button onclick="closeAnswerModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitAnswer();">
+        <input type="hidden" id="ans_clar_id">
+        <div style="background: var(--color-bg);padding:.75rem 1rem;border: 1px solid var(--color-border-subtle);border-radius:8px;margin-bottom:1rem;">
+          <div style="font-size:.74rem;color: var(--color-text-muted);font-weight:700;text-transform:uppercase;">Nội dung câu hỏi:</div>
+          <div id="ans_question_text" style="color: var(--color-text);font-size:.88rem;margin-top:4px;"></div>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Câu trả lời chính thức *</label>
+          <textarea id="ans_answer_content" required class="ca-textarea" rows="4" placeholder="Nhập câu trả lời (Ví dụ: Đọc kỹ đề bài, Yes/No, hoặc đính chính đề)..."></textarea>
+        </div>
+        <div class="ca-form-group">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;">
+            <input type="checkbox" id="ans_is_public" style="width:16px;height:16px;" checked>
+            <span style="font-size:.88rem;color: var(--color-text);">Công khai câu trả lời cho toàn bộ thí sinh trong kỳ thi</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeAnswerModal()" class="ca-btn ca-btn-secondary">Hủy</button>
+          <button type="submit" class="ca-btn ca-btn-primary">Gửi câu trả lời</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('clarifications', contestKey);
+    ContestAdminUI.renderHeader('Hỏi Đáp &amp; Clarification', `Phản hồi thắc mắc thí sinh kỳ thi ${contestKey}`);
+
+    async function loadClarifications() {
+      const res = await ContestAdminAPI.getClarifications(contestKey);
+      const tbody = document.getElementById('clarsTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có câu hỏi nào từ thí sinh.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(c => `
+        <tr>
+          <td style="font-family:monospace;font-weight:700;color: var(--color-primary);">#${c.id}</td>
+          <td><strong style="color: #fff;">${c.user}</strong></td>
+          <td><span style="color: var(--color-accent);font-weight:700;">${c.problem_code}</span></td>
+          <td style="color: var(--color-text-secondary);max-width:240px;">${c.question}</td>
+          <td style="color: ${c.is_answered ? '#34d399' : '#64748b'};max-width:240px;">
+            ${c.answer ? c.answer : '<em>Chưa trả lời</em>'}
+          </td>
+          <td style="text-align:center;">
+            ${c.is_public ? '<span style="color: var(--color-primary);font-weight:700;">🌐 Công khai</span>' : '<span style="color: var(--color-text-muted);">🔒 Riêng tư</span>'}
+          </td>
+          <td style="text-align:center;">
+            <span class="ca-badge ${c.is_answered ? 'ca-badge-running' : 'ca-badge-frozen'}" style="${!c.is_answered ? 'background: rgba(245,158,11,.15);color: #f59e0b;border-color: rgba(245,158,11,.3);' : ''}">
+              ${c.is_answered ? 'ANSWERED' : 'PENDING'}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <button onclick="openAnswerModal(${c.id}, '${c.question.replace(/'/g, "\\'")}', '${(c.answer || '').replace(/'/g, "\\'")}', ${Boolean(c.is_public)})" class="ca-btn ca-btn-primary" style="padding:.28rem .65rem;font-size:.76rem;">
+              ${c.is_answered ? 'Sửa đáp án' : 'Trả lời'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAnswerModal(id, question, answer, isPublic) {
+      document.getElementById('ans_clar_id').value = id;
+      document.getElementById('ans_question_text').textContent = question;
+      document.getElementById('ans_answer_content').value = answer;
+      document.getElementById('ans_is_public').checked = isPublic;
+      document.getElementById('answerModal').classList.add('open');
+    }
+    function closeAnswerModal() {
+      document.getElementById('answerModal').classList.remove('open');
+    }
+
+    async function submitAnswer() {
+      const id = document.getElementById('ans_clar_id').value;
+      const answer = document.getElementById('ans_answer_content').value.trim();
+      const is_public = document.getElementById('ans_is_public').checked;
+
+      const res = await ContestAdminAPI.answerClarification(contestKey, id, answer, is_public);
+      alert(res.message || res.error);
+      if (res.status === 200) {
+        closeAnswerModal();
+        loadClarifications();
+      }
+    }
+
+    loadClarifications();
+  </script>
+</body>
+</html>

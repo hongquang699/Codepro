@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Tổ chức | CodeProOJ Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <style>
+    body { background: var(--color-bg); color: var(--color-text); }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 260px; min-width: 260px;
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border-subtle);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh;
+      overflow-y: auto; z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: .75rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+      text-decoration: none !important;
+    }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800; font-size: 1.1rem;
+    }
+    .brand-text { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .brand-sub { font-size: .7rem; color: #ef4444; font-weight: 700; letter-spacing: .08em; }
+
+    .nav-group-title {
+      padding: 1rem 1.5rem .35rem 1.5rem;
+      font-size: .7rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--color-text-dim);
+    }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: .65rem;
+      padding: .65rem 1.5rem;
+      color: var(--color-text-muted); font-size: .88rem; font-weight: 600;
+      text-decoration: none !important;
+      transition: all .15s; position: relative;
+      white-space: nowrap; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; overflow: hidden;
+    }
+    .admin-nav-item:hover { color: var(--color-text); background: rgba(255,255,255,.04); }
+    .admin-nav-item.active {
+      color: var(--color-primary) !important; background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+      font-weight: 700; border-left: 3px solid var(--color-primary);
+    }
+    .nav-badge {
+      margin-left: auto; font-size: .72rem; padding: .15rem .55rem;
+      border-radius: 9999px; background: var(--color-card); color: var(--color-text-secondary); font-weight: 700;
+      white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1.25;
+    }
+
+    .admin-main { flex: 1; min-width: 0; padding: 2rem 2.5rem; }
+    .admin-topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .stat-card {
+      background: var(--color-bg-secondary); border: 1px solid var(--color-border-subtle); border-radius: 12px;
+      padding: 1.25rem 1.5rem; text-align: center;
+    }
+    .stat-num { font-size: 1.85rem; font-weight: 800; color: var(--color-primary); line-height: 1.2; }
+    .stat-lbl { font-size: .78rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-top: 4px; }
+
+    .btn-act {
+      background: var(--color-bg-secondary); border: 1px solid var(--color-border); color: var(--color-text-secondary);
+      padding: .5rem 1rem; border-radius: 8px; font-size: .85rem; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .4rem;
+      text-decoration: none !important; transition: all .15s;
+    }
+    .btn-act:hover { background: rgba(255,255,255,.08); color: #fff; border-color: #64748b; }
+    .btn-act-primary {
+      background: var(--color-primary); color: #fff !important; border-color: var(--color-primary);
+    }
+    .btn-act-primary:hover { background: var(--color-primary-hover); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: 14px;
+      width: 90%; max-width: 580px; padding: 1.75rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,.7);
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="sidebar-brand">
+        <div class="brand-icon">&lt;/&gt;</div>
+        <div>
+          <div class="brand-text">CodeProOJ</div>
+          <div class="brand-sub">ADMINISTRATION</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="dashboard" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+      </a>
+      <a href="/admin/security" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="code" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+      <a href="/admin/blogs" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/organizations" class="admin-nav-item active">
+        <cp-icon name="shield" size="sm"></cp-icon> Quản lý Tổ chức
+        <span class="nav-badge" id="navOrgBadge" style="background: var(--color-primary);color: #fff;">0</span>
+      </a>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+    </aside>
+
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 style="font-size:1.85rem;font-weight:800;margin:0;color: var(--color-text);">
+            🏛️ Quản Lý Tổ Chức &amp; Cộng Đồng (Organizations)
+          </h1>
+          <p style="color: var(--color-text-muted);font-size:.88rem;margin-top:4px;">
+            Quản lý các tổ chức chuyên môn, trường chuyên KHTN, CLB thuật toán và Olympic Tin học.
+          </p>
+        </div>
+        <div style="display:flex;gap:.75rem;">
+          <button onclick="openCreateOrgModal()" class="btn-act btn-act-primary">
+            <cp-icon name="plus" size="sm"></cp-icon> Tạo tổ chức mới
+          </button>
+          <a href="/organizations" target="_blank" class="btn-act">
+            <cp-icon name="globe" size="sm"></cp-icon> Trang công khai
+          </a>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:1rem;margin-bottom:1.75rem;">
+        <div class="stat-card">
+          <div class="stat-num" id="totalOrgs">0</div>
+          <div class="stat-lbl">Tổng số tổ chức</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="totalVerified" style="color: var(--color-primary);">0</div>
+          <div class="stat-lbl">Tích xanh xác minh</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="totalMembers" style="color: #10b981;">0</div>
+          <div class="stat-lbl">Tổng thành viên</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="totalOpen" style="color: #f59e0b;">0</div>
+          <div class="stat-lbl">Đang mở tự do</div>
+        </div>
+      </div>
+
+      <!-- Controls & Search -->
+      <div style="background: var(--color-bg-secondary);border: 1px solid var(--color-border-subtle);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <div style="display:flex;gap:.75rem;align-items:center;">
+            <input type="text" id="orgSearchInput" placeholder="Tìm theo tên, mã slug, từ khóa..." style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem 1rem;color: #fff;outline: none;min-width:280px;">
+            <select id="verifiedFilter" style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+              <option value="all">Tất cả xác minh</option>
+              <option value="verified">Đã có tích xanh</option>
+              <option value="unverified">Chưa có tích xanh</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Organizations Table -->
+      <div style="background: var(--color-bg-secondary);border: 1px solid var(--color-border-subtle);border-radius:12px;overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th style="width:280px;">Tổ chức</th>
+                <th>Mã Slug</th>
+                <th style="text-align:center;">Tích xanh</th>
+                <th style="text-align:center;">Thành viên</th>
+                <th style="text-align:center;">Kỳ thi / Bài tập</th>
+                <th style="text-align:center;">Chính sách</th>
+                <th style="text-align:right;width:240px;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="orgsTbody">
+              <tr><td colspan="7" style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải danh sách tổ chức...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create Org Modal -->
+  <div class="modal-overlay" id="createOrgModal">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.2rem;">🏛️ Khởi Tạo Tổ Chức Mới</h3>
+        <button onclick="closeCreateOrgModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitCreateOrg();">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Tên đầy đủ *</label>
+            <input type="text" id="new_name" required placeholder="CodePro Competitive Programming Club" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Mã Slug URL *</label>
+            <input type="text" id="new_slug" required placeholder="codepro-club (viết thường, không dấu)" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Tên viết tắt *</label>
+            <input type="text" id="new_short_name" required placeholder="CPOJ" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Website chính thức</label>
+            <input type="url" id="new_website" placeholder="https://codeprooj.com" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Mô tả ngắn</label>
+          <input type="text" id="new_desc" placeholder="Cộng đồng Tin học trẻ Việt Nam" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;color: var(--color-primary);font-size:.88rem;">
+            <input type="checkbox" id="new_verified" style="width:16px;height:16px;accent-color:#0284c7;">
+            <span>Cấp Tích Xanh chính chủ ngay khi tạo (Verified)</span>
+          </label>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;color: var(--color-text-secondary);font-size:.88rem;">
+            <input type="checkbox" id="new_is_open" checked style="width:16px;height:16px;accent-color:var(--color-primary);">
+            <span>Cho phép tự do tham gia không cần duyệt</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;">
+          <button type="button" onclick="closeCreateOrgModal()" class="btn-act">Hủy</button>
+          <button type="submit" class="btn-act btn-act-primary">Tạo tổ chức</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Org Modal -->
+  <div class="modal-overlay" id="editOrgModal">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.2rem;">✏️ Sửa Thông Tin Tổ Chức: <span id="editModalSlug" style="color: var(--color-primary);">...</span></h3>
+        <button onclick="closeEditOrgModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitEditOrg();">
+        <input type="hidden" id="edit_slug">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Tên đầy đủ *</label>
+            <input type="text" id="edit_name" required style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Tên viết tắt *</label>
+            <input type="text" id="edit_short_name" required style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+          </div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Mô tả / Slogan</label>
+          <input type="text" id="edit_desc" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block;font-size:.82rem;font-weight:600;color: var(--color-text-secondary);margin-bottom:4px;">Website chính thức</label>
+          <input type="url" id="edit_website" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:.55rem .85rem;color: #fff;outline: none;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;color: var(--color-primary);font-size:.88rem;">
+            <input type="checkbox" id="edit_verified" style="width:16px;height:16px;accent-color:#0284c7;">
+            <span>Tích Xanh chính chủ (Verified)</span>
+          </label>
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;color: var(--color-text-secondary);font-size:.88rem;">
+            <input type="checkbox" id="edit_is_open" style="width:16px;height:16px;accent-color:var(--color-primary);">
+            <span>Mở đăng ký tự do</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;">
+          <button type="button" onclick="closeEditOrgModal()" class="btn-act">Hủy</button>
+          <button type="submit" class="btn-act btn-act-primary">Lưu thông tin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    let allOrgs = [];
+
+    function openCreateOrgModal() {
+      document.getElementById('createOrgModal').classList.add('open');
+    }
+    function closeCreateOrgModal() {
+      document.getElementById('createOrgModal').classList.remove('open');
+    }
+
+    function openEditOrgModal(slug) {
+      const org = allOrgs.find(o => o.slug === slug);
+      if (!org) return;
+      document.getElementById('edit_slug').value = org.slug;
+      document.getElementById('editModalSlug').textContent = org.slug;
+      document.getElementById('edit_name').value = org.name || '';
+      document.getElementById('edit_short_name').value = org.short_name || '';
+      document.getElementById('edit_desc').value = org.description || '';
+      document.getElementById('edit_website').value = org.website || '';
+      document.getElementById('edit_verified').checked = Boolean(org.verified);
+      document.getElementById('edit_is_open').checked = Boolean(org.is_open);
+      document.getElementById('editOrgModal').classList.add('open');
+    }
+    function closeEditOrgModal() {
+      document.getElementById('editOrgModal').classList.remove('open');
+    }
+
+    async function loadOrgs() {
+      const search = document.getElementById('orgSearchInput').value;
+      const res = await OrgAPI.listOrgs(search);
+      allOrgs = res.data || [];
+
+      // Update stat cards
+      document.getElementById('totalOrgs').textContent = allOrgs.length;
+      document.getElementById('navOrgBadge').textContent = allOrgs.length;
+      document.getElementById('totalVerified').textContent = allOrgs.filter(o => o.verified).length;
+      document.getElementById('totalOpen').textContent = allOrgs.filter(o => o.is_open).length;
+      const totalM = allOrgs.reduce((acc, cur) => acc + (cur.member_count || 0), 0);
+      document.getElementById('totalMembers').textContent = totalM.toLocaleString();
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const verifiedFlt = document.getElementById('verifiedFilter').value;
+      let filtered = allOrgs;
+      if (verifiedFlt === 'verified') filtered = filtered.filter(o => o.verified);
+      if (verifiedFlt === 'unverified') filtered = filtered.filter(o => !o.verified);
+
+      const tbody = document.getElementById('orgsTbody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color: var(--color-text-muted);">Không tìm thấy tổ chức nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <div style="width:40px;height:40px;border-radius:10px;background: var(--color-bg-secondary);border: 1px solid var(--color-border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                <img src="${o.logo || '/frontend/assets/icons/org-default.svg'}" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div style="min-width:0;">
+                <div style="font-weight:700;color: #fff;font-size:.95rem;">${o.short_name || o.name}</div>
+                <div style="font-size:.78rem;color: var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${o.name}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <code style="background: var(--color-bg);color: var(--color-primary);padding:2px 6px;border-radius:4px;border: 1px solid var(--color-border-subtle);">${o.slug}</code>
+          </td>
+          <td style="text-align:center;">
+            <button onclick="toggleVerified('${o.slug}', ${!o.verified})" style="background: none;border: none;cursor:pointer;" title="Bấm để bật/tắt tích xanh">
+              ${o.verified ? `
+                <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:9999px;background: rgba(56,189,248,.12);color: var(--color-primary);border: 1px solid rgba(56,189,248,.3);font-size:.75rem;font-weight:700;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 12L11 14L15 10M12 3L13.91 4.26L16.14 3.73L17.55 5.48L19.78 5.74L20.31 7.97L22.06 9.38L21.53 11.61L22.79 13.52L21.53 15.43L22.06 17.66L20.31 19.07L19.78 21.3L17.55 21.56L16.14 23.31L13.91 22.78L12 24.04L10.09 22.78L7.86 23.31L6.45 21.56L4.22 21.3L3.69 19.07L1.94 17.66L2.47 15.43L1.21 13.52L2.47 11.61L1.94 9.38L3.69 7.97L4.22 5.74L6.45 5.48L7.86 3.73L10.09 4.26L12 3Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.2"/><path d="M8.5 12.5L11 15L16 9" stroke="white" stroke-width="2"/></svg>
+                  Tích xanh
+                </span>
+              ` : `
+                <span style="padding:2px 8px;border-radius:4px;background: var(--color-card);color: var(--color-text-dim);font-size:.75rem;">Chưa có</span>
+              `}
+            </button>
+          </td>
+          <td style="text-align:center;font-weight:700;">
+            ${(o.member_count || 0).toLocaleString()}
+          </td>
+          <td style="text-align:center;color: var(--color-text-secondary);font-size:.85rem;">
+            🏆 <strong>${o.contest_count || 0}</strong> • 📝 <strong>${o.problem_count || 0}</strong>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:4px;background: ${o.is_open ? 'rgba(16,185,129,.15);color: #10b981;' : 'rgba(245,158,11,.15);color: #f59e0b;'}">
+              ${o.is_open ? 'Mở tự do' : 'Cần duyệt'}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <a href="/organizations/${o.slug}/admin" class="btn-act" style="padding:.3rem .6rem;font-size:.78rem;background: linear-gradient(135deg,var(--color-accent),var(--color-accent));color: #fff;border: none;margin-right:3px;">
+              Quản trị
+            </a>
+            <button onclick="openEditOrgModal('${o.slug}')" class="btn-act" style="padding:.3rem .6rem;font-size:.78rem;margin-right:3px;">
+              Sửa
+            </button>
+            <a href="/organizations/${o.slug}" target="_blank" class="btn-act" style="padding:.3rem .6rem;font-size:.78rem;margin-right:3px;">
+              Xem
+            </a>
+            <button onclick="deleteOrg('${o.slug}')" class="btn-act" style="padding:.3rem .6rem;font-size:.78rem;color: #ef4444;">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function toggleVerified(slug, nextVal) {
+      const res = await OrgAPI.updateSettings(slug, { verified: nextVal });
+      alert(res.message || res.error);
+      loadOrgs();
+    }
+
+    async function deleteOrg(slug) {
+      if (!confirm(`Xác nhận XÓA vĩnh viễn tổ chức "${slug}"?`)) return;
+      const res = await OrgAPI.request(`/${slug}/`, { method: 'DELETE' });
+      alert(res.message || res.error);
+      loadOrgs();
+    }
+
+    async function submitCreateOrg() {
+      const payload = {
+        name: document.getElementById('new_name').value,
+        slug: document.getElementById('new_slug').value,
+        short_name: document.getElementById('new_short_name').value,
+        website: document.getElementById('new_website').value,
+        description: document.getElementById('new_desc').value,
+        verified: document.getElementById('new_verified').checked,
+        is_open: document.getElementById('new_is_open').checked
+      };
+
+      const res = await OrgAPI.request('/', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeCreateOrgModal();
+        loadOrgs();
+      }
+    }
+
+    async function submitEditOrg() {
+      const slug = document.getElementById('edit_slug').value;
+      const payload = {
+        name: document.getElementById('edit_name').value,
+        short_name: document.getElementById('edit_short_name').value,
+        description: document.getElementById('edit_desc').value,
+        website: document.getElementById('edit_website').value,
+        verified: document.getElementById('edit_verified').checked,
+        is_open: document.getElementById('edit_is_open').checked
+      };
+
+      const res = await OrgAPI.updateSettings(slug, payload);
+      alert(res.message || res.error);
+      if (res.status === 200) {
+        closeEditOrgModal();
+        loadOrgs();
+      }
+    }
+
+    document.getElementById('orgSearchInput').addEventListener('input', loadOrgs);
+    document.getElementById('verifiedFilter').addEventListener('change', renderTable);
+    loadOrgs();
+  </script>
+</body>
+</html>
