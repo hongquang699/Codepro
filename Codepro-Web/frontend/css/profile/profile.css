@@ -1,0 +1,598 @@
+@import url('/frontend/css/global/theme.css');
+
+/* Modern Profile Stylesheet - CodeProOJ Adaptive Theme */
+:root {
+  --profile-bg: var(--color-bg, #0f172a);
+  --profile-card-bg: var(--color-card, #1e293b);
+  --profile-border: var(--color-border, #334155);
+  --profile-text: var(--color-text, #f8fafc);
+  --profile-muted: var(--color-text-muted, #94a3b8);
+  --profile-blue: var(--color-primary, var(--color-primary));
+  --profile-cyan: var(--color-info, #06b6d4);
+  --profile-green: var(--color-success, #10b981);
+  --profile-yellow: var(--color-warning, #f59e0b);
+  --profile-red: var(--color-danger, #ef4444);
+  --profile-purple: var(--color-accent);
+  --profile-orange: #f97316;
+}
+
+body {
+  background-color: var(--profile-bg);
+  color: var(--profile-text);
+  font-family: var(--font-family-base);
+  margin: 0;
+  padding: 0;
+}
+
+a, a:hover {
+  text-decoration: none !important;
+}
+
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+/* ─── Hero Header Card ─── */
+.profile-hero {
+  background: linear-gradient(135deg, var(--color-card) 0%, var(--color-bg-secondary) 100%);
+  border: 1px solid var(--profile-border);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+.profile-hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), #06b6d4, #10b981, #f59e0b);
+}
+
+.profile-header-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--profile-border);
+  background: var(--color-surface-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.profile-status-dot {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  background: #10b981;
+  border: 2px solid var(--color-border-subtle);
+  border-radius: 50%;
+}
+
+.profile-info-main {
+  flex: 1;
+  min-width: 260px;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.profile-username {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.profile-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.profile-fullname {
+  font-size: 1.05rem;
+  color: var(--profile-muted);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.profile-tags {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.profile-tag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.profile-bio {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+  max-width: 700px;
+}
+
+/* Header Action (Settings/Edit) */
+.profile-header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-self: flex-start;
+}
+
+.btn-profile-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-profile-act:hover {
+  background: #475569;
+  border-color: #64748b;
+}
+
+.btn-profile-act.primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-profile-act.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Quick Metrics Row in Header */
+.profile-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.metric-pill {
+  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.metric-pill .label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--profile-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-pill .val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-top: 0.2rem;
+  color: var(--color-text);
+}
+
+/* ─── Navigation Tabs Bar ─── */
+.profile-tabs-nav {
+  display: flex;
+  gap: 0.4rem;
+  background: var(--color-card);
+  border: 1px solid var(--profile-border);
+  border-radius: 10px;
+  padding: 0.35rem;
+  margin-bottom: 1.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.profile-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 7px;
+  color: var(--profile-muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.profile-tab-btn:hover {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.profile-tab-btn.active {
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ─── Content Cards & Layout ─── */
+.profile-card {
+  background: var(--profile-card-bg);
+  border: 1px solid var(--profile-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 1.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Stats 4-Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--profile-border);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-box .num {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.stat-box .desc {
+  font-size: 0.78rem;
+  color: var(--profile-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* Verdict Distribution Bar */
+.verdict-bar-wrap {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.5rem 0 1rem;
+  background: var(--color-bg-secondary);
+}
+
+.verdict-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.verdict-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ─── Table Styles ─── */
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.profile-table th {
+  background: var(--color-bg-secondary);
+  color: var(--profile-muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--profile-border);
+}
+
+.profile-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+}
+
+.profile-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Verdict Badges */
+.verdict-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.verdict-ac { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.verdict-wa { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.verdict-tle { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.verdict-rte { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.verdict-ce { background: rgba(148, 163, 184, 0.15); color: var(--color-text-secondary); }
+
+/* ─── Timeline / Activity ─── */
+.activity-list {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.activity-list::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  width: 2px;
+  background: var(--profile-border);
+}
+
+.activity-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.activity-dot {
+  position: absolute;
+  left: -1.5rem;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid var(--color-border-subtle);
+}
+
+.activity-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.activity-time {
+  font-size: 0.78rem;
+  color: var(--profile-muted);
+  margin-top: 0.2rem;
+}
+
+.activity-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.35rem;
+}
+
+/* ─── Achievements Grid ─── */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.achievement-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--profile-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.achievement-card.unlocked {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, var(--color-bg-secondary) 100%);
+}
+
+.achievement-card.locked {
+  opacity: 0.55;
+  filter: grayscale(80%);
+}
+
+.achievement-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.achievement-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.3rem;
+}
+
+.achievement-desc {
+  font-size: 0.8rem;
+  color: var(--profile-muted);
+  line-height: 1.4;
+}
+
+.achievement-date {
+  font-size: 0.72rem;
+  color: #f59e0b;
+  margin-top: 0.4rem;
+  font-weight: 600;
+}
+
+/* ─── Settings Forms ─── */
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.settings-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--profile-border);
+  margin-bottom: 1.25rem;
+}
+
+.settings-form-group {
+  margin-bottom: 1.2rem;
+}
+
+.settings-form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.settings-input,
+.settings-select,
+.settings-textarea {
+  width: 100%;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--profile-border);
+  border-radius: 7px;
+  padding: 0.65rem 0.9rem;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.settings-input:focus,
+.settings-select:focus,
+.settings-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.settings-btn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.settings-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Problem Tags List */
+.prob-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.prob-tag-chip {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.prob-tag-chip:hover {
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  border-color: var(--color-primary);
+  color: #fff;
+}

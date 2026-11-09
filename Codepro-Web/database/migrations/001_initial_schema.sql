@@ -1,0 +1,2 @@
+-- Migration: 001_initial_schema.sql
+-- Create initial core tables

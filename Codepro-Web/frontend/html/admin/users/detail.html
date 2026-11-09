@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Người Dùng | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .user-profile-header { display: flex; align-items: center; gap: 1.5rem; background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .user-avatar-lg { width: 72px; height: 72px; border-radius: 50%; background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; border: 3px solid rgba(255,255,255,0.1); }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media(max-width: 900px) { .action-grid { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/users" class="admin-nav-item active"><cp-icon name="users" size="sm"></cp-icon> Quản lý Người dùng</a>
+      <a href="/admin/submissions" class="admin-nav-item"><cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp</a>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình hệ thống</a>
+
+      <div class="sidebar-footer">
+        <div>CodeProOJ Admin v2.4</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1>Hồ Sơ Quản Trị Thành Viên</h1>
+          <p>Xem thông tin chi tiết, điều chỉnh phân quyền, đổi mật khẩu và xem lịch sử hoạt động.</p>
+        </div>
+        <div class="topbar-actions">
+          <a href="/admin/users" class="btn-top btn-top-secondary">&larr; Quay lại danh sách</a>
+          <a href="#" target="_blank" id="btnViewPublicProfile" class="btn-top btn-top-primary">👁️ Xem hồ sơ công khai</a>
+        </div>
+      </div>
+
+      <!-- User Header Card -->
+      <div class="user-profile-header">
+        <div class="user-avatar-lg" id="userAvatarText">?</div>
+        <div>
+          <h2 style="margin:0;color: var(--color-text);font-size:1.6rem;display:flex;align-items:center;gap:0.75rem;">
+            <span id="txtDisplayName">...</span>
+            <span id="badgeUserRole" class="badge-v bv-other">ROLE</span>
+          </h2>
+          <div style="font-size:0.9rem;color: var(--color-text-muted);margin-top:0.35rem;">
+            Tài khoản: <code id="txtUsername" style="color: var(--color-primary);font-weight:700;">...</code> &bull;
+            Email: <span id="txtEmail">...</span> &bull;
+            Ngày tạo: <span id="txtJoined">...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Grid -->
+      <div class="action-grid" style="margin-bottom:1.5rem;">
+        <!-- Card 1: Role & Status -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="shield" size="sm"></cp-icon> Phân Quyền &amp; Trạng Thái Tài Khoản</h3>
+          </div>
+          <div class="panel-bdy">
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label class="form-label" style="display:block;font-size:0.8rem;color: var(--color-text-secondary);font-weight:700;margin-bottom:0.4rem;">Vai trò trong hệ thống</label>
+              <select id="selRole" class="form-control" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.65rem 0.9rem;color: #fff;">
+                <option value="user">Người dùng thông thường (User)</option>
+                <option value="setter">Người ra đề / Tác giả (Problem Setter)</option>
+                <option value="admin">Quản trị viên toàn quyền (Super Admin)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.5rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color: var(--color-text-secondary);cursor:pointer;">
+                <input type="checkbox" id="chkIsActive" style="width:18px;height:18px;">
+                Tài khoản đang hoạt động (Bỏ tích để KHÓA / CẤM tài khoản)
+              </label>
+            </div>
+
+            <button class="btn-top btn-top-primary" onclick="updateUserRole()">💾 Cập nhật quyền hạn</button>
+          </div>
+        </div>
+
+        <!-- Card 2: Reset Password -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3>🔑 Đặt Lại Mật Khẩu (Admin Reset Password)</h3>
+          </div>
+          <div class="panel-bdy">
+            <div class="form-group" style="margin-bottom:1rem;">
+              <label class="form-label" style="display:block;font-size:0.8rem;color: var(--color-text-secondary);font-weight:700;margin-bottom:0.4rem;">Mật khẩu mới</label>
+              <input type="password" id="inputNewPassword" placeholder="Nhập mật khẩu mới ít nhất 6 ký tự" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.65rem 0.9rem;color: #fff;">
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.5rem;">
+              <label class="form-label" style="display:block;font-size:0.8rem;color: var(--color-text-secondary);font-weight:700;margin-bottom:0.4rem;">Xác nhận mật khẩu mới</label>
+              <input type="password" id="inputConfirmPassword" placeholder="Nhập lại mật khẩu mới" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;padding:0.65rem 0.9rem;color: #fff;">
+            </div>
+
+            <button class="btn-top btn-top-secondary" style="color: #f87171;" onclick="resetPassword()"><cp-icon name="bolt" size="sm"></cp-icon> Đặt lại mật khẩu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submissions Table -->
+      <div class="panel-box">
+        <div class="panel-hdr">
+          <h3><cp-icon name="document" size="sm"></cp-icon> Bài nộp gần đây của thành viên</h3>
+        </div>
+        <div class="panel-bdy" style="padding:0;">
+          <table class="admin-tbl">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Bài tập</th>
+                <th>Ngôn ngữ</th>
+                <th>Kết quả</th>
+                <th>Điểm</th>
+                <th>Thời gian</th>
+                <th>Thời điểm</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="userSubsTbody">
+              <tr><td colspan="8" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Đang tải lịch sử bài nộp...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('user') || params.get('username') || '';
+
+    async function loadUserData() {
+      if (!username) {
+        window.location.replace('/admin/users');
+        return;
+      }
+
+      document.getElementById('txtUsername').textContent = username;
+      document.getElementById('btnViewPublicProfile').href = `/profile/${username}`;
+
+      try {
+        const res = await fetch(`/api/v2/user/${username}`);
+        const json = await res.json();
+        if (json.status !== 200 || !json.data) {
+          alert('Không tìm thấy người dùng!');
+          return;
+        }
+
+        const u = json.data;
+        document.getElementById('txtDisplayName').textContent = u.display_name || u.username;
+        document.getElementById('txtEmail').textContent = u.email || 'Chưa cung cấp';
+        document.getElementById('txtJoined').textContent = u.joined ? new Date(u.joined).toLocaleDateString('vi-VN') : '—';
+        document.getElementById('userAvatarText').textContent = (u.display_name || u.username).charAt(0).toUpperCase();
+
+        let roleVal = 'user';
+        if (u.is_superuser) roleVal = 'admin';
+        else if (u.is_staff) roleVal = 'setter';
+
+        document.getElementById('selRole').value = roleVal;
+        document.getElementById('chkIsActive').checked = u.is_active !== false;
+
+        const roleBadge = document.getElementById('badgeUserRole');
+        if (roleVal === 'admin') {
+          roleBadge.textContent = 'SUPER ADMIN';
+          roleBadge.className = 'badge-v bv-WA';
+        } else if (roleVal === 'setter') {
+          roleBadge.textContent = 'SETTER';
+          roleBadge.className = 'badge-v bv-other';
+        } else {
+          roleBadge.textContent = 'USER';
+          roleBadge.className = 'badge-v bv-AC';
+        }
+
+        loadUserSubmissions();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadUserSubmissions() {
+      try {
+        const res = await fetch(`/api/v2/submissions?user=${username}&page_size=15`);
+        const json = await res.json();
+        const items = json.data?.items || json.data?.results || [];
+        const tbody = document.getElementById('userSubsTbody');
+
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Người dùng chưa nộp bài nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = items.map(s => `
+          <tr>
+            <td><a href="/submissions/${s.id}" target="_blank" style="color: var(--color-primary);font-weight:700;">#${s.id}</a></td>
+            <td><code>${s.problem_code || s.problem}</code></td>
+            <td>${s.language_name || s.language}</td>
+            <td><span class="badge-v ${s.result === 'AC' ? 'bv-AC' : (s.result === 'WA' ? 'bv-WA' : 'bv-other')}">${s.result}</span></td>
+            <td>${s.score !== null ? s.score : '—'}</td>
+            <td>${s.time !== null ? s.time + 's' : '—'}</td>
+            <td style="font-size:0.75rem;color: var(--color-text-muted);">${new Date(s.date).toLocaleDateString('vi-VN')}</td>
+            <td>
+              <a href="/submissions/${s.id}" target="_blank" class="btn-act">Xem</a>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function updateUserRole() {
+      const role = document.getElementById('selRole').value;
+      const is_active = document.getElementById('chkIsActive').checked;
+      try {
+        const res = await fetch(`/api/v2/admin/users/${username}/role`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ role, is_active })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error?.message || json?.detail || `HTTP ${res.status}`);
+        alert(json.data?.message || 'Đã cập nhật vai trò');
+        loadUserData();
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    async function resetPassword() {
+      const p1 = document.getElementById('inputNewPassword').value;
+      const p2 = document.getElementById('inputConfirmPassword').value;
+      if (!p1 || p1.length < 6) return alert('Mật khẩu phải có ít nhất 6 ký tự!');
+      if (p1 !== p2) return alert('Xác nhận mật khẩu không trùng khớp!');
+
+      if (!confirm(`Xác nhận đặt lại mật khẩu cho tài khoản ${username}?`)) return;
+
+      try {
+        const res = await fetch(`/api/v2/admin/users/${username}/role`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ password: p1 })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error?.message || json?.detail || `HTTP ${res.status}`);
+        alert('Đã đổi mật khẩu thành công!');
+        document.getElementById('inputNewPassword').value = '';
+        document.getElementById('inputConfirmPassword').value = '';
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    loadUserData();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

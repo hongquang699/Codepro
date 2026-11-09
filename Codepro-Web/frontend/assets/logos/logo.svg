@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="304" height="80" viewBox="0 0 304 80" role="img" aria-label="CodeProOJ Online Judge">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#153A83"/>
+      <stop offset="1" stop-color="#091A41"/>
+    </linearGradient>
+    <linearGradient id="code" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#7BE9FF"/>
+      <stop offset="1" stop-color="#3198F5"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(8 8)">
+    <rect width="64" height="64" rx="16" fill="url(#tile)"/>
+    <path d="M45 17 35 12a9 9 0 0 0-10 1L13 25a10 10 0 0 0 0 14l12 12a9 9 0 0 0 10 1l5-3" fill="none" stroke="url(#code)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m27 32 8 8 17-18" fill="none" stroke="#46E3B7" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="88" y="44" fill="#102349" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" font-weight="800" letter-spacing="-1.4">CodePro<tspan fill="#2563D9">OJ</tspan></text>
+  <text x="89" y="64" fill="#547091" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="3">ONLINE JUDGE</text>
+</svg>

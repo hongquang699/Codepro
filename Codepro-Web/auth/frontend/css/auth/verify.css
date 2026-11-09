@@ -1,0 +1,71 @@
+/* frontend/css/auth/verify.css - 6-Digit OTP Box Styling */
+@import url('./auth.css');
+
+.verify-card {
+  max-width: 480px;
+  text-align: center;
+}
+
+.otp-inputs-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 1.5rem 0;
+}
+
+.otp-box {
+  width: 48px;
+  height: 58px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1.5px solid #334155;
+  border-radius: 10px;
+  text-align: center;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.otp-box:focus {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25), 0 4px 12px rgba(2, 132, 199, 0.2);
+  transform: translateY(-2px);
+}
+
+.otp-box.filled {
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.resend-timer-box {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 1.25rem;
+}
+
+.btn-resend-otp {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.btn-resend-otp:hover:not(:disabled) {
+  color: #7dd3fc;
+}
+
+.btn-resend-otp:disabled {
+  color: #64748b;
+  cursor: not-allowed;
+  text-decoration: none;
+}

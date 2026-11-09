@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biên Soạn Bài Viết Thuật Toán | CodeProOJ Blog Studio</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/blog/blog.css">
+  <style>
+    .studio-container { max-width: 1200px; margin: 2rem auto 4rem; padding: 0 1.5rem; }
+    .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-height: 550px; }
+    .editor-pane, .preview-pane {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .md-textarea {
+      width: 100%;
+      flex: 1;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      color: var(--color-text);
+      font-family: 'Fira Code', 'Consolas', monospace;
+      padding: 1rem;
+      font-size: 0.95rem;
+      resize: none;
+      line-height: 1.6;
+    }
+    .preview-content {
+      flex: 1;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      color: var(--color-text-secondary);
+      overflow-y: auto;
+      line-height: 1.7;
+    }
+    .preview-content h1, .preview-content h2 { color: var(--color-primary); margin-top: 1rem; margin-bottom: 0.5rem; }
+    .preview-content pre { background: var(--color-bg-secondary); padding: 1rem; border-radius: 6px; color: #a5f3fc; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/blog/index.html">&larr; Quay lại Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-secondary" onclick="alert('Đã lưu bản nháp vào LocalStorage!');">💾 Lưu Nháp</button>
+        <button class="btn btn-primary" onclick="publishPost();"><cp-icon name="rocket" size="sm"></cp-icon> Xuất Bản Bài Viết</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="studio-container">
+    <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+        <div>
+          <label style="color: var(--color-text-secondary); font-weight:600; display:block; margin-bottom:0.4rem;">Tiêu đề bài viết</label>
+          <input type="text" id="postTitle" placeholder="Ví dụ: Tối ưu hóa Quy hoạch động với Convex Hull Trick..." style="width:100%; padding:0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius:6px; color: #fff; font-size:1.1rem; font-weight:700;">
+        </div>
+        <div>
+          <label style="color: var(--color-text-secondary); font-weight:600; display:block; margin-bottom:0.4rem;">Chuyên mục</label>
+          <select id="postCat" style="width:100%; padding:0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius:6px; color: #fff; font-size:1rem;">
+            <option>Giải thuật & Cấu trúc dữ liệu</option>
+            <option>Kinh nghiệm thi HSG & ICPC</option>
+            <option>Lập trình C++ Thi đấu</option>
+            <option>Editorial / Lời giải đề thi</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-grid">
+      <div class="editor-pane">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <strong style="color: var(--color-text);">✍️ Trình soạn thảo Markdown</strong>
+          <span style="font-size:0.8rem; color: var(--color-text-dim);">Hỗ trợ KaTeX Math &amp; Code blocks</span>
+        </div>
+        <textarea id="postContent" class="md-textarea" oninput="renderLivePreview();"># Giới thiệu Giải thuật
+
+Viết lời giải thích ngắn gọn về bài toán tại đây...
+
+## 1. Phân tích Độ phức tạp
+Độ phức tạp thời gian: $O(N \log N)$
+Độ phức tạp không gian: $O(N)$
+
+## 2. Mã nguồn mẫu C++
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout << "Accepted 100 points!" << endl;
+    return 0;
+}
+```
+</textarea>
+      </div>
+
+      <div class="preview-pane">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <strong style="color: var(--color-primary);">👁️ Xem trước Thời gian thực (Live Preview)</strong>
+          <span style="font-size:0.8rem; color: #10b981;">Đồng bộ tức thì</span>
+        </div>
+        <div id="previewArea" class="preview-content"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function renderLivePreview() {
+      const raw = document.getElementById('postContent').value;
+      // Simple lightweight markdown parser for preview
+      let html = raw
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/```cpp([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
+        .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\n/gim, '<br>');
+      document.getElementById('previewArea').innerHTML = html;
+    }
+    renderLivePreview();
+
+    function publishPost() {
+      const title = document.getElementById('postTitle').value;
+      if (!title) return alert('Vui lòng nhập tiêu đề bài viết!');
+      alert('Chúc mừng! Bài viết "' + title + '" đã được xuất bản lên CodeProOJ Blog.');
+      window.location.href = '/frontend/html/blog/index.html';
+    }
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

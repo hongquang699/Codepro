@@ -1,0 +1,6 @@
+name: Python 3
+extension: .py
+compiled: false
+executable: solution.py
+time_limit_multiplier: 2.5
+memory_limit_multiplier: 2.0

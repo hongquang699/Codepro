@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Học Sinh & Điểm Số | Cổng Giáo Viên &amp; Nhà Trường (Teacher Hub)</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/teacher/teacher.css">
+  <style>
+    .teacher-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .teacher-sidebar { background: var(--color-bg-secondary); border-right: 1px solid var(--color-border); padding: 1.5rem 1rem; }
+    .teacher-main { padding: 2rem; background: var(--color-bg); overflow-y: auto; }
+    .teacher-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 0.35rem; }
+    .teacher-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .teacher-nav-item.active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="teacher-layout">
+    <aside class="teacher-sidebar">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;padding-left:0.5rem;">
+        <span style="font-size:1.75rem;">🎓</span>
+        <div>
+          <div style="font-weight:800;color: #fff;font-size:1.1rem;">TEACHER HUB</div>
+          <div style="font-size:0.75rem;color: #34d399;">Quản lý Lớp học &amp; Đào tạo</div>
+        </div>
+      </div>
+      <a href="/frontend/html/teacher/index.html" class="teacher-nav-item "><cp-icon name="chart" size="sm"></cp-icon> Tổng quan lớp học</a>
+      <a href="/frontend/html/teacher/classes.html" class="teacher-nav-item "><cp-icon name="users" size="sm"></cp-icon> Danh sách Lớp</a>
+      <a href="/frontend/html/teacher/assignments.html" class="teacher-nav-item "><cp-icon name="edit" size="sm"></cp-icon> Bài tập &amp; Bài tập về nhà</a>
+      <a href="/frontend/html/teacher/students.html" class="teacher-nav-item active"><span>🧑‍🎓</span> Học sinh &amp; Điểm số</a>
+      <a href="/frontend/html/teacher/statistics.html" class="teacher-nav-item "><span>📈</span> Thống kê &amp; Tiến độ</a>
+      <a href="/frontend/html/teacher/contests.html" class="teacher-nav-item "><cp-icon name="trophy" size="sm"></cp-icon> Kỳ thi Nội bộ</a>
+      <a href="/frontend/html/teacher/problems.html" class="teacher-nav-item "><span>📁</span> Kho Đề riêng</a>
+      <a href="/" class="teacher-nav-item" style="margin-top:3rem;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="teacher-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <h1 style="font-size:1.75rem;color: var(--color-text);font-weight:800;">Học Sinh & Điểm Số</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Không gian giảng dạy thuật toán &amp; bồi dưỡng học sinh giỏi</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Mở form tạo bài tập mới');" style="padding:0.6rem 1.25rem;"><cp-icon name="plus" size="sm"></cp-icon> Giao Bài Tập Mới</button>
+      </div>
+      
+<div class="card" style="padding:1.5rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h3 style="color: var(--color-text);">Bảng Điểm &amp; Danh Sách Học Sinh Toàn Khối</h3>
+    <button class="btn btn-secondary" onclick="alert('Đã xuất file gradebook.csv thành công!');"><cp-icon name="inbox" size="sm"></cp-icon> Xuất File Excel (CSV)</button>
+  </div>
+  <table class="table" style="width:100%;">
+    <thead>
+      <tr><th>STT</th><th>Họ và Tên</th><th>Lớp</th><th>Điểm TB</th><th>Bài nộp gần nhất</th><th>Đánh giá</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Lê Quang Huy</td><td>11 Tin</td><td>95/100</td><td>DP_KNAPSACK (AC 100đ)</td><td><span style="color: #10b981;">Xuất sắc</span></td></tr>
+      <tr><td>2</td><td>Phạm Thu Hương</td><td>10 Tin</td><td>88/100</td><td>SUM_AB (AC 100đ)</td><td><span style="color: var(--color-primary);">Tốt</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+name: TypeScript
+extension: .ts
+compiled: true
+executable: solution.js
+time_limit_multiplier: 2.0
+memory_limit_multiplier: 2.0

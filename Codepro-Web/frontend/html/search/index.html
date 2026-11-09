@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tìm Kiếm Toàn Sàn | CodeProOJ Search</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <style>
+    .search-hero { background: radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%), var(--color-bg); border-bottom: 1px solid var(--color-border-subtle); padding: 3rem 0; margin-bottom: 2rem; }
+    .search-box-wrap { max-width: 700px; margin: 1.5rem 0 0 0; position: relative; }
+    .search-big-input { width: 100%; background: var(--color-bg); border: 2px solid var(--color-border); border-radius: 12px; padding: 1rem 1.25rem; font-size: 1.15rem; color: #fff; outline: none; transition: border-color 0.2s; }
+    .search-big-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 20%, transparent); }
+    .section-title { font-size: 1.25rem; font-weight: 700; color: var(--color-text); margin: 2rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem; }
+    .result-item { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; transition: all 0.15s; }
+    .result-item:hover { border-color: var(--color-primary); transform: translateX(4px); }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/contests">Cuộc thi</a></li>
+        <li><a href="/ranking">Xếp hạng</a></li>
+        <li><a href="/submissions">Bài nộp</a></li>
+        <li><a href="/search" class="active">Tìm kiếm</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/login" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/register" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <div class="search-hero">
+    <div class="container">
+      <h1 style="font-size:2.2rem;font-weight:800;color: var(--color-text);margin:0 0 0.5rem 0;">Tìm Kiếm Toàn Hệ Thống</h1>
+      <p style="color: var(--color-text-muted);font-size:1rem;margin:0;">Tra cứu bài tập thuật toán, kỳ thi, hồ sơ thí sinh và bài viết kỹ thuật.</p>
+      
+      <div class="search-box-wrap">
+        <input type="text" id="mainSearchInput" class="search-big-input" placeholder="Nhập tên bài, mã bài (SUMA), username, hoặc tên kỳ thi..." autofocus>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="padding-bottom: 4rem;">
+    <div id="resultsWrapper">
+      <div style="text-align:center;padding:4rem;color: var(--color-text-dim);">
+        Hãy nhập từ khóa để bắt đầu tìm kiếm.
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    let searchDebounceTimer = null;
+    const input = document.getElementById('mainSearchInput');
+
+    const params = new URLSearchParams(window.location.search);
+    const initialQ = params.get('q') || '';
+    if (initialQ) {
+      input.value = initialQ;
+      executeSearch(initialQ);
+    }
+
+    input.addEventListener('input', (e) => {
+      clearTimeout(searchDebounceTimer);
+      const q = e.target.value.trim();
+      if (!q) {
+        document.getElementById('resultsWrapper').innerHTML = '<div style="text-align:center;padding:4rem;color: var(--color-text-dim);">Hãy nhập từ khóa để bắt đầu tìm kiếm.</div>';
+        return;
+      }
+      searchDebounceTimer = setTimeout(() => executeSearch(q), 300);
+    });
+
+    async function executeSearch(query) {
+      const wrapper = document.getElementById('resultsWrapper');
+      wrapper.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);">🔍 Đang tra cứu dữ liệu...</div>';
+
+      try {
+        const res = await fetch(`/api/v2/search?q=${encodeURIComponent(query)}`);
+        const json = await res.json();
+        if (json.status !== 200 || !json.data) {
+          wrapper.innerHTML = '<div style="text-align:center;padding:3rem;color: #ef4444;">Không thể thực hiện tìm kiếm.</div>';
+          return;
+        }
+
+        const { problems, contests, users, blogs } = json.data;
+        const total = problems.length + contests.length + users.length + blogs.length;
+
+        if (total === 0) {
+          wrapper.innerHTML = `<div style="text-align:center;padding:4rem;color: var(--color-text-muted);">Không tìm thấy kết quả nào khớp với "<strong>${escapeHtml(query)}</strong>".</div>`;
+          return;
+        }
+
+        let html = `<div style="color: var(--color-text-muted);font-size:0.9rem;margin-bottom:1.5rem;">Tìm thấy ${total} kết quả cho "<strong>${escapeHtml(query)}</strong>":</div>`;
+
+        // Problems
+        if (problems.length > 0) {
+          html += `<div class="section-title"><cp-icon name="edit" size="sm"></cp-icon> Bài tập (${problems.length})</div>`;
+          html += problems.map(p => `
+            <a href="/problem/${p.code}" class="result-item">
+              <div>
+                <strong style="color: var(--color-primary);font-size:1.05rem;">${p.code}</strong> &mdash; 
+                <span style="color: #fff;font-weight:600;">${p.name}</span>
+              </div>
+              <span class="badge" style="background: color-mix(in srgb, var(--color-primary) 15%, transparent);color: var(--color-primary);padding:0.25rem 0.6rem;border-radius:4px;font-size:0.8rem;font-weight:700;">${p.points || 100} điểm</span>
+            </a>
+          `).join('');
+        }
+
+        // Contests
+        if (contests.length > 0) {
+          html += `<div class="section-title"><cp-icon name="trophy" size="sm"></cp-icon> Cuộc thi (${contests.length})</div>`;
+          html += contests.map(c => `
+            <a href="/contest/${c.key}" class="result-item">
+              <div>
+                <strong style="color: #f59e0b;font-size:1.05rem;">[${c.key}]</strong> &mdash; 
+                <span style="color: #fff;font-weight:600;">${c.name}</span>
+              </div>
+              <span class="badge" style="background: rgba(245,158,11,0.15);color: #fbbf24;padding:0.25rem 0.6rem;border-radius:4px;font-size:0.8rem;font-weight:700;">${c.format || 'ACM/ICPC'}</span>
+            </a>
+          `).join('');
+        }
+
+        // Users
+        if (users.length > 0) {
+          html += `<div class="section-title"><cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Thí sinh (${users.length})</div>`;
+          html += users.map(u => `
+            <a href="/profile/${u.username}" class="result-item">
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                <div style="width:32px;height:32px;border-radius:50%;background: var(--color-primary);color: #fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">
+                  ${u.username.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <strong style="color: #fff;">${u.display_name}</strong>
+                  <span style="color: var(--color-text-dim);font-size:0.85rem;margin-left:6px;">@${u.username}</span>
+                </div>
+              </div>
+              <span class="badge" style="background: rgba(16,185,129,0.15);color: #34d399;padding:0.25rem 0.6rem;border-radius:4px;font-size:0.8rem;font-weight:700;">Rating: ${u.rating || 1500}</span>
+            </a>
+          `).join('');
+        }
+
+        // Blogs
+        if (blogs.length > 0) {
+          html += `<div class="section-title"><cp-icon name="book" size="sm"></cp-icon> Bài viết Kỹ thuật (${blogs.length})</div>`;
+          html += blogs.map(b => `
+            <a href="/blog/${b.slug}" class="result-item">
+              <div>
+                <strong style="color: #fff;">${b.title}</strong>
+                <span style="color: var(--color-text-dim);font-size:0.85rem;margin-left:6px;">bởi @${b.author}</span>
+              </div>
+              <span style="font-size:0.8rem;color: var(--color-text-muted);">📅 ${b.publish_on}</span>
+            </a>
+          `).join('');
+        }
+
+        wrapper.innerHTML = html;
+      } catch (err) {
+        wrapper.innerHTML = `<div style="text-align:center;padding:3rem;color: #ef4444;">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Check user auth
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+      const u = Auth.getUser();
+      document.getElementById('navAuth').innerHTML = `
+        <a href="/profile/${u.username}" class="btn btn-secondary"><cp-icon name="user" size="sm"></cp-icon> @${u.username}</a>
+        <button onclick="Auth.logout()" class="btn btn-danger" style="margin-left:0.5rem;">Đăng xuất</button>
+      `;
+    }
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

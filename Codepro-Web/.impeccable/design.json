@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T21:30:00+07:00",
+  "title": "Design System: CodeProOJ",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Xanh biển hải đồ", "canonical": "#0a5c8f", "dark": "#4fb0e6", "tonalRamp": ["#063a5a", "#08486f", "#0a5c8f", "#3a82ad", "#6ba3c4", "#9cc3da", "#cfe1ec", "#eaf2f7"] },
+      "accent": { "role": "secondary", "displayName": "Lam ngọc", "canonical": "#0e7490", "dark": "#38bdf8", "tonalRamp": ["#08424f", "#0b5a6f", "#0e7490", "#3b90a6", "#6cacbd", "#9dc8d3", "#cfe3e9", "#ebf4f6"] },
+      "alert": { "role": "tertiary", "displayName": "Cam cảnh báo", "canonical": "#d4520a", "dark": "#ff8a3d", "tonalRamp": ["#7a2f05", "#a84008", "#d4520a", "#e07a3e", "#e99d71", "#f2c0a2", "#f9e0d1", "#fdf2eb"] },
+      "success": { "role": "tertiary", "displayName": "Lục AC", "canonical": "#16734a", "dark": "#34d399", "tonalRamp": ["#0b3a25", "#10532f", "#16734a", "#499270", "#6fae91", "#9fcab5", "#cfe5da", "#ecf5f0"] },
+      "danger": { "role": "tertiary", "displayName": "Đỏ WA", "canonical": "#b4232d", "dark": "#f87171", "tonalRamp": ["#5c1217", "#83191f", "#b4232d", "#c85960", "#d98a90", "#e8b7ba", "#f4dcde", "#fbf1f2"] },
+      "warning": { "role": "tertiary", "displayName": "Hổ phách TLE", "canonical": "#a35a00", "dark": "#fbbf24", "tonalRamp": ["#522d00", "#753f00", "#a35a00", "#bb803a", "#cfa070", "#e0c1a0", "#f0e0d0", "#f9f1ea"] },
+      "info": { "role": "tertiary", "displayName": "Lam thông tin", "canonical": "#0a6d9c", "dark": "#38bdf8", "tonalRamp": ["#05364e", "#075174", "#0a6d9c", "#3a8ab0", "#6ba8c4", "#9cc5d9", "#cfe2ec", "#eaf3f7"] },
+      "chart-paper": { "role": "neutral", "displayName": "Giấy hải đồ", "canonical": "#eef3f5", "dark": "#07131f", "tonalRamp": ["#07131f", "#0b1c2b", "#0e2233", "#14304a", "#c6d5db", "#dbe6ea", "#e3ecef", "#eef3f5"] },
+      "surface": { "role": "neutral", "displayName": "Mặt giấy", "canonical": "#fbfdfd", "dark": "#0e2233", "tonalRamp": ["#0e2233", "#123049", "#14304a", "#9fb3bd", "#c6d5db", "#e1ebee", "#f0f6f7", "#fbfdfd"] },
+      "isobath": { "role": "neutral", "displayName": "Đường đẳng sâu", "canonical": "#c6d5db", "dark": "#1d3a50", "tonalRamp": ["#162d40", "#1d3a50", "#2c4d66", "#587181", "#9fb3bd", "#c6d5db", "#dbe6ea", "#eef3f5"] },
+      "ink": { "role": "neutral", "displayName": "Mực", "canonical": "#0b2236", "dark": "#e8f1f5", "tonalRamp": ["#0b2236", "#2c4558", "#4d6678", "#587181", "#93abb9", "#c2d3dc", "#e8f1f5", "#f6fafb"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Tiêu đề hero trang chủ." },
+      "headline": { "displayName": "Headline", "purpose": "h1 tiêu đề trang." },
+      "stat": { "displayName": "Stat", "purpose": "Số thống kê, tabular." },
+      "body": { "displayName": "Body", "purpose": "Nội dung, line-height 1.6." },
+      "label": { "displayName": "Label", "purpose": "Đầu cột bảng, nhãn thống kê; chữ hoa 0.75rem." },
+      "mono": { "displayName": "Mono", "purpose": "Mã nguồn và khối pre." }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 0 rgba(11,34,54,.05)", "purpose": "Thẻ ở trạng thái nghỉ (tối: 0 1px 0 rgba(0,0,0,.3))." },
+      { "name": "shadow-md", "value": "0 2px 6px -1px rgba(11,34,54,.10)", "purpose": "Thẻ thống kê và wiki khi hover." },
+      { "name": "shadow-lg", "value": "0 10px 20px -6px rgba(11,34,54,.16)", "purpose": "Chỉ modal." },
+      { "name": "ui-ring", "value": "0 0 0 3px rgba(10,92,143,.28)", "purpose": "Vòng focus (tối: rgba(79,176,230,.40))." }
+    ],
+    "motion": [
+      { "name": "ease-chart", "value": "cubic-bezier(.2, .8, .2, 1)", "purpose": "Easing chung cho FLIP đổi hạng và nhấn nút." },
+      { "name": "rank-flip", "value": "420ms", "purpose": "Dòng bảng điểm trượt tại chỗ khi đổi hạng; tắt khi prefers-reduced-motion." },
+      { "name": "state-change", "value": ".18s ease", "purpose": "Đổi màu nền, viền, chữ ở nút, liên kết, ô nhập." }
+    ],
+    "breakpoints": [
+      { "name": "xs", "value": "600px" },
+      { "name": "sm", "value": "720px" },
+      { "name": "md", "value": "1100px" },
+      { "name": "lg", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Hành động chính, ví dụ Nộp bài.",
+      "html": "<button class=\"ds-btn-primary\">Nộp bài</button>",
+      "css": ".ds-btn-primary { min-height: 42px; padding: .5rem 1rem; background: var(--color-primary, #0a5c8f); color: var(--color-on-primary, #fff); border: 1px solid transparent; border-radius: var(--radius-md, 5px); font: 700 .875rem/1.25 'Be Vietnam Pro', Inter, sans-serif; cursor: pointer; transition: background-color .18s ease; } .ds-btn-primary:hover { background: var(--color-primary-hover, #08486f); } .ds-btn-primary:focus-visible { outline: none; box-shadow: var(--ui-ring, 0 0 0 3px rgba(10,92,143,.28)); } .ds-btn-primary:active { transform: translateY(1px) scale(.99); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Hành động phụ, nền mặt giấy, viền đẳng sâu.",
+      "html": "<button class=\"ds-btn-secondary\">Xem đề</button>",
+      "css": ".ds-btn-secondary { min-height: 42px; padding: .5rem 1rem; background: var(--color-surface, #fbfdfd); color: var(--color-text-secondary, #2c4558); border: 1px solid var(--color-border, #c6d5db); border-radius: var(--radius-md, 5px); font: 700 .875rem/1.25 'Be Vietnam Pro', Inter, sans-serif; cursor: pointer; transition: background-color .18s ease, border-color .18s ease; } .ds-btn-secondary:hover { background: var(--color-surface-hover, #f0f6f7); border-color: var(--color-primary-glow, rgba(10,92,143,.22)); color: var(--color-text, #0b2236); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: var(--ui-ring, 0 0 0 3px rgba(10,92,143,.28)); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Ô nhập cao 42px, viền 1px, focus bằng viền primary và vòng 3px.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Tìm bài tập\">",
+      "css": ".ds-input { min-height: 42px; padding: .5rem .75rem; background: var(--input-bg, #fff); color: var(--color-text, #0b2236); border: 1px solid var(--input-border, #9fb3bd); border-radius: var(--radius-md, 5px); font: inherit; transition: border-color .18s ease, box-shadow .18s ease; } .ds-input::placeholder { color: var(--color-text-dim, #587181); } .ds-input:focus { outline: none; border-color: var(--input-focus-border, #0a5c8f); box-shadow: var(--ui-ring, 0 0 0 3px rgba(10,92,143,.28)); }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Mục điều hướng; trạng thái active dùng nền primary-subtle và viền trong 1px.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\">Bài tập</a><a href=\"#\" class=\"active\">Kỳ thi</a></nav>",
+      "css": ".ds-nav { display: flex; gap: .1rem; } .ds-nav a { min-height: 40px; display: inline-flex; align-items: center; padding: 0 .75rem; border-radius: var(--radius-md, 5px); color: var(--color-text-secondary, #2c4558); text-decoration: none; transition: background-color .18s ease, color .18s ease; } .ds-nav a:hover { background: var(--color-primary-subtle, rgba(10,92,143,.08)); color: var(--color-text, #0b2236); } .ds-nav a.active { background: var(--color-primary-subtle, rgba(10,92,143,.08)); color: var(--color-primary, #0a5c8f); box-shadow: inset 0 0 0 1px var(--color-primary-glow, rgba(10,92,143,.22)); } .ds-nav a:focus-visible { outline: none; box-shadow: var(--ui-ring, 0 0 0 3px rgba(10,92,143,.28)); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Trạng thái chấm bài: nền -bg, viền 40% màu trạng thái, 3px.",
+      "html": "<span class=\"ds-badge\">AC</span>",
+      "css": ".ds-badge { display: inline-block; padding: .2rem .5rem; font: 700 .75rem 'Be Vietnam Pro', Inter, sans-serif; letter-spacing: .02em; text-transform: uppercase; border-radius: var(--radius-sm, 3px); background: var(--color-success-bg, rgba(22,115,74,.12)); color: var(--color-success, #16734a); border: 1px solid color-mix(in srgb, var(--color-success, #16734a) 40%, transparent); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Thẻ phẳng: nền mặt giấy, viền đẳng sâu, 8px, bóng sợi; hover chỉ đổi màu viền.",
+      "html": "<div class=\"ds-card\"><strong>128</strong><span>Bài đã giải</span></div>",
+      "css": ".ds-card { padding: 1.25rem; background: var(--color-card, #fbfdfd); color: var(--color-text, #0b2236); border: 1px solid var(--color-card-border, #c6d5db); border-radius: var(--radius-lg, 8px); box-shadow: var(--shadow-sm, 0 1px 0 rgba(11,34,54,.05)); transition: border-color .25s ease; } .ds-card:hover { border-color: var(--color-primary-glow, rgba(10,92,143,.22)); } .ds-card strong { display: block; font-size: 2.2rem; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; } .ds-card span { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-muted, #4d6678); }"
+    },
+    {
+      "name": "Scoreboard Rows",
+      "kind": "custom",
+      "refersTo": "scoreboard-row-changed",
+      "description": "Bảng điểm: số tabular; dòng vừa đổi hạng giữ nền và vạch trái màu cảnh báo cho đến khi được xem.",
+      "html": "<table class=\"ds-board\"><thead><tr><th>Hạng</th><th>Thí sinh</th><th>Điểm</th><th>Phạt</th></tr></thead><tbody><tr class=\"is-changed\"><td class=\"r\">1</td><td>an.nguyen</td><td class=\"s\">300</td><td class=\"p\">142 phút</td></tr><tr><td class=\"r\">2</td><td>binh.tran</td><td class=\"s\">280</td><td class=\"p\">120 phút</td></tr></tbody></table>",
+      "css": ".ds-board { width: 100%; border-collapse: collapse; background: var(--color-card, #fbfdfd); color: var(--color-text, #0b2236); font-variant-numeric: tabular-nums; } .ds-board th { padding: .6rem .75rem; background: var(--table-header-bg, #e1ebee); color: var(--color-text-muted, #4d6678); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; text-align: left; } .ds-board td { padding: .6rem .75rem; border-bottom: 1px solid var(--table-border, #cfdde2); } .ds-board tbody tr:hover { box-shadow: inset 3px 0 0 var(--color-primary, #0a5c8f); } .ds-board .r { font-weight: 700; text-align: center; } .ds-board .s { font-weight: 700; font-size: 1.05rem; color: var(--color-success, #16734a); } .ds-board .p { color: var(--color-text-muted, #4d6678); } .ds-board tr.is-changed > td { background: var(--color-alert-bg, rgba(212,82,10,.12)); } .ds-board tr.is-changed > td:first-child { box-shadow: inset 3px 0 0 var(--color-alert, #d4520a); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Hải đồ & bảng thủy triều",
+    "overview": "Mỗi bài là một điểm trên hải đồ, thứ hạng là dòng nước đang dâng. Giao diện là một công cụ làm việc: nền xanh hải đồ nhạt, mực xanh đậm, đường kẻ mảnh như đường đẳng sâu, số căn theo giá trị vị trí. Sáng là mặc định, tối (\"hải đồ ban đêm\") ngang hàng; mọi thành phần đổi theme chỉ qua token màu.\n\nHệ thống phẳng và dày thông tin. Độ sâu đến từ tông nền và viền mảnh, không từ bóng đổ hay gradient. Chuyển động chỉ phục vụ nghĩa: dòng đổi hạng trượt tại chỗ (FLIP, 420ms) và giữ màu cảnh báo cho đến khi người dùng nhận ra.\n\nNguồn token duy nhất: frontend/css/global/site-refresh.css (nạp cuối trên mọi trang, ghi đè variables.css và khối cùng tên trong theme.css).",
+    "keyCharacteristics": [
+      "Một nền xanh hải đồ, một màu nhấn xanh biển, một màu cảnh báo cam cháy dành riêng cho thay đổi hạng.",
+      "Số tabular ở mọi bảng, điểm, hạng, thời gian.",
+      "Bán kính nhỏ 3/5/8px, góc gần vuông như khung bản đồ.",
+      "Phẳng: bóng chỉ là sợi mảnh hoặc nhẹ; không glow, không nâng khi hover.",
+      "Sáng mặc định, tối ngang hàng."
+    ],
+    "rules": [
+      { "name": "The One Alert Rule", "body": "--color-alert chỉ xuất hiện trên dòng bảng điểm có .rank-changed. Không dùng cho lỗi (đó là danger), cảnh báo chung (warning) hay trang trí.", "section": "colors" },
+      { "name": "The Token Only Rule", "body": "Mọi màu đi qua custom property để sáng và tối cùng đổi. Màu cứng trong CSS từng trang là khoảng trống đã biết, không phải quy tắc.", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "Mọi số cần so sánh (điểm, hạng, thời gian phạt, rating, đếm) dùng font-variant-numeric: tabular-nums; áp ở table, td, th, time và các lớp số.", "section": "typography" },
+      { "name": "The Flat Chart Rule", "body": "Một tấm hải đồ không phát sáng. Không glow, không gradient trang trí, không nâng thẻ khi hover; hover chỉ đổi màu viền sang primary-glow. Token --ui-gradient giữ tên cho tương thích nhưng đã phẳng (một màu).", "section": "elevation" }
+    ],
+    "dos": [
+      "Do dùng token (var(--color-*)) cho mọi màu để sáng và tối ngang hàng.",
+      "Do để --color-alert dành riêng cho dòng vừa đổi hạng và giữ cho đến khi được xem.",
+      "Do dùng --color-on-primary cho chữ trên nền primary.",
+      "Do dùng số tabular cho mọi giá trị so sánh.",
+      "Do giữ bán kính trong 3/5/8px.",
+      "Do tôn trọng prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't thêm gradient, glow hoặc hiệu ứng nâng khi hover.",
+      "Don't dùng màu cảnh báo cam cho lỗi hay trang trí.",
+      "Don't viết màu slate/tím cứng trong CSS từng trang.",
+      "Don't dùng ký hiệu la bàn hay trang trí trên màn làm việc.",
+      "Don't dùng bóng đổ cứng lệch hoặc bán kính ngoài 3/5/8px."
+    ]
+  }
+}

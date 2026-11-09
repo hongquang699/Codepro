@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật Ký Kiểm Toán (Audit Log) | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">🛡️ Nhật Ký Thao Tác Quản Trị Viên (Contest Audit Log)</h3>
+          <span id="auditCountBadge" style="font-size:.8rem;color: var(--color-text-muted);font-weight:700;">Đang tải...</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="width:170px;">Thời Điểm (Time)</th>
+                <th>Người Thực Hiện (Admin)</th>
+                <th>Hành Động (Action)</th>
+                <th>Đối Tượng (Target)</th>
+                <th>Chi Tiết (Details)</th>
+                <th style="text-align:right;">Địa Chỉ IP</th>
+              </tr>
+            </thead>
+            <tbody id="auditTbody">
+              <tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải nhật ký kiểm toán...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('audit', contestKey);
+    ContestAdminUI.renderHeader('Nhật Ký Kiểm Toán', `Ghi nhận mọi hành động thay đổi nhạy cảm trong kỳ thi ${contestKey}`);
+
+    async function loadAuditLog() {
+      const res = await ContestAdminAPI.getAuditLog(contestKey);
+      const tbody = document.getElementById('auditTbody');
+      const countEl = document.getElementById('auditCountBadge');
+
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có hoạt động quản trị nào được ghi lại.</td></tr>';
+        countEl.textContent = '0 bản ghi';
+        return;
+      }
+
+      countEl.textContent = `${res.data.length} bản ghi`;
+      tbody.innerHTML = res.data.map(l => `
+        <tr>
+          <td style="font-family:monospace;font-size:.78rem;color: var(--color-text-muted);">${l.time}</td>
+          <td><strong style="color: var(--color-primary);">${l.admin}</strong></td>
+          <td>
+            <span style="font-family:monospace;font-weight:700;font-size:.78rem;padding:2px 7px;border-radius:4px;background: var(--color-bg);border: 1px solid var(--color-border-subtle);color: var(--color-text);">
+              ${l.action}
+            </span>
+          </td>
+          <td style="font-weight:600;color: #fff;">
+            ${l.target_type ? `<span style="color: var(--color-text-muted);font-size:.74rem;">[${l.target_type}]</span> ` : ''}${l.target_id || '—'}
+          </td>
+          <td style="color: var(--color-text-secondary);max-width:320px;">${l.details || '—'}</td>
+          <td style="text-align:right;font-family:monospace;font-size:.78rem;color: var(--color-text-dim);">${l.ip}</td>
+        </tr>
+      `).join('');
+    }
+
+    loadAuditLog();
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài Nộp | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/list.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/submission/all.html" class="active">Bài nộp</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; min-height: 85vh;">
+    <div class="page-header">
+      <h1><cp-icon name="document" size="sm"></cp-icon> Tất cả bài nộp</h1>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num" id="totalCount">—</div><div class="stat-label">Tổng bài nộp</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#22c55e" id="acCount">—</div><div class="stat-label">Accepted (AC)</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#ef4444" id="waCount">—</div><div class="stat-label">Wrong Answer</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#f59e0b" id="tleCount">—</div><div class="stat-label">TLE / MLE / RE</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <input type="text" id="filterUser" placeholder="Người dùng..." style="width: 170px;">
+      <input type="text" id="filterProblem" placeholder="Bài toán..." style="width: 170px;">
+      <select id="filterVerdict">
+        <option value="">Tất cả phán quyết</option>
+        <option value="AC">✅ Accepted</option>
+        <option value="WA">❌ Wrong Answer</option>
+        <option value="TLE">⏱ Time Limit</option>
+        <option value="MLE">💾 Memory Limit</option>
+        <option value="RE">💥 Runtime Error</option>
+        <option value="CE">🔧 Compile Error</option>
+      </select>
+      <select id="filterLang">
+        <option value="">Tất cả ngôn ngữ</option>
+        <option value="CPP17">C++17</option>
+        <option value="PY3">Python 3</option>
+        <option value="JAVA">Java</option>
+        <option value="RUST">Rust</option>
+      </select>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadSubmissions()">
+        <svg id="refreshIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+        Làm mới
+      </button>
+      <label class="auto-toggle">
+        <input type="checkbox" id="autoRefresh" checked>
+        <span class="pulse-dot live" id="pulseDot"></span>
+        Tự động cập nhật (5s)
+      </label>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table class="sub-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Người dùng</th>
+            <th>Bài toán</th>
+            <th>Phán quyết</th>
+            <th>Điểm</th>
+            <th>Thời gian</th>
+            <th>Bộ nhớ</th>
+            <th>Ngôn ngữ</th>
+            <th>Nộp lúc</th>
+          </tr>
+        </thead>
+        <tbody id="subTableBody">
+          <tr><td colspan="9" class="empty-state">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer style="background:var(--color-surface);border-top:1px solid var(--color-border);padding:1.5rem 0;margin-top:2rem;">
+    <div class="container" style="display:flex;justify-content:space-between;color:var(--color-text-muted);font-size:.875rem;">
+      <div>© 2026 CodeProOJ. Competitive Programming & Learning Hub.</div>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/submissions/all.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

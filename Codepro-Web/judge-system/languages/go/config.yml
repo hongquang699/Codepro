@@ -1,0 +1,6 @@
+name: Go 1.22
+extension: .go
+compiled: true
+executable: solution
+time_limit_multiplier: 1.2
+memory_limit_multiplier: 1.5

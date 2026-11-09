@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Quản Trị Hệ Thống | CodeProOJ Admin Hub</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    :root {
+      --admin-bg: var(--color-bg);
+      --admin-card-bg: var(--color-card);
+      --admin-card-border: var(--color-border);
+      --admin-card-hover: var(--color-card-hover);
+      --admin-primary: var(--color-primary);
+      --admin-accent-blue: var(--color-primary);
+      --admin-accent-purple: var(--color-accent);
+      --admin-accent-emerald: #10b981;
+      --admin-accent-amber: #f59e0b;
+      --admin-text-main: var(--color-text);
+      --admin-text-muted: var(--color-text-muted);
+    }
+
+    body {
+      background-color: var(--admin-bg);
+      color: var(--admin-text-main);
+      font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+      min-height: 100vh;
+      margin: 0;
+      padding-bottom: 3rem;
+    }
+
+    /* Hub Header */
+    .hub-header {
+      background: linear-gradient(180deg, color-mix(in srgb, var(--color-card) 70%, transparent) 0%, rgba(11, 17, 32, 0.95) 100%);
+      border-bottom: 1px solid var(--admin-card-border);
+      padding: 2.2rem 2rem 1.8rem;
+    }
+
+    .hub-header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hub-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .hub-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(220, 38, 38, 0.35);
+      padding: 0.3rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--color-danger);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hub-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .hub-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-hub-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-hub-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--admin-card-border);
+    }
+
+    .btn-hub-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: var(--color-border);
+    }
+
+    .btn-hub-primary {
+      background: #dc2626;
+      color: #ffffff;
+      border: 1px solid #ef4444;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-hub-primary:hover {
+      background: #b91c1c;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
+    }
+
+    .hub-title-block h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .hub-title-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #dc2626, #991b1b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+
+    .hub-title-block p {
+      color: var(--admin-text-muted);
+      font-size: 0.95rem;
+      margin: 0;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+
+    /* Quick Filter & Status Strip */
+    .hub-search-strip {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-box {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-input-box svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-dim);
+      pointer-events: none;
+    }
+
+    .search-input-box input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.6rem;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .search-input-box input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+      background: #0d1527;
+    }
+
+    .hub-pulse-status {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: color-mix(in srgb, var(--color-card) 80%, transparent);
+      border: 1px solid var(--admin-card-border);
+      padding: 0.6rem 1.1rem;
+      border-radius: 10px;
+      font-size: 0.82rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .status-badge-online {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Main Container */
+    .hub-body {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* Section Structure */
+    .hub-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .hub-section-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .hub-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .hub-section-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .section-icon-red { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .section-icon-purple { background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: #c4b5fd; border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent); }
+    .section-icon-blue { background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary); border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent); }
+    .section-icon-emerald { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .section-icon-amber { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .section-icon-cyan { background: rgba(6, 182, 212, 0.15); color: var(--color-primary); border: 1px solid rgba(6, 182, 212, 0.3); }
+
+    .hub-section-count {
+      font-size: 0.8rem;
+      color: var(--admin-text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Grid of Cards */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Individual Admin Card */
+    .admin-card {
+      background: var(--admin-card-bg);
+      border: 1px solid var(--admin-card-border);
+      border-radius: 12px;
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .admin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background 0.25s ease;
+    }
+
+    .admin-card:hover {
+      background: var(--admin-card-hover);
+      border-color: var(--color-border);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    }
+
+    .admin-card.featured-card {
+      border-color: rgba(220, 38, 38, 0.45);
+      background: linear-gradient(145deg, #161e33, var(--color-bg-secondary));
+    }
+
+    .admin-card.featured-card::before {
+      background: #dc2626;
+    }
+
+    .admin-card.featured-purple {
+      border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+    }
+    .admin-card.featured-purple::before {
+      background: var(--color-accent);
+    }
+
+    .admin-card.featured-blue::before {
+      background: var(--color-primary);
+    }
+
+    .admin-card.featured-emerald::before {
+      background: #10b981;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .admin-card:hover .card-icon {
+      transform: scale(1.08);
+    }
+
+    .card-info {
+      flex: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 0.35rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.3;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-purple { background: color-mix(in srgb, var(--color-accent) 20%, transparent); color: #d8b4fe; border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent); }
+    .badge-blue { background: color-mix(in srgb, var(--color-primary) 20%, transparent); color: var(--color-primary); border: 1px solid color-mix(in srgb, var(--color-primary) 40%, transparent); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: var(--color-warning); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-gray { background: rgba(255, 255, 255, 0.08); color: var(--color-text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--admin-text-muted);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* Sublinks pills inside card */
+    .card-sublinks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 0.9rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .sublink-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sublink-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.1rem;
+      font-size: 0.82rem;
+      color: var(--color-text-dim);
+      font-weight: 600;
+    }
+
+    .card-link-arrow {
+      color: var(--color-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.2s ease;
+    }
+
+    .admin-card:hover .card-link-arrow {
+      transform: translateX(4px);
+      color: var(--color-primary);
+    }
+
+    /* Empty search indicator */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+      background: var(--admin-card-bg);
+      border: 1px dashed var(--admin-card-border);
+      border-radius: 12px;
+      color: var(--admin-text-muted);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hub-header { padding: 1.5rem 1rem; }
+      .hub-body { padding: 0 1rem; }
+      .hub-grid { grid-template-columns: 1fr; }
+      .hub-title-block h1 { font-size: 1.5rem; }
+      .hub-pulse-status { display: none; }
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+
+  <!-- Reusable CodeProOJ Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-container"></div>
+  </nav>
+
+  <!-- HUB HEADER -->
+  <header class="hub-header">
+    <div class="hub-header-container">
+      <div class="hub-top-row">
+        <div class="hub-badge-wrap">
+          <span class="hub-badge-dot"></span>
+          <span>Khu Vực Quản Trị Hệ Thống (Admin Control Center)</span>
+        </div>
+        <div class="hub-actions">
+          <a href="/admin/dashboard" class="btn-hub-nav btn-hub-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            <span>Tổng Quan Hệ Thống</span>
+          </a>
+          <a href="/" class="btn-hub-nav btn-hub-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Về Trang Chủ</span>
+          </a>
+          <button onclick="window.logoutUser && window.logoutUser()" class="btn-hub-nav btn-hub-primary" style="background: #b91c1c;border-color: #ef4444;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Đăng Xuất</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hub-title-block">
+        <h1>
+          <div class="hub-title-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <span>Menu Quản Trị Hệ Thống CodeProOJ</span>
+        </h1>
+        <p>Trung tâm điều hành và lối tắt truy cập toàn bộ các phân hệ quản trị: Cuộc thi (Contest Admin), Tổ chức & CLB, Kho bài tập, Người dùng & Phân quyền, Cụm máy chấm và Nhật ký hệ thống.</p>
+      </div>
+
+      <!-- Quick Search & Pulse Status -->
+      <div class="hub-search-strip">
+        <div class="search-input-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="menuSearchInput" placeholder="Tìm kiếm nhanh trang quản trị (gõ 'contest', 'tổ chức', 'testcase', 'máy chấm', 'rejudge', 'thí sinh'...)" autofocus>
+        </div>
+        <div class="hub-pulse-status">
+          <div class="status-item">
+            <span class="status-badge-online" id="judgeIndicator" style="background: #64748b;"></span>
+            <span style="color: var(--color-text-muted);">Judge Server:</span>
+            <strong style="color: var(--color-text-muted);" id="judgeStatusText">ĐANG KIỂM TRA</strong>
+          </div>
+          <div class="status-item" style="border-left: 1px solid var(--color-border); padding-left: 1rem;">
+            <span style="color: var(--color-text-muted);">Chế độ:</span>
+            <strong style="color: var(--color-primary);" id="systemModeText">VẬN HÀNH (LIVE)</strong>
+          </div>
+          <div class="status-item" style="border-left: 1px solid var(--color-border); padding-left: 1rem;">
+            <span style="color: var(--color-text-muted);">Bảo mật:</span>
+            <strong style="color: var(--color-accent);">WAF ACTIVE</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HUB BODY -->
+  <main class="hub-body" id="hubMainContainer">
+
+    <!-- ══════════════ 1. QUẢN TRỊ CUỘC THI (CONTEST ADMIN) ══════════════ -->
+    <section class="hub-section" data-section="contest">
+      <div class="hub-section-hdr">
+        <div class="hub-section-title">
+          <div class="hub-section-icon section-icon-red">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          </div>
+          <span>Quản Trị Cuộc Thi & Kỳ Thi (Contest Admin)</span>
+        </div>
+        <span class="hub-section-count">5 Phân hệ</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Card: HSG_TIN_2026 Live Contest -->
+        <div class="admin-card featured-card" data-keywords="hsg tin hoc 2026 contest live dang dien ra dashboard hsg_tin_2026 bang diem">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(220, 38, 38, 0.2); color: #f87171;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">HSG Tin Học 2026</div>
+                <span class="card-badge badge-red">Đang Diễn Ra</span>
+              </div>
+              <p class="card-desc">Bảng điều khiển riêng của Kỳ thi HSG Tin Học Quốc Gia 2026. Quản trị trực tiếp đề bài, thí sinh, bài nộp và giám khảo.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <a href="/admin/contests/HSG_TIN_2026/dashboard" class="sublink-pill">📊 Dashboard</a>
+            <a href="/admin/contests/HSG_TIN_2026/settings" class="sublink-pill">⚙️ Cài đặt</a>
+            <a href="/admin/contests/HSG_TIN_2026/problems" class="sublink-pill">📝 Đề thi (7 bài)</a>
+            <a href="/admin/contests/HSG_TIN_2026/ranking" class="sublink-pill">🏆 Bảng điểm</a>
+            <a href="/admin/contests/HSG_TIN_2026/jury" class="sublink-pill">🤖 Giám khảo</a>
+            <a href="/admin/contests/HSG_TIN_2026/audit" class="sublink-pill">📋 Nhật ký</a>
+          </div>
+          <div class="card-footer">
+            <span>Mã: HSG_TIN_2026</span>
+            <a href="/admin/contests/HSG_TIN_2026/dashboard" class="card-link-arrow">Vào Quản Trị &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Contest Portal List -->
+        <div class="admin-card" data-keywords="contests portal danh sach cuoc thi tao ky thi tat ca contest admin">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Cổng Quản Trị Cuộc Thi</div>
+                <span class="card-badge badge-gray">Tất Cả</span>
+              </div>
+              <p class="card-desc">Danh sách toàn bộ các cuộc thi đã tổ chức, đang diễn ra hoặc sắp tới. Quản lý trạng thái, chế độ tính Rating và đóng mở cổng thi.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <a href="/admin/contests" class="sublink-pill">Tất cả kỳ thi</a>
+            <a href="/admin/contests/create" class="sublink-pill">+ Tạo kỳ thi mới</a>
+            <a href="/admin/contests/manage" class="sublink-pill">Quản lý cấu hình</a>
+          </div>
+          <div class="card-footer">
+            <span>/admin/contests</span>
+            <a href="/admin/contests" class="card-link-arrow">Mở Cổng &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Contest anti-cheat bot -->
+        <div class="admin-card" data-keywords="bot chong gian lan anti cheat dao van ma nguon kiem tra bai nop khieu nai">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-primary) 16%, transparent); color: var(--color-primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bot Chống Gian Lận</div>
+                <span class="card-badge badge-blue">Kỳ thi</span>
+              </div>
+              <p class="card-desc">Chọn kỳ thi để xem lượt quét mã nguồn, cặp bài nghi vấn, bằng chứng và kháng nghị. Bot chỉ gợi ý để quản trị viên xem xét.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Quét và kiểm tra bài nộp</span>
+            <a href="/admin/anti-cheat" class="card-link-arrow">Mở Bot &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Create Contest -->
+        <div class="admin-card" data-keywords="tao cuoc thi moi create contest icpc oi setup">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Tạo Cuộc Thi Mới</div>
+                <span class="card-badge badge-green">Tạo Mới</span>
+              </div>
+              <p class="card-desc">Khởi tạo kỳ thi lập trình mới, đặt thời gian bắt đầu/kết thúc, chọn thể thức chấm điểm (ICPC hoặc OI scoring), mã bảo mật thi đấu.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Khởi tạo contest</span>
+            <a href="/admin/contests/create" class="card-link-arrow">Thiết lập ngay &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Scoreboard & Freeze -->
+        <div class="admin-card" data-keywords="scoreboard freeze dong bang bang diem rank standing ket qua">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bảng Xếp Hạng & Freeze</div>
+                <span class="card-badge badge-amber">Scoreboard</span>
+              </div>
+              <p class="card-desc">Xem bảng xếp hạng ma trận trực tiếp, bật/tắt đóng băng trước lễ bế mạc và xuất file báo cáo kết quả thi đấu (CSV/Excel).</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Giám sát xếp hạng</span>
+            <a href="/admin/contests/HSG_TIN_2026/ranking" class="card-link-arrow">Xem bảng điểm &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 2. QUẢN TRỊ TỔ CHỨC & CLB (ORGANIZATIONS) ══════════════ -->
+    <section class="hub-section" data-section="organization">
+      <div class="hub-section-hdr">
+        <div class="hub-section-title">
+          <div class="hub-section-icon section-icon-purple">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <span>Quản Trị Tổ Chức & CLB (Organizations)</span>
+        </div>
+        <span class="hub-section-count">3 Phân hệ</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Card: Org Admin Control Panel -->
+        <div class="admin-card featured-purple" data-keywords="to chuc organization clb truong hoc admin settings thanh vien role cuoc thi">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-accent) 20%, transparent); color: #c4b5fd;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bảng Quản Trị Tổ Chức</div>
+                <span class="card-badge badge-purple">Chuyên Sâu</span>
+              </div>
+              <p class="card-desc">Bảng điều khiển quản trị toàn diện cho tổ chức: Cấu hình thông tin, duyệt thành viên, phân quyền vai trò (Admin/Manager), cuộc thi và bài tập nội bộ.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <select id="orgAdminOrgSelect" aria-label="Chọn tổ chức để quản trị" style="width:100%;padding:.55rem .7rem;border: 1px solid var(--color-border);border-radius:8px;background: var(--color-bg-secondary);color: var(--color-text);"></select>
+            <a id="orgAdminMembersLink" href="/admin/organizations" class="sublink-pill">👥 Thành viên</a>
+            <a id="orgAdminContestsLink" href="/admin/organizations" class="sublink-pill">🏆 Cuộc thi nội bộ</a>
+            <a id="orgAdminRolesLink" href="/admin/organizations" class="sublink-pill">🛡️ Phân vai trò</a>
+          </div>
+          <div class="card-footer">
+            <span id="orgAdminSelectedSlug">Đang tải tổ chức...</span>
+            <a id="orgAdminPrimaryLink" href="/admin/organizations" class="card-link-arrow">Vào Quản Trị Tổ Chức &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: All Organizations Management -->
+        <div class="admin-card" data-keywords="danh sach to chuc quan ly clb truong hoc organizations list">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: #c4b5fd;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="9" y1="13" x2="9" y2="13.01"/><line x1="9" y1="17" x2="9" y2="17.01"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Quản Lý Danh Sách Tổ Chức</div>
+                <span class="card-badge badge-gray">Hệ Thống</span>
+              </div>
+              <p class="card-desc">Duyệt và kiểm duyệt các tổ chức, trường học, CLB đăng ký trên sàn CodeProOJ. Khóa hoặc chỉnh sửa trạng thái hoạt động.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>/admin/organizations</span>
+            <a href="/admin/organizations" class="card-link-arrow">Xem danh sách &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Create Organization -->
+        <div class="admin-card" data-keywords="tao to chuc moi create organization clb trường học thêm">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 8.5 12 15 5 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Tạo Tổ Chức Mới</div>
+                <span class="card-badge badge-green">Tạo Mới</span>
+              </div>
+              <p class="card-desc">Khởi tạo không gian tổ chức mới cho các trường THPT Chuyên, Đại học hoặc Câu lạc bộ Tin học. Chỉ định Chủ sở hữu (Owner).</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Tạo mới tổ chức</span>
+            <a href="/admin/organizations/create" class="card-link-arrow">Khởi tạo ngay &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 3. KHO BÀI TẬP & TESTCASE (PROBLEMS) ══════════════ -->
+    <section class="hub-section" data-section="problem">
+      <div class="hub-section-hdr">
+        <div class="hub-section-title">
+          <div class="hub-section-icon section-icon-blue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <span>Kho Bài Tập & Bộ Testcase (Problems & Tests)</span>
+        </div>
+        <span class="hub-section-count">3 Phân hệ</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Card: Problems List -->
+        <div class="admin-card featured-blue" data-keywords="bai tap problem de thi kho bai testcase tag difficulty">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-primary) 20%, transparent); color: var(--color-primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Quản Lý Kho Bài Tập</div>
+                <span class="card-badge badge-blue">Toàn Sàn</span>
+              </div>
+              <p class="card-desc">Quản lý ngân hàng đề bài lập trình, phân loại độ khó, gắn nhãn thuật toán (DP, Graph, Math, Greedy), cấu hình điểm và quyền truy cập.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <a href="/admin/problems" class="sublink-pill">Danh sách bài tập</a>
+            <a href="/admin/problems/create" class="sublink-pill">+ Soạn bài mới</a>
+            <a href="/admin/problems/import" class="sublink-pill">Nhập / Xuất bài</a>
+          </div>
+          <div class="card-footer">
+            <span>/admin/problems</span>
+            <a href="/admin/problems" class="card-link-arrow">Mở Kho Bài &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Problem Creator -->
+        <div class="admin-card" data-keywords="tao bai tap moi problem creator markdown latex soan de">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Soạn Thảo Bài Tập Mới</div>
+                <span class="card-badge badge-green">Trình Soạn Thảo</span>
+              </div>
+              <p class="card-desc">Trình soạn thảo đề bài chuẩn Markdown hỗ trợ công thức Toán học KaTeX / LaTeX, giới hạn thời gian (Time Limit) và bộ nhớ (Memory Limit).</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Soạn đề bài</span>
+            <a href="/admin/problems/create" class="card-link-arrow">Soạn ngay &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Testcases & Checker -->
+        <div class="admin-card" data-keywords="testcase checker validator special judge testlib loi giai test">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bộ Test, Checker & Validator</div>
+                <span class="card-badge badge-amber">Kiểm Thử</span>
+              </div>
+              <p class="card-desc">Upload bộ test nén zip, cấu hình điểm từng subtask, viết mã chấm đặc biệt (Special Judge / testlib.h), bộ sinh test và lời giải chuẩn.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Quản lý testcases</span>
+            <a href="/admin/problems" class="card-link-arrow">Cấu hình test &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 4. MÁY CHẤM & VẬN HÀNH HỆ THỐNG (JUDGE & SYSTEM) ══════════════ -->
+    <section class="hub-section" data-section="system">
+      <div class="hub-section-hdr">
+        <div class="hub-section-title">
+          <div class="hub-section-icon section-icon-emerald">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </div>
+          <span>Máy Chấm & Vận Hành Hệ Thống (Judge & System)</span>
+        </div>
+        <span class="hub-section-count">4 Phân hệ</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Card: Judge Cluster -->
+        <div class="admin-card featured-emerald" data-keywords="judge server cluster may cham worker queue hang doi port 9999 cpu ram sandbox">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Cụm Máy Chấm (Judge Cluster)</div>
+                <span class="card-badge badge-green">Port 9999</span>
+              </div>
+              <p class="card-desc">Giám sát các nút worker chấm bài thời gian thực, tài nguyên CPU, RAM, dung lượng bộ nhớ đệm và tiến độ xử lý hàng đợi nộp bài.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <a href="/admin/judge" class="sublink-pill">Giám sát Nodes</a>
+            <a href="/admin/judge/queue" class="sublink-pill">Hàng đợi chấm</a>
+            <a href="/admin/judge/logs" class="sublink-pill">Log Sandbox</a>
+          </div>
+          <div class="card-footer">
+            <span>Judge Server Health</span>
+            <a href="/admin/judge" class="card-link-arrow">Xem Cụm Máy Chấm &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: System Dashboard -->
+        <div class="admin-card" data-keywords="dashboard he thong admin tong quan thong ke he thong metrics">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bảng Tổng Quan Hệ Thống</div>
+                <span class="card-badge badge-blue">Admin Portal</span>
+              </div>
+              <p class="card-desc">Bảng chỉ số đo lường toàn diện: Thống kê số lượng người dùng, biểu đồ nộp bài hàng ngày, tỉ lệ chấp nhận AC và các cảnh báo hệ thống.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>/admin/dashboard</span>
+            <a href="/admin/dashboard" class="card-link-arrow">Xem Dashboard &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: System Settings & Maintenance -->
+        <div class="admin-card" data-keywords="cai dat he thong bao tri settings maintenance cache redis banner thong bao">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Cấu Hình & Bảo Trì</div>
+                <span class="card-badge badge-red">Bảo Mật</span>
+              </div>
+              <p class="card-desc">Bật/tắt chế độ bảo trì hệ thống, thiết lập banner thông báo toàn sàn, dọn dẹp bộ nhớ đệm cache và cấu hình thông số máy chủ.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>/admin/settings</span>
+            <a href="/admin/settings" class="card-link-arrow">Vào Cấu Hình &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Security & WAF -->
+        <div class="admin-card" data-keywords="bao mat waf chong ddos anti bot anti-dos ip jail whitelist">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: #c4b5fd;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Bảo Mật & Chống DDoS (WAF)</div>
+                <span class="card-badge badge-purple">Phòng Thủ</span>
+              </div>
+              <p class="card-desc">Theo dõi hệ thống tường lửa ứng dụng (WAF v2.4), quản lý danh sách IP bị khóa (Jail), cấu hình Whitelist và bảo vệ chống tấn công Bot.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>WAF Engine</span>
+            <a href="/admin/security" class="card-link-arrow">Xem Tường Lửa &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 5. NGƯỜI DÙNG & BÀI NỘP (USERS & SUBMISSIONS) ══════════════ -->
+    <section class="hub-section" data-section="user-sub">
+      <div class="hub-section-hdr">
+        <div class="hub-section-title">
+          <div class="hub-section-icon section-icon-amber">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span>Người Dùng, Phân Quyền & Bài Nộp (Users & Submissions)</span>
+        </div>
+        <span class="hub-section-count">4 Phân hệ</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Card: User Management -->
+        <div class="admin-card" data-keywords="nguoi dung user quan ly tai khoan rating ban khoa tai khoan phan quyen">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Quản Lý Người Dùng</div>
+                <span class="card-badge badge-blue">Tài Khoản</span>
+              </div>
+              <p class="card-desc">Danh sách tài khoản đăng ký, điểm số xếp hạng Rating, lịch sử thi đấu và xử lý mở/khóa tài khoản vi phạm.</p>
+            </div>
+          </div>
+          <div class="card-sublinks">
+            <a href="/admin/users" class="sublink-pill">Danh sách thành viên</a>
+            <a href="/admin/users/roles" class="sublink-pill">Cấp quyền vai trò</a>
+            <a href="/admin/users/ban" class="sublink-pill">Xử lý vi phạm</a>
+          </div>
+          <div class="card-footer">
+            <span>/admin/users</span>
+            <a href="/admin/users" class="card-link-arrow">Quản lý User &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: All Submissions -->
+        <div class="admin-card" data-keywords="bai nop submissions lich su submission ac wa tle ma nguon code">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Lịch Sử Bài Nộp Toàn Hệ Thống</div>
+                <span class="card-badge badge-green">Trực Tiếp</span>
+              </div>
+              <p class="card-desc">Theo dõi tất cả bài nộp của thí sinh theo thời gian thực. Kiểm tra mã nguồn, log chi tiết từng testcase (AC, WA, TLE, MLE, RTE).</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>/admin/submissions</span>
+            <a href="/admin/submissions" class="card-link-arrow">Xem Bài Nộp &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Universal Rejudge -->
+        <div class="admin-card" data-keywords="cham lai rejudge hang loat submission problem contest re-judge">
+          <div class="card-top">
+            <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Trung Tâm Chấm Lại (Rejudge)</div>
+                <span class="card-badge badge-amber">Rejudge Center</span>
+              </div>
+              <p class="card-desc">Công cụ chấm lại theo Submission ID, chấm lại toàn bộ một bài tập sau khi chỉnh sửa test hoặc chấm lại toàn bộ bài thi trong kỳ thi.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>Tự động xếp hàng chấm</span>
+            <a href="/admin/judge/rejudge" class="card-link-arrow">Vào Rejudge &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Card: Blogs & Media -->
+        <div class="admin-card" data-keywords="blog tin tuc bai viet thong bao truyen thong media editorial">
+          <div class="card-top">
+            <div class="card-icon" style="background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: #c4b5fd;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title-row">
+                <div class="card-title">Quản Lý Blog & Tin Tức</div>
+                <span class="card-badge badge-purple">Truyền Thông</span>
+              </div>
+              <p class="card-desc">Đăng bài viết chia sẻ thuật toán, công bố kết quả thi đấu, lời giải mẫu và tin tức hoạt động lập trình trên CodeProOJ.</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>/admin/blogs</span>
+            <a href="/admin/blogs" class="card-link-arrow">Quản lý Blog &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty Results Fallback -->
+    <div class="no-results" id="noResultsMsg">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:1rem;color: var(--color-text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <h3 style="color: var(--color-text);margin:0 0 0.5rem;font-size:1.1rem;">Không tìm thấy trang quản trị phù hợp</h3>
+      <p style="margin:0;">Vui lòng thử từ khóa khác như "contest", "tổ chức", "máy chấm", "testcase", "rejudge"...</p>
+    </div>
+
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+
+  <!-- Instant Search & Live Health Checker -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('menuSearchInput');
+      const cards = document.querySelectorAll('.admin-card');
+      const sections = document.querySelectorAll('.hub-section');
+      const noResultsMsg = document.getElementById('noResultsMsg');
+
+      const organizationSelect = document.getElementById('orgAdminOrgSelect');
+      const organizationToken = localStorage.getItem('token');
+      const getAuthenticated = async (url) => {
+        let response = await fetch(url, { credentials: 'include' });
+        if (response.status === 401 && organizationToken) {
+          response = await fetch(url, {
+            credentials: 'include',
+            headers: { Authorization: `Token ${organizationToken}` }
+          });
+        }
+        return response;
+      };
+      getAuthenticated('/api/v1/organizations/').then(response => {
+        if (!response.ok) throw new Error('Không tải được tổ chức');
+        return response.json();
+      }).then(result => {
+        const organizations = Array.isArray(result.data) ? result.data.filter(org => org.can_manage === true) : [];
+        organizationSelect.replaceChildren();
+        if (!organizations.length) {
+          organizationSelect.add(new Option('Chưa có tổ chức có thể quản trị', ''));
+          organizationSelect.disabled = true;
+          document.getElementById('orgAdminSelectedSlug').textContent = 'Xem danh sách tổ chức';
+          return;
+        }
+        organizations.forEach(org => organizationSelect.add(new Option(org.name, org.slug)));
+        const selectOrganization = () => {
+          const slug = encodeURIComponent(organizationSelect.value);
+          document.getElementById('orgAdminSelectedSlug').textContent = `Slug: ${organizationSelect.value}`;
+          document.getElementById('orgAdminPrimaryLink').href = `/frontend/html/organization/admin/index.html?org=${slug}`;
+          document.getElementById('orgAdminMembersLink').href = `/frontend/html/organization/admin/members.html?org=${slug}`;
+          document.getElementById('orgAdminContestsLink').href = `/frontend/html/organization/admin/contests.html?org=${slug}`;
+          document.getElementById('orgAdminRolesLink').href = `/frontend/html/organization/admin/roles.html?org=${slug}`;
+        };
+        organizationSelect.addEventListener('change', selectOrganization);
+        selectOrganization();
+      }).catch(() => {
+        organizationSelect.replaceChildren(new Option('Không tải được danh sách tổ chức', ''));
+        organizationSelect.disabled = true;
+        document.getElementById('orgAdminSelectedSlug').textContent = 'Vui lòng thử lại';
+      });
+
+      // Live Instant Search Filter
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.trim().toLowerCase();
+          let visibleCardCount = 0;
+
+          if (!query) {
+            cards.forEach(card => card.style.display = '');
+            sections.forEach(sec => sec.style.display = '');
+            noResultsMsg.style.display = 'none';
+            return;
+          }
+
+          sections.forEach(sec => {
+            let secHasVisible = false;
+            const secCards = sec.querySelectorAll('.admin-card');
+
+            secCards.forEach(card => {
+              const textContent = card.innerText.toLowerCase();
+              const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+              const isMatch = textContent.includes(query) || keywords.includes(query);
+
+              if (isMatch) {
+                card.style.display = '';
+                secHasVisible = true;
+                visibleCardCount++;
+              } else {
+                card.style.display = 'none';
+              }
+            });
+
+            sec.style.display = secHasVisible ? '' : 'none';
+          });
+
+          noResultsMsg.style.display = visibleCardCount === 0 ? 'block' : 'none';
+        });
+      }
+
+      // The Judge Admin health endpoint checks the manager without a demo contest.
+      getAuthenticated('/api/v1/admin/judge/health').then(response => {
+        const indicator = document.getElementById('judgeIndicator');
+        const label = document.getElementById('judgeStatusText');
+        if (response.ok) {
+          indicator.style.background = '#10b981';
+          label.textContent = 'ONLINE';
+          label.style.color = '#34d399';
+        } else {
+          indicator.style.background = '#ef4444';
+          label.textContent = 'KHÔNG SẴN SÀNG';
+          label.style.color = '#f87171';
+        }
+      }).catch(() => {
+        document.getElementById('judgeIndicator').style.background = '#ef4444';
+        const label = document.getElementById('judgeStatusText');
+        label.textContent = 'MẤT KẾT NỐI';
+        label.style.color = '#f87171';
+      });
+    });
+  </script>
+</body>
+</html>

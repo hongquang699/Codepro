@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh hiệu & Thành tích | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <div class="profile-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h3 class="profile-card-title" style="margin: 0;">🏅 Huy hiệu & Thành tích (Achievements)</h3>
+        <span id="achSummaryBadge" style="font-size: 0.88rem; color: #f59e0b; font-weight: 700;">Đang tải...</span>
+      </div>
+
+      <div class="achievements-grid" id="achievementsGrid">
+        <div style="color: var(--color-text-muted);">Đang tải danh hiệu...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    async function init() {
+      const data = await ProfileAPI.getOverview(username);
+      document.title = `Danh hiệu - ${data.profile.display_name || username} (@${username})`;
+      ProfileAPI.renderHeader('profileHeaderContainer', data, 'achievements');
+
+      try {
+        const res = await ProfileAPI.getAchievements(username);
+        const list = res.results || [];
+        const unlocked = res.unlocked_count || 0;
+        document.getElementById('achSummaryBadge').textContent = `Đã mở khóa: ${unlocked} / ${list.length} huy hiệu`;
+
+        const grid = document.getElementById('achievementsGrid');
+        if (list.length === 0) {
+          grid.innerHTML = '<div style="color: var(--color-text-muted);">Chưa có danh hiệu nào.</div>';
+          return;
+        }
+
+        grid.innerHTML = list.map(a => `
+          <div class="achievement-card ${a.is_unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-icon">${a.icon || '🏆'}</div>
+            <div style="flex: 1;">
+              <div class="achievement-name">${a.name}</div>
+              <div class="achievement-desc">${a.description}</div>
+              ${a.is_unlocked ? `
+                <div class="achievement-date">
+                  ✓ Đạt được: ${a.unlocked_at || 'Gần đây'}
+                </div>
+              ` : `
+                <div style="font-size: 0.75rem; color: var(--color-text-dim); margin-top: 0.4rem;">
+                  🔒 Chưa mở khóa
+                </div>
+              `}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

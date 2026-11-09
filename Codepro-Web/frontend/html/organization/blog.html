@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog &amp; Tin tức Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div id="orgHeaderTarget"></div>
+
+    <div class="org-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h3 class="org-panel-title">📰 Bài Viết &amp; Tin Tức Hoạt Động</h3>
+      </div>
+
+      <div id="blogContainer" style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải bài viết...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    (async () => {
+      const slug = OrgAPI.getOrgSlugFromUrl();
+      const orgRes = await OrgAPI.getOrg(slug);
+      if (orgRes.status === 200 && orgRes.data) {
+        OrgAPI.renderHeader(orgRes.data, 'blog');
+      }
+
+      const res = await OrgAPI.getBlog(slug);
+      const container = document.getElementById('blogContainer');
+      const posts = res.data || [];
+
+      if (posts.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Chưa có bài viết nào được đăng tải.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <div class="card" style="padding:1.75rem;border-radius:12px;background: var(--color-surface);border: 1px solid var(--color-card-border);">
+          <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.5rem;">
+            ${p.is_pinned ? '<span style="background: rgba(239,68,68,.15);color: #ef4444;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">📌 GHIM</span>' : ''}
+            <h4 style="font-size:1.25rem;font-weight:800;color: var(--color-text);margin:0;">
+              ${p.title}
+            </h4>
+          </div>
+          <div style="font-size:.82rem;color: var(--color-text-muted);margin-bottom:1rem;">
+            Tác giả: <strong style="color: var(--color-primary);">${p.author_display_name || p.author_username}</strong> • Đăng ngày ${new Date(p.created_at).toLocaleDateString('vi-VN')}
+          </div>
+          <p style="font-size:.92rem;color: var(--color-text-secondary);line-height:1.65;margin-bottom:1.25rem;">
+            ${p.summary || p.content.slice(0, 200) + '...'}
+          </p>
+          <div>
+            <a href="/organizations/${slug}/blog/${p.id}" class="btn-org-outline" style="padding:.45rem 1rem;font-size:.84rem;">
+              Đọc tiếp &rarr;
+            </a>
+          </div>
+        </div>
+      `).join('');
+    })();
+  </script>
+</body>
+</html>

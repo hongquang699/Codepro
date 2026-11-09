@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div id="orgHeaderTarget"></div>
+
+    <div class="org-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h3 class="org-panel-title">📢 Thông Báo Chính Thức</h3>
+      </div>
+
+      <div id="annContainer" style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải thông báo...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    (async () => {
+      const slug = OrgAPI.getOrgSlugFromUrl();
+      const orgRes = await OrgAPI.getOrg(slug);
+      if (orgRes.status === 200 && orgRes.data) {
+        OrgAPI.renderHeader(orgRes.data, 'announcements');
+      }
+
+      const res = await OrgAPI.getAnnouncements(slug);
+      const container = document.getElementById('annContainer');
+      const items = res.data || [];
+
+      if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Không có thông báo nào.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(a => {
+        const badgeColors = {
+          'info': 'rgba(59,130,246,.15);color: var(--color-primary);border: 1px solid var(--color-primary);',
+          'warning': 'rgba(245,158,11,.15);color: #f59e0b;border: 1px solid #f59e0b;',
+          'success': 'rgba(16,185,129,.15);color: #10b981;border: 1px solid #10b981;',
+          'danger': 'rgba(239,68,68,.15);color: #ef4444;border: 1px solid #ef4444;'
+        };
+        const style = badgeColors[a.badge_type] || badgeColors['info'];
+
+        return `
+          <div class="card" style="padding:1.5rem;border-radius:12px;background: var(--color-surface);border: 1px solid var(--color-card-border);display:flex;gap:1.25rem;align-items:flex-start;">
+            <div style="font-size:1.75rem;padding:.35rem .75rem;border-radius:10px;background: rgba(255,255,255,.04);border: 1px solid var(--color-border-subtle);">
+              📢
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.35rem;flex-wrap:wrap;">
+                <h4 style="font-size:1.15rem;font-weight:800;color: var(--color-text);margin:0;">${a.title}</h4>
+                <span style="font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;background: ${style}">
+                  ${a.badge_type.toUpperCase()}
+                </span>
+              </div>
+              <p style="font-size:.92rem;color: var(--color-text-secondary);line-height:1.6;margin-bottom:.5rem;white-space:pre-line;">
+                ${a.content}
+              </p>
+              <div style="font-size:.78rem;color: var(--color-text-muted);">
+                Phát hành bởi Ban Quản trị • Ngày ${new Date(a.created_at).toLocaleDateString('vi-VN')} ${new Date(a.created_at).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    })();
+  </script>
+</body>
+</html>

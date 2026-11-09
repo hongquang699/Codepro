@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script>
+    // This page needs the web gateway for its root-relative assets and API.
+    if (window.location.protocol === 'file:') {
+      window.location.replace(`http://localhost:8888/admin/contests/create${window.location.search}`);
+    }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết Lập Kỳ Thi (Contest Studio) | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-group label { font-size: .85rem; font-weight: 700; color: var(--color-text-secondary); }
+    .form-input { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; color: #fff; padding: .6rem .85rem; font-size: .88rem; outline: none; }
+    .form-input:focus { border-color: var(--color-primary); }
+    .prob-chip { display: flex; align-items: center; justify-content: space-between; background: #0b1120; border: 1px solid var(--color-border-subtle); border-radius: 8px; padding: .6rem .85rem; margin-bottom: .5rem; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm (Judge)
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+      <a href="/admin/contests/create" class="admin-nav-item active">
+        <cp-icon name="plus" size="sm"></cp-icon> Tạo kỳ thi mới
+      </a>
+      <a href="/admin/anti-cheat" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bot chống gian lận
+      </a>
+      <a href="/admin/blogs" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div class="topbar-title">
+          <h1 id="pageTitle"><cp-icon name="trophy" size="sm"></cp-icon> Thiết Lập Kỳ Thi (Contest Studio)</h1>
+          <p>Tạo kỳ thi mới hoặc chỉnh sửa cấu hình luật thi, thời gian và đề bài theo chuẩn CodeProOJ.</p>
+        </div>
+        <div style="display:flex;gap:.5rem;">
+          <a href="/admin/contests" class="btn-top btn-top-secondary">&larr; Danh sách kỳ thi</a>
+          <a id="antiCheatLink" href="/admin/anti-cheat" class="btn-top btn-top-secondary" style="display:none;">Chống gian lận</a>
+          <button onclick="saveContest()" class="btn-top btn-top-primary">💾 Lưu kỳ thi</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+        <!-- Left: Form -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          <!-- Basic Info Card -->
+          <div class="panel-box">
+            <div class="panel-hdr"><h3><cp-icon name="edit" size="sm"></cp-icon> 1. Thông tin chung về kỳ thi</h3></div>
+            <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+              <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;">
+                <div class="form-group">
+                  <label>Mã kỳ thi (Slug / Key)*</label>
+                  <input type="text" id="contestKey" class="form-input" placeholder="ví dụ: hsg-tin-2026" required>
+                  <div style="font-size:.75rem;color: var(--color-text-dim);">Dùng trên URL: /contests/{slug}</div>
+                </div>
+                <div class="form-group">
+                  <label>Tên kỳ thi (Full Name)*</label>
+                  <input type="text" id="contestName" class="form-input" placeholder="ví dụ: Kỳ Thi Học Sinh Giỏi Tin Học 2026" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Mô tả &amp; Thể lệ kỳ thi (Markdown)</label>
+                <textarea id="contestDesc" rows="5" class="form-input" placeholder="Nêu rõ thể thức, đối tượng tham gia, thang điểm, và các quy định chống gian lận..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rules & Timing Card -->
+          <div class="panel-box">
+            <div class="panel-hdr"><h3><span>⏱️</span> 2. Thể thức &amp; Thời gian thi đấu</h3></div>
+            <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:1rem;">
+                <div class="form-group">
+                  <label>Thể thức thi</label>
+                  <select id="contestFormat" class="form-input">
+                    <option value="icpc">ICPC (Penalty 20m / Wrong)</option>
+                    <option value="ioi">IOI (Điểm từng Subtask lớn nhất)</option>
+                    <option value="atcoder">AtCoder Format</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Thời lượng (Phút)</label>
+                  <input type="number" id="contestDurationMin" class="form-input" value="180" oninput="updateEndTimeFromDuration()">
+                </div>
+                <div class="form-group">
+                  <label>Đóng băng bảng điểm (Phút)</label>
+                  <input type="number" id="contestFreezeMin" class="form-input" value="60">
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group">
+                  <label>Thời gian bắt đầu</label>
+                  <input type="datetime-local" id="contestStartTime" class="form-input" onchange="updateEndTimeFromDuration()">
+                </div>
+                <div class="form-group">
+                  <label>Thời gian kết thúc</label>
+                  <input type="datetime-local" id="contestEndTime" class="form-input">
+                </div>
+              </div>
+
+              <div style="display:flex;gap:1.5rem;align-items:center;padding-top:.5rem;">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.85rem;color: var(--color-text-secondary);">
+                  <input type="checkbox" id="contestRated" checked>
+                  <strong>Tính Rating CodeProOJ (Rated Contest)</strong>
+                </label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.85rem;color: var(--color-text-secondary);">
+                  <input type="checkbox" id="contestVisible" checked>
+                  <strong>Công khai kỳ thi cho mọi người</strong>
+                </label>
+              </div>
+              <div class="form-group" style="margin-top:1rem;">
+                <label for="contestDisplayTarget">Nơi hiển thị cuộc thi</label>
+                <select id="contestDisplayTarget" class="form-input">
+                  <option value="both">Hiện trên web và client</option>
+                  <option value="web">Chỉ hiện trên web</option>
+                  <option value="client">Chỉ hiện trên client</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Problem Selector -->
+        <div>
+          <div class="panel-box">
+            <div class="panel-hdr">
+              <h3><cp-icon name="book" size="sm"></cp-icon> 3. Bài tập trong kỳ thi</h3>
+            </div>
+            <div class="panel-bdy">
+              <div style="font-size:.82rem;color: var(--color-text-muted);margin-bottom:.75rem;">
+                Chọn các bài toán từ kho bài tập để gán vào kỳ thi (A, B, C, D...):
+              </div>
+
+              <div style="display:flex;gap:.5rem;margin-bottom:1rem;">
+                <select id="probPickerSelect" class="form-input" style="flex:1;">
+                  <option value="">-- Chọn bài tập từ kho --</option>
+                </select>
+                <button onclick="addSelectedProblem()" class="btn-top btn-top-primary" style="padding:.5rem .85rem;"><cp-icon name="plus" size="sm"></cp-icon> Thêm</button>
+              </div>
+
+              <div id="contestProblemsList" style="min-height:150px;">
+                <!-- Selected problems chip list -->
+              </div>
+
+              <div style="margin-top:1.5rem;padding-top:1rem;border-top: 1px solid var(--color-border-subtle);">
+                <button onclick="saveContest()" class="btn-top btn-top-primary" style="width:100%;padding:.75rem;font-size:.95rem;text-align:center;">
+                  💾 Lưu &amp; Cập Nhật Kỳ Thi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+    let availableProblems = [];
+    let selectedProblems = [];
+    let isEditMode = false;
+    let currentKey = '';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const editKey = urlParams.get('key');
+
+    async function initPage() {
+      // Set default start time to now + 1 hour, formatted for datetime-local
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('contestStartTime').value = now.toISOString().slice(0, 16);
+      updateEndTimeFromDuration();
+
+      // Load all available problems for picker
+      try {
+        const pResp = await fetch(`${API}/api/v2/problems`);
+        const pJson = await pResp.json();
+        availableProblems = pJson?.data?.objects || [];
+        const select = document.getElementById('probPickerSelect');
+        select.innerHTML = '<option value="">-- Chọn bài tập từ kho --</option>' + 
+          availableProblems.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+      } catch (e) {
+        console.warn('Error loading problems:', e);
+      }
+
+      // If edit mode, load contest details
+      if (editKey) {
+        isEditMode = true;
+        currentKey = editKey;
+        const antiCheatLink = document.getElementById('antiCheatLink');
+        antiCheatLink.href = `/admin/contests/${encodeURIComponent(editKey)}/anti-cheat`;
+        antiCheatLink.style.display = 'inline-flex';
+        document.getElementById('pageTitle').textContent = `✏️ Chỉnh Sửa Kỳ Thi: ${editKey}`;
+        document.getElementById('contestKey').value = editKey;
+        document.getElementById('contestKey').disabled = true;
+
+        try {
+          const cResp = await fetch(`${API}/api/v2/contest/${editKey}`, { headers: window.adminApiHeaders('application/json') });
+          const cJson = await cResp.json();
+          const c = cJson?.data?.object || {};
+
+          document.getElementById('contestName').value = c.name || '';
+          document.getElementById('contestDesc').value = c.description || '';
+          document.getElementById('contestFormat').value = c.format_name || 'icpc';
+          document.getElementById('contestRated').checked = c.is_rated !== false;
+          document.getElementById('contestVisible').checked = c.is_visible !== false;
+          document.getElementById('contestDisplayTarget').value = c.display_target || 'both';
+
+          if (c.time_limit) {
+            document.getElementById('contestDurationMin').value = Math.round(c.time_limit / 60);
+          }
+          if (c.start_time) {
+            const st = new Date(c.start_time);
+            st.setMinutes(st.getMinutes() - st.getTimezoneOffset());
+            document.getElementById('contestStartTime').value = st.toISOString().slice(0, 16);
+          }
+          if (c.end_time) {
+            const et = new Date(c.end_time);
+            et.setMinutes(et.getMinutes() - et.getTimezoneOffset());
+            document.getElementById('contestEndTime').value = et.toISOString().slice(0, 16);
+          }
+
+          // Populate existing problems
+          if (c.problems && c.problems.length > 0) {
+            selectedProblems = c.problems.map(p => p.code || p);
+            renderSelectedProblems();
+          }
+        } catch (e) {
+          alert('Không thể tải thông tin kỳ thi: ' + e.message);
+        }
+      }
+    }
+
+    function updateEndTimeFromDuration() {
+      const startVal = document.getElementById('contestStartTime').value;
+      const durMin = parseInt(document.getElementById('contestDurationMin').value || '180');
+      if (startVal) {
+        const st = new Date(startVal);
+        st.setMinutes(st.getMinutes() + durMin);
+        document.getElementById('contestEndTime').value = st.toISOString().slice(0, 16);
+      }
+    }
+
+    window.addSelectedProblem = function() {
+      const select = document.getElementById('probPickerSelect');
+      const code = select.value;
+      if (!code) return;
+      if (selectedProblems.includes(code)) {
+        alert(`Bài tập ${code} đã có trong kỳ thi!`);
+        return;
+      }
+      selectedProblems.push(code);
+      renderSelectedProblems();
+      select.value = '';
+    };
+
+    window.removeProblem = function(code) {
+      selectedProblems = selectedProblems.filter(c => c !== code);
+      renderSelectedProblems();
+    };
+
+    function renderSelectedProblems() {
+      const container = document.getElementById('contestProblemsList');
+      if (!selectedProblems.length) {
+        container.innerHTML = '<div style="text-align:center;padding:1.5rem;color: var(--color-text-dim);font-size:.85rem;">Chưa có bài tập nào được chọn.</div>';
+        return;
+      }
+
+      container.innerHTML = selectedProblems.map((code, idx) => {
+        const prefix = String.fromCharCode(65 + idx);
+        const pObj = availableProblems.find(p => p.code === code) || { name: code };
+        return `
+          <div class="prob-chip">
+            <div>
+              <strong style="color: var(--color-primary);font-family:monospace;font-size:1.05rem;margin-right:6px;">${prefix}.</strong>
+              <span style="font-weight:700;color: #fff;">${code}</span>
+              <span style="font-size:.78rem;color: var(--color-text-muted);margin-left:4px;">- ${pObj.name}</span>
+            </div>
+            <button onclick="removeProblem('${code}')" class="btn-act btn-act-danger" style="padding:.2rem .4rem;" title="Xóa bài">✕</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.saveContest = async function() {
+      const key = document.getElementById('contestKey').value.trim();
+      const name = document.getElementById('contestName').value.trim();
+      const desc = document.getElementById('contestDesc').value.trim();
+      const format = document.getElementById('contestFormat').value;
+      const durMin = parseInt(document.getElementById('contestDurationMin').value || '180');
+      const startTime = document.getElementById('contestStartTime').value;
+      const endTime = document.getElementById('contestEndTime').value;
+      const isRated = document.getElementById('contestRated').checked;
+      const isVisible = document.getElementById('contestVisible').checked;
+
+      if (!key || !name) {
+        alert('Vui lòng nhập đầy đủ Mã kỳ thi và Tên kỳ thi!');
+        return;
+      }
+
+      const payload = {
+        key: key,
+        name: name,
+        description: desc,
+        format_name: format,
+        time_limit: durMin * 60,
+        start_time: startTime ? new Date(startTime).toISOString() : null,
+        end_time: endTime ? new Date(endTime).toISOString() : null,
+        is_rated: isRated,
+        is_visible: isVisible,
+        display_target: document.getElementById('contestDisplayTarget').value,
+        problems: selectedProblems
+      };
+
+      try {
+        const url = isEditMode ? `${API}/api/v2/contest/${currentKey}` : `${API}/api/v2/contests`;
+        const method = isEditMode ? 'PUT' : 'POST';
+        const resp = await fetch(url, {
+          method: method,
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify(payload)
+        });
+        const json = await resp.json();
+        if (resp.ok) {
+          alert('✓ Đã lưu cấu hình kỳ thi thành công!');
+          window.location.href = '/admin/contests';
+        } else {
+          alert(`Lỗi: ${json?.error?.message || 'Không thể lưu kỳ thi'}`);
+        }
+      } catch (err) {
+        alert(`Lỗi kết nối: ${err.message}`);
+      }
+    };
+
+    initPage();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

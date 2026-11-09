@@ -1,0 +1,222 @@
+LƯU Ý: Hướng dẫn bên dưới là bản cũ. Với Docker Compose hiện tại, dùng
+docs/deployment/README.md làm hướng dẫn deploy chính (HTTPS, cổng 8080
+chỉ nghe loopback, migrate và staticfiles). Không dùng lệnh runserver
+trong tài liệu cũ để chạy production.
+
+================================================================================
+          HƯỚNG DẪN CHI TIẾT DEPLOY HỆ THỐNG CHẤM CODING_OJ LÊN VPS
+               (CODEPROOJ - COMPETITIVE PROGRAMMING PLATFORM)
+================================================================================
+
+I. YÊU CẦU PHẦN CỨNG & NƠI THUÊ VPS
+--------------------------------------------------------------------------------
+1. Hệ điều hành khuyến nghị:
+   - Ubuntu 22.04 LTS hoặc Ubuntu 24.04 LTS (64-bit).
+
+2. Cấu hình phần cứng:
+   - Thử nghiệm / Lớp học nhỏ (< 50 người): 2 vCPU, 2GB RAM, 25GB SSD.
+   - Thi chính thức / Trường học (100 - 500 người): 2 - 4 vCPU, 4GB - 8GB RAM.
+
+3. Nhà cung cấp gợi ý:
+   - Việt Nam (Thanh toán Momo / Chuyển khoản VietQR, ping siêu nhanh):
+     + Vietnix (Khuyên dùng - có sẵn tường lửa Anti-DDoS): https://vietnix.vn
+     + TinoHost / BKHost: https://tinohost.com / https://bkhost.vn
+   - Quốc tế (Cần thẻ Visa/Mastercard, chọn Server Singapore):
+     + Vultr: https://www.vultr.com ($6 - $12/tháng)
+     + DigitalOcean: https://www.digitalocean.com
+     + Hetzner (Server Đức/Phần Lan - Rẻ và CPU rất khỏe): https://www.hetzner.com
+
+
+================================================================================
+II. CÁCH 1: TRIỂN KHAI TRỰC TIẾP VỚI PM2 + NGINX (NHANH & NHẸ NHẤT)
+--------------------------------------------------------------------------------
+
+BƯỚC 1: Đăng nhập SSH vào VPS và cài đặt môi trường
+Mở Terminal trên máy tính hoặc PuTTY, gõ:
+   ssh root@<IP_VPS_CUA_BAN>
+
+Sau khi vào VPS, chạy lần lượt các lệnh sau:
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y python3 python3-pip python3-venv git build-essential g++ gcc openjdk-17-jdk curl nginx certbot python3-certbot-nginx
+
+Cài đặt Node.js 24 LTS và PM2 (quản lý tiến trình chạy nền):
+   curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+   sudo apt install -y nodejs
+   sudo npm install -g pm2
+
+
+BƯỚC 2: Tải mã nguồn dự án lên VPS
+Tạo thư mục chứa dự án:
+   sudo mkdir -p /var/www/coding-oj
+   sudo chown -R $USER:$USER /var/www/coding-oj
+   cd /var/www/coding-oj
+
+Tải code lên bằng Git:
+   git clone <URL_REPO_GITHUB_CUA_BAN> .
+(Hoặc dùng phần mềm FileZilla / WinSCP để copy toàn bộ thư mục code lên /var/www/coding-oj).
+
+
+BƯỚC 3: Cài đặt thư viện Python & Node.js
+   cd /var/www/coding-oj
+
+Tạo môi trường ảo Python và cài thư viện:
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   pip install gunicorn psutil pyyaml requests
+
+Cài thư viện Node.js:
+   npm install
+
+
+BƯỚC 4: Khởi tạo Database và Tài khoản Quản trị (Admin)
+   python manage.py migrate
+   python manage.py createsuperuser
+(Nhập tên đăng nhập, email, mật khẩu cho tài khoản Admin chính).
+
+
+BƯỚC 5: Khởi động 3 dịch vụ hệ thống bằng PM2
+Hệ thống gồm 3 tiến trình hoạt động song song:
+1. oj-backend: API Django REST (cổng 8000)
+2. oj-judge: Cụm máy chấm đa ngôn ngữ
+3. oj-web: Web Gateway & Tường lửa WAF chống DDoS (cổng 8888)
+
+Chạy các lệnh:
+   pm2 start "venv/bin/gunicorn backend.core.wsgi:application --bind 127.0.0.1:8000 --workers 3" --name "oj-backend"
+   pm2 start "venv/bin/python judge-system/judge-server/main.py" --name "oj-judge"
+   pm2 start "apps/web/server.js" --name "oj-web"
+
+Lưu cấu hình để tự động bật lại khi khởi động lại VPS:
+   pm2 save
+   pm2 startup
+
+Kiểm tra trạng thái:
+   pm2 status
+(Cả 3 tiến trình đều báo "online" màu xanh là thành công 100%).
+
+
+================================================================================
+III. GẮN TÊN MIỀN & CÀI ĐẶT SSL (HTTPS) CHO TRANG WEB
+--------------------------------------------------------------------------------
+
+BƯỚC 1: Trỏ DNS tại nơi bạn mua tên miền (iNET, Mắt Bão, Cloudflare, Namecheap...)
+Thêm 2 bản ghi A:
+   - Loại: A | Tên/Host: @   | Giá trị: <IP_CỦA_VPS>
+   - Loại: A | Tên/Host: www | Giá trị: <IP_CỦA_VPS>
+
+
+BƯỚC 2: Cấu hình Nginx trên VPS
+Tạo file cấu hình:
+   sudo nano /etc/nginx/sites-available/codingoj.conf
+
+Dán nội dung sau cấu hình cho tên miền codeprooj.com:
+--------------------------------------------------------------------------------
+server {
+    listen 80;
+    server_name codeprooj.com www.codeprooj.com;
+
+    client_max_body_size 100M;
+
+    # ── 1. Ẩn và chặn tuyệt đối lộ mã nguồn & file cấu hình nhạy cảm ──
+    location ~ /\.(?!well-known).* {
+        deny all;
+        access_log off;
+        log_not_found off;
+        return 404;
+    }
+
+    location ~* \.(py|pyc|env|sqlite3|db|sql|bak|log|sh|yml|yaml|toml|ini|conf|map)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+        return 404;
+    }
+
+    # ── 2. Header an ninh mạng chống Clickjacking, XSS, Mime-sniffing ──
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # ── 3. Proxy chuyển tiếp an toàn tới Cổng 8888 ──
+    location / {
+        proxy_pass http://127.0.0.1:8888;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+--------------------------------------------------------------------------------
+(Nhấn Ctrl + O rồi Enter để lưu, Ctrl + X để thoát).
+
+Kích hoạt cấu hình:
+   sudo ln -sf /etc/nginx/sites-available/codingoj.conf /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl reload nginx
+
+
+BƯỚC 3: Cài đặt chứng chỉ SSL miễn phí (HTTPS - Ổ khóa xanh)
+Chạy lệnh tự động của Certbot:
+   sudo certbot --nginx -d codeprooj.com -d www.codeprooj.com
+
+Nhập Email của bạn -> Chọn Y để đồng ý điều khoản.
+Certbot sẽ tự động cấu hình HTTPS vĩnh viễn (tự động gia hạn khi hết hạn).
+
+
+================================================================================
+IV. CÁCH 2: TRIỂN KHAI BẰNG DOCKER & DOCKER COMPOSE (CHUẨN DOANH NGHIỆP)
+--------------------------------------------------------------------------------
+Nếu bạn muốn dùng cơ sở dữ liệu PostgreSQL + Redis và cô lập hoàn toàn:
+
+1. Cài đặt Docker trên VPS:
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   sudo usermod -aG docker $USER
+   newgrp docker
+
+2. Vào thư mục dự án và khởi chạy toàn bộ 5 container:
+   cd /var/www/coding-oj
+   docker compose up -d --build
+
+3. Chạy migrate CSDL và tạo tài khoản Admin trong container:
+   docker compose exec backend python manage.py migrate
+   docker compose exec backend python manage.py createsuperuser
+
+4. Kiểm tra các container:
+   docker compose ps
+
+
+================================================================================
+V. CÁC LỆNH BẢO TRÌ & QUẢN LÝ THƯỜNG DÙNG TRÊN VPS
+--------------------------------------------------------------------------------
+
+1. Quản lý tiến trình PM2:
+   pm2 status               # Xem danh sách các dịch vụ đang chạy
+   pm2 logs                 # Xem log realtime của tất cả dịch vụ
+   pm2 logs oj-judge        # Xem log hoạt động của máy chấm
+   pm2 restart all          # Khởi động lại toàn bộ hệ thống
+   pm2 restart oj-web       # Khởi động lại web gateway
+
+2. Cập nhật mã nguồn mới từ Git:
+   cd /var/www/coding-oj
+   git pull origin main
+   pm2 restart all
+
+3. Mở cổng tường lửa UFW (Nếu không truy cập được web):
+   sudo ufw allow 22/tcp    # Cổng SSH
+   sudo ufw allow 80/tcp    # Cổng Web HTTP
+   sudo ufw allow 443/tcp   # Cổng Web HTTPS
+   sudo ufw allow 8888/tcp  # Cổng trực tiếp Web Gateway
+   sudo ufw enable
+
+4. Kiểm tra đường dẫn quản trị Admin:
+   https://codeprooj.com/admin
+   (Đăng nhập bằng tài khoản tạo ở lệnh createsuperuser).
+
+Chúc bạn triển khai hệ thống thành công và tổ chức các kỳ thi thuật toán hiệu quả!
+================================================================================

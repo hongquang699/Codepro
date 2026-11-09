@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Bài viết Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              📰 Quản Lý Bài Viết &amp; Tin Tức Blog
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Biên tập, ghim bài viết quan trọng và công bố tin tức tới cộng đồng.
+            </p>
+          </div>
+          <div>
+            <button onclick="openCreatePostModal()" class="btn-org-cta" style="font-size:.84rem;">
+              <cp-icon name="plus" size="sm"></cp-icon> Đăng bài viết mới
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Tiêu đề bài viết</th>
+                <th>Tác giả</th>
+                <th style="text-align:center;">Ghim</th>
+                <th style="text-align:center;">Ngày đăng</th>
+                <th style="text-align:right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminBlogTbody">
+              <tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách bài viết...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Create Post Modal -->
+  <div class="org-modal-overlay" id="createPostModal">
+    <div class="org-modal-box" style="max-width:650px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">✍️ Viết Bài Đăng Mới</h3>
+        <button onclick="closeCreatePostModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitCreatePost();">
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Tiêu đề bài viết *</label>
+          <input type="text" id="post_title" class="org-admin-input" required placeholder="Nhập tiêu đề">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Tóm tắt ngắn gọn</label>
+          <input type="text" id="post_summary" class="org-admin-input" placeholder="Tóm tắt hiển thị trên card">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Nội dung chi tiết *</label>
+          <textarea id="post_content" class="org-admin-textarea" rows="6" required placeholder="Viết nội dung bài viết..."></textarea>
+        </div>
+        <div class="org-admin-form-group">
+          <label style="display:flex;align-items:center;gap:.65rem;cursor:pointer;color: var(--color-text);font-size:.88rem;">
+            <input type="checkbox" id="post_pinned" style="width:16px;height:16px;accent-color:#ef4444;">
+            <span>Ghim lên đầu trang (Pinned Post)</span>
+          </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeCreatePostModal()" class="btn-org-outline">Hủy</button>
+          <button type="submit" class="btn-org-cta">Đăng ngay</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'blog');
+
+    function openCreatePostModal() {
+      document.getElementById('createPostModal').classList.add('open');
+    }
+    function closeCreatePostModal() {
+      document.getElementById('createPostModal').classList.remove('open');
+    }
+
+    async function loadBlog() {
+      const res = await OrgAPI.getBlog(slug);
+      const tbody = document.getElementById('adminBlogTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có bài viết nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(p => `
+        <tr>
+          <td>
+            <div style="font-weight:700;color: var(--color-text);">${p.title}</div>
+            <div style="font-size:.78rem;color: var(--color-text-muted);">${p.summary || ''}</div>
+          </td>
+          <td style="color: var(--color-primary);font-weight:600;">${p.author_display_name || p.author_username}</td>
+          <td style="text-align:center;">
+            ${p.is_pinned ? '<span style="color: #ef4444;font-weight:700;">📌 Có</span>' : '<span style="color: var(--color-text-dim);">—</span>'}
+          </td>
+          <td style="text-align:center;color: var(--color-text-muted);font-size:.84rem;">
+            ${new Date(p.created_at).toLocaleDateString('vi-VN')}
+          </td>
+          <td style="text-align:right;">
+            <a href="/organizations/${slug}/blog/${p.id}" class="btn-org-outline" style="padding:.3rem .65rem;font-size:.78rem;margin-right:.35rem;">
+              Xem
+            </a>
+            <button onclick="deletePost(${p.id})" class="btn-org-outline" style="padding:.3rem .65rem;font-size:.78rem;color: #ef4444;">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function submitCreatePost() {
+      const title = document.getElementById('post_title').value;
+      const summary = document.getElementById('post_summary').value;
+      const content = document.getElementById('post_content').value;
+      const is_pinned = document.getElementById('post_pinned').checked;
+
+      const res = await OrgAPI.createPost(slug, { title, summary, content, is_pinned });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeCreatePostModal();
+        loadBlog();
+      }
+    }
+
+    async function deletePost(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
+      const res = await OrgAPI.request(`/${slug}/blog/${id}/`, { method: 'DELETE' });
+      alert(res.message || res.error);
+      loadBlog();
+    }
+
+    loadBlog();
+  </script>
+</body>
+</html>

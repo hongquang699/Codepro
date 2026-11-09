@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết Bài viết | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container" style="max-width:960px;">
+    <div style="margin-bottom:1.5rem;">
+      <a id="backBlogLink" href="#" style="color:var(--color-primary);font-size:.88rem;display:inline-flex;align-items:center;gap:.35rem;">
+        &larr; Quay lại danh sách bài viết
+      </a>
+    </div>
+
+    <div class="card" style="padding:2.5rem;border-radius:14px;background:var(--color-surface);border:1px solid var(--color-card-border);">
+      <h1 id="postTitle" style="font-size:1.85rem;font-weight:800;color:var(--color-text);margin-bottom:.75rem;line-height:1.35;">
+        Đang tải...
+      </h1>
+      <div id="postMeta" style="font-size:.85rem;color:var(--color-text-muted);border-bottom:1px solid var(--color-border-subtle);padding-bottom:1.25rem;margin-bottom:1.5rem;">
+      </div>
+      <div id="postContent" style="font-size:1.02rem;color:var(--color-text-secondary);line-height:1.8;white-space:pre-line;">
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    (async () => {
+      const slug = OrgAPI.getOrgSlugFromUrl();
+      const urlParams = new URLSearchParams(window.location.search);
+      let postId = urlParams.get('id');
+      if (!postId) {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        postId = parts[parts.length - 1];
+      }
+
+      document.getElementById('backBlogLink').href = `/organizations/${slug}/blog`;
+
+      const res = await OrgAPI.getBlogDetail(slug, postId);
+      if (res.status !== 200 || !res.data) {
+        document.getElementById('postTitle').textContent = 'Không tìm thấy bài viết';
+        return;
+      }
+
+      const p = res.data;
+      document.title = `${p.title} | CodeProOJ`;
+      document.getElementById('postTitle').textContent = p.title;
+      document.getElementById('postMeta').innerHTML = `
+        Tác giả: <strong style="color:var(--color-primary);">${p.author_display_name || p.author_username}</strong> • Ngày đăng: ${new Date(p.created_at).toLocaleDateString('vi-VN')}
+      `;
+      document.getElementById('postContent').textContent = p.content;
+    })();
+  </script>
+</body>
+</html>

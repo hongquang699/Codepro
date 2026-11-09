@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Tiết Thảo Luận | CodeProOJ Community</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/community/community.css">
+  <link rel="stylesheet" href="/frontend/css/community/forum.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/frontend/html/problem/index.html" class="nav-link">Bài tập</a>
+        <a href="/frontend/html/contest/index.html" class="nav-link">Cuộc thi</a>
+        <a href="/frontend/html/ranking/index.html" class="nav-link">Xếp hạng</a>
+        <a href="/frontend/html/submission/index.html" class="nav-link">Bài nộp</a>
+        <a href="/frontend/html/community/home/index.html" class="nav-link active">Cộng đồng</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/frontend/html/admin/dashboard.html" class="btn-nav btn-admin">Quản trị</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="comm-layout">
+    <!-- Left Sidebar -->
+    <aside class="comm-left-sidebar">
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Menu</div>
+        <nav class="comm-nav-list">
+          <a href="/frontend/html/community/forum/index.html" class="comm-nav-link active">
+            <span>&larr;</span> Quay lại Diễn đàn
+          </a>
+          <a href="/frontend/html/community/home/index.html" class="comm-nav-link">
+            <span>🏠</span> Trang chủ Feed
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="comm-main" style="grid-column: span 2;">
+      <!-- Thread Header -->
+      <div class="comm-card">
+        <div style="font-size:0.82rem;color:var(--comm-primary);font-weight:700;text-transform:uppercase;margin-bottom:0.4rem;" id="threadCategory">
+          Chuyên mục
+        </div>
+        <h1 style="font-size:1.5rem;color: var(--color-text);font-weight:800;margin-bottom:1rem;" id="threadTitle">
+          Đang tải chủ đề...
+        </h1>
+        <div id="threadOriginalPost" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:1rem;"></div>
+      </div>
+
+      <!-- Replies List -->
+      <h3 style="font-size:1.15rem;color: var(--color-text);font-weight:700;margin:1.5rem 0 1rem;">Các Phản Hồi &amp; Trao Đổi</h3>
+      <div id="threadRepliesList"></div>
+
+      <!-- Reply Box -->
+      <div class="comm-card" style="margin-top:1.5rem;">
+        <h4 style="color: var(--color-text);font-size:1rem;margin-bottom:0.75rem;">Viết phản hồi của bạn</h4>
+        <textarea id="replyContent" placeholder="Nhập câu trả lời, trao đổi hoặc code tham khảo..." class="comm-composer-input" style="min-height:90px;margin-bottom:0.75rem;"></textarea>
+        <button id="btnSubmitReply" class="comm-btn-primary">Gửi phản hồi</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/community/api.js"></script>
+  <script src="/frontend/js/community/thread.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

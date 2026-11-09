@@ -1,0 +1,1 @@
+print('Contest creator script')

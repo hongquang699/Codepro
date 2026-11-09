@@ -1,0 +1,35 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - GLOBAL DESIGN SYSTEM & FOUNDATION
+   ══════════════════════════════════════════════════════════════════════ */
+
+@import url('/frontend/css/global/reset.css');
+@import url('/frontend/css/global/variables.css');
+@import url('/frontend/css/global/typography.css');
+@import url('/frontend/css/global/theme.css');
+@import url('/frontend/css/global/icons.css');
+@import url('/frontend/css/global/common.css');
+
+/* Universal Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-card);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Global Selection */
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  color: #ffffff;
+}

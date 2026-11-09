@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kỷ Luật Tài Khoản | Trung Tâm Kiểm Duyệt (Moderator Center)</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/moderator/moderator.css">
+  <style>
+    .mod-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .mod-sidebar { background: var(--color-bg-secondary); border-right: 1px solid var(--color-border); padding: 1.5rem 1rem; }
+    .mod-main { padding: 2rem; background: var(--color-bg); overflow-y: auto; }
+    .mod-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 0.35rem; }
+    .mod-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .mod-nav-item.active { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .badge-count { margin-left: auto; background: #ef4444; color: #fff; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="mod-layout">
+    <aside class="mod-sidebar">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;padding-left:0.5rem;">
+        <span style="font-size:1.75rem;"><cp-icon name="shield" size="sm"></cp-icon> </span>
+        <div>
+          <div style="font-weight:800;color: #fff;font-size:1.1rem;">MODERATOR</div>
+          <div style="font-size:0.75rem;color: #f59e0b;">Kiểm duyệt Nội dung</div>
+        </div>
+      </div>
+      <a href="/frontend/html/moderator/index.html" class="mod-nav-item "><cp-icon name="chart" size="sm"></cp-icon> Tổng quan</a>
+      <a href="/frontend/html/moderator/reports.html" class="mod-nav-item "><span>🚩</span> Báo cáo vi phạm <span class="badge-count">5</span></a>
+      <a href="/frontend/html/moderator/comments.html" class="mod-nav-item "><span><cp-icon name="send" size="sm"></cp-icon> </span> Bình luận & Thảo luận</a>
+      <a href="/frontend/html/moderator/posts.html" class="mod-nav-item "><cp-icon name="edit" size="sm"></cp-icon> Bài viết Blog</a>
+      <a href="/frontend/html/moderator/users.html" class="mod-nav-item active"><cp-icon name="user" size="sm"></cp-icon> Xử lý Tài khoản</a>
+      <a href="/frontend/html/moderator/moderation-log.html" class="mod-nav-item "><span>📜</span> Lịch sử Xử lý</a>
+      <a href="/" class="mod-nav-item" style="margin-top:3rem;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="mod-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <h1 style="font-size:1.75rem;color: var(--color-text);font-weight:800;">Kỷ Luật Tài Khoản</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Hệ thống kiểm duyệt & bảo vệ cộng đồng CodeProOJ</p>
+        </div>
+      </div>
+      
+<div class="card" style="padding: 1.5rem; max-width:800px;">
+  <h3 style="color: var(--color-text); margin-bottom:1.5rem;">Áp dụng Án Phạt &amp; Giới hạn Tài khoản</h3>
+  <form onsubmit="event.preventDefault(); alert('Án phạt đã được áp dụng và thông báo qua email cho người dùng!'); this.reset();">
+    <div style="margin-bottom:1rem;">
+      <label style="color: var(--color-text-secondary); display:block; margin-bottom:0.4rem;">Tên người dùng (Username)</label>
+      <input type="text" required placeholder="Nhập username..." style="width:100%; padding:0.65rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius:6px; color: #fff;">
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="color: var(--color-text-secondary); display:block; margin-bottom:0.4rem;">Hình thức kỷ luật</label>
+      <select style="width:100%; padding:0.65rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius:6px; color: #fff;">
+        <option>Cảnh cáo lần 1 (Warning)</option>
+        <option>Cấm bình luận 7 ngày (Mute 7 days)</option>
+        <option>Trừ 200 điểm Rating thi đấu</option>
+        <option>Khóa tài khoản 30 ngày</option>
+        <option>Khóa vĩnh viễn &amp; Đưa vào danh sách đen IP</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="color: var(--color-text-secondary); display:block; margin-bottom:0.4rem;">Lý do cụ thể</label>
+      <textarea rows="3" required placeholder="Ghi rõ hành vi vi phạm và bằng chứng..." style="width:100%; padding:0.65rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius:6px; color: #fff;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" style="padding:0.75rem 2rem;">Thi hành Kỷ luật</button>
+  </form>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

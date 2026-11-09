@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nộp bài giải | CodeProOJ</title>
+  
+  <!-- Global & Component Stylesheets -->
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  
+  <!-- Separated Page Stylesheet -->
+  <link rel="stylesheet" href="/frontend/css/problems/submit.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/submission/all.html">Bài nộp</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 3.5rem;">
+    <div class="submit-container">
+      <div class="card-submit">
+        <h1><cp-icon name="rocket" size="sm"></cp-icon> Nộp bài giải thuật toán</h1>
+        <p>Chọn bài tập và ngôn ngữ, dán mã nguồn của bạn vào khung bên dưới. Hệ thống sẽ tự động chấm điểm và trả kết quả ngay lập tức.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Chọn Bài Tập Cần Nộp</label>
+            <select class="form-control" id="problemSelect">
+              <option value="">Đang tải danh sách bài tập...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Ngôn Ngữ Lập Trình</label>
+            <select class="form-control" id="langSelect">
+              <option value="CPP17">C++17 (GCC 11.2)</option>
+              <option value="CPP14">C++14 (GCC 9.4)</option>
+              <option value="PY3">Python 3.12</option>
+              <option value="PYPY3">PyPy 3</option>
+              <option value="JAVA">Java 17 (OpenJDK)</option>
+              <option value="RUST">Rust 2021</option>
+              <option value="GO">Go 1.22</option>
+              <option value="PAS">Free Pascal 3.2</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="editor-box">
+          <div class="editor-hdr">
+            <span style="font-weight:700;color: var(--color-text-muted);">📝 MÃ NGUỒN (SOURCE CODE)</span>
+            <span id="charCount" style="color: var(--color-text-dim);">0 ký tự</span>
+          </div>
+          <textarea id="sourceCode" placeholder="// Nhập mã nguồn ở đây..."></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <button class="btn-submit-main" id="btnSubmit" onclick="doSubmit()">
+            🚀 Nộp bài ngay (Submit)
+          </button>
+          <a href="/frontend/html/problem/index.html" style="color: var(--color-text-muted);text-decoration:none;font-size:.9rem;">
+            ← Quay lại kho bài tập
+          </a>
+        </div>
+
+        <div class="result-alert" id="resultAlert">
+          <h3 id="resTitle" style="font-size:1.3rem;margin-bottom:.4rem;"></h3>
+          <p id="resDetails" style="font-size:.92rem;margin-bottom:.75rem;"></p>
+          <a href="#" id="resLink" style="font-weight:700;color: inherit;text-decoration: none !important;">
+            Xem chi tiết bài nộp →
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="background: var(--color-surface);border-top: 1px solid var(--color-border);padding:1.5rem 0;margin-top:2rem;">
+    <div class="container" style="display:flex;justify-content:space-between;color: var(--color-text-muted);font-size:.875rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.</div>
+    </div>
+  </footer>
+
+  <!-- Separated JavaScript Modules -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/problems/submit.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

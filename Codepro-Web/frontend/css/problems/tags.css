@@ -1,0 +1,72 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - Algorithm Tags Page Styling
+   ══════════════════════════════════════════════════════════════════════ */
+
+body {
+  background: var(--color-bg, var(--color-bg-secondary));
+  color: var(--color-text, var(--color-text));
+}
+
+.page-title-box {
+  padding: 1.5rem 0 1rem;
+  border-bottom: 1px solid var(--color-border, var(--color-border));
+  margin-bottom: 1.5rem;
+}
+
+.page-title-box h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: .3rem;
+}
+
+.page-title-box p {
+  color: var(--color-text-muted);
+  font-size: .92rem;
+}
+
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.tag-card {
+  background: var(--color-surface, var(--color-card));
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: .2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.tag-info h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: .25rem;
+}
+
+.tag-info p {
+  font-size: .8rem;
+  color: var(--color-text-muted);
+}
+
+.tag-count {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  padding: .35rem .75rem;
+  border-radius: 8px;
+}

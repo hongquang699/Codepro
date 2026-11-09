@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodePro Wiki - Thư Viện Thuật Toán & Lập Trình Thi Đấu | CodeProOJ</title>
+  
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  
+  <style>
+    :root {
+      --wiki-bg: var(--color-bg);
+      --wiki-card: var(--color-card);
+      --wiki-card-hover: var(--color-card-hover);
+      --wiki-border: var(--color-border);
+      --wiki-text: var(--color-text);
+      --wiki-muted: var(--color-text-muted);
+      --wiki-blue: var(--color-primary);
+      --wiki-cyan: #06b6d4;
+      --wiki-green: #10b981;
+      --wiki-yellow: #f59e0b;
+      --wiki-purple: var(--color-accent);
+    }
+
+    body {
+      background-color: var(--wiki-bg);
+      color: var(--wiki-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Hero Section */
+    .wiki-hero {
+      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-primary) 20%, transparent) 0%, transparent 70%);
+      padding: 3.5rem 1rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--wiki-border);
+      margin-bottom: 2.5rem;
+    }
+
+    .wiki-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      color: var(--color-primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .wiki-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.75rem;
+      color: var(--color-text);
+    }
+
+    .wiki-desc {
+      color: var(--wiki-muted);
+      font-size: 1.15rem;
+      max-width: 720px;
+      margin: 0 auto 1.75rem auto;
+      line-height: 1.6;
+    }
+
+    .wiki-search-box {
+      max-width: 580px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .wiki-search-input {
+      width: 100%;
+      background: var(--color-bg-secondary);
+      border: 1px solid #374151;
+      padding: 0.85rem 1.25rem 0.85rem 3rem;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      outline: none;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .wiki-search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-dim);
+      font-size: 1.1rem;
+    }
+
+    /* Category Navigation Chips */
+    .wiki-categories {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .cat-chip {
+      background: var(--color-card);
+      border: 1px solid var(--wiki-border);
+      color: var(--wiki-muted);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cat-chip:hover, .cat-chip.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      border-color: var(--color-primary);
+    }
+
+    /* Section & Cards */
+    .wiki-section {
+      margin-bottom: 3rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .topic-card {
+      background: var(--wiki-card);
+      border: 1px solid var(--wiki-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .topic-card:hover {
+      background: var(--wiki-card-hover);
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .topic-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .topic-level {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    .level-easy { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .level-medium { background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary); }
+    .level-hard { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .level-expert { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    .topic-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .topic-summary {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0 0 1rem 0;
+    }
+
+    .topic-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.82rem;
+      color: var(--color-text-secondary);
+    }
+
+    .topic-link {
+      color: var(--color-primary);
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Modal Reader */
+    .wiki-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .wiki-modal-box {
+      background: var(--color-bg-secondary);
+      border: 1px solid #374151;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 850px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    .wiki-modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: var(--color-text-secondary);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .code-preview {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 8px;
+      padding: 1rem;
+      color: var(--color-primary);
+      font-family: monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="wiki-hero">
+    <div class="container">
+      <div class="wiki-badge">
+        <cp-icon name="book" size="sm"></cp-icon> CodeProOJ WIKI & KHO THUẬT TOÁN
+      </div>
+      <h1 class="wiki-title">Thư Viện Kiến Thức Lập Trình Thi Đấu</h1>
+      <p class="wiki-desc">
+        Hệ thống tài liệu chuyên đề thuật toán và cấu trúc dữ liệu chuẩn Olympic Tin học và ICPC. Được biên soạn chi tiết kèm mã nguồn C++ và bài tập rèn luyện.
+      </p>
+
+      <!-- Search Input -->
+      <div class="wiki-search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="wikiSearchInput" class="wiki-search-input" placeholder="Tìm kiếm chuyên đề: Dijkstra, Segment Tree, Knapsack, Quy hoạch động..." oninput="handleSearch()">
+      </div>
+
+      <!-- Quick Category Filter Chips -->
+      <div class="wiki-categories">
+        <button class="cat-chip active" onclick="filterCategory('all', this)">Tất cả chuyên đề</button>
+        <button class="cat-chip" onclick="filterCategory('intro', this)">⭐ Giới thiệu & Hướng dẫn</button>
+        <button class="cat-chip" onclick="filterCategory('cpp', this)">C++ & STL</button>
+        <button class="cat-chip" onclick="filterCategory('ds', this)">Cấu trúc dữ liệu</button>
+        <button class="cat-chip" onclick="filterCategory('graph', this)">Đồ thị (Graph)</button>
+        <button class="cat-chip" onclick="filterCategory('dp', this)">Quy hoạch động (DP)</button>
+        <button class="cat-chip" onclick="filterCategory('math', this)">Toán học & Số học</button>
+        <button class="cat-chip" onclick="filterCategory('string', this)">Xử lý chuỗi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Categories -->
+  <main class="container" style="padding-bottom: 5rem;">
+
+    <!-- 0. GIỚI THIỆU VỀ CODEPROOJ & HƯỚNG DẪN SỬ DỤNG -->
+    <div class="wiki-section" data-cat="intro" id="section-intro">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(220, 38, 38, 0.15); color: #ef4444;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </div>
+        <div>
+          <h2 class="section-title">Giới Thiệu Nền Tảng CodeProOJ & Hướng Dẫn Sử Dụng</h2>
+          <div style="font-size:0.88rem; color: var(--wiki-muted); margin-top:2px;">Tổng quan về hệ thống chấm bài tự động, quy trình luyện tập, thể thức thi đấu và các quy chuẩn nộp bài.</div>
+        </div>
+      </div>
+
+      <div class="topic-grid">
+        <!-- 1. Giới thiệu tổng quan CodeProOJ -->
+        <div class="topic-card" onclick="openTopic('about_oj')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium" style="background: rgba(220,38,38,0.15);color: var(--color-danger);">Tổng quan</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">Online Judge v2.4</span>
+            </div>
+            <h3 class="topic-name">CodeProOJ là gì? Sứ mệnh & Tính năng cốt lõi</h3>
+            <p class="topic-summary">
+              Nền tảng thi đấu lập trình trực tuyến và luyện tập thuật toán chuẩn Olympic Tin học và ICPC. Khám phá hệ thống máy chấm, kỳ thi trực tiếp và mô hình tổ chức trường học / CLB.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Đọc giới thiệu chi tiết</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 2. Quy trình 5 bước sử dụng -->
+        <div class="topic-card" onclick="openTopic('guide_steps')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-easy">Người mới</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">5 Bước cơ bản</span>
+            </div>
+            <h3 class="topic-name">Quy trình 5 bước luyện tập & thi đấu trên CodeProOJ</h3>
+            <p class="topic-summary">
+              Từ tạo tài khoản, tra cứu bài tập theo chủ đề, viết code kiểm thử, nộp bài nhận kết quả theo từng testcase đến tham gia tranh tài trên bảng xếp hạng kỳ thi.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Hướng dẫn từng bước</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 3. Ý nghĩa kết quả chấm (Verdicts) -->
+        <div class="topic-card" onclick="openTopic('verdicts_explained')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-hard" style="background: rgba(245,158,11,0.15);color: var(--color-warning);">Quy chuẩn</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">AC, WA, TLE, MLE, RTE, CE</span>
+            </div>
+            <h3 class="topic-name">Ý nghĩa các trạng thái chấm bài (Verdict Cheatsheet)</h3>
+            <p class="topic-summary">
+              Giải thích tường tận ý nghĩa các kết quả máy chấm trả về: Đúng (AC), Sai đáp án (WA), Quá thời gian (TLE), Tràn bộ nhớ (MLE), Lỗi thực thi (RTE) và cách khắc phục.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Bảng tra cứu kết quả</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 4. Mẹo C++ Fast I/O & Sandbox Rules -->
+        <div class="topic-card" onclick="openTopic('cpp_best_practices')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-expert" style="background: color-mix(in srgb, var(--color-accent) 15%, transparent);color: #d8b4fe;">Kinh nghiệm</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">Tối ưu vào/ra C++</span>
+            </div>
+            <h3 class="topic-name">Mẹo viết code C++ chuẩn thi đấu & Tối ưu Fast I/O</h3>
+            <p class="topic-summary">
+              Cách cấu hình template đọc dữ liệu nhanh với <code>std::ios::sync_with_stdio(false)</code>, tránh lỗi TLE/RTE, quy chuẩn Sandbox an toàn và những điều cấm kỵ khi nộp bài.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Code mẫu & Lưu ý</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 5. Thể thức thi đấu ICPC & IOI -->
+        <div class="topic-card" onclick="openTopic('contest_formats')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Quy chế</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">ICPC & IOI / Subtask</span>
+            </div>
+            <h3 class="topic-name">Thể thức thi đấu, Penalty & Đóng băng bảng điểm</h3>
+            <p class="topic-summary">
+              Tìm hiểu cách tính điểm theo thể thức ICPC (thời gian phạt) và IOI-style (điểm thành phần từng subtask), quy chế đóng băng bảng xếp hạng (Freeze) trong 60 phút cuối.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Tìm hiểu thể thức</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+
+        <!-- 6. Không gian Tổ chức & CLB -->
+        <div class="topic-card" onclick="openTopic('org_feature')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-easy" style="background: rgba(6,182,212,0.15);color: var(--color-primary);">Cộng đồng</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">Trường học & CLB</span>
+            </div>
+            <h3 class="topic-name">Mô hình Tổ chức: Dành cho Trường học & CLB Tin học</h3>
+            <p class="topic-summary">
+              Hướng dẫn tham gia hoặc khởi tạo Tổ chức độc lập: quản lý thành viên, tạo kỳ thi riêng và ngân hàng bài tập nội bộ phục vụ bồi dưỡng học sinh giỏi.
+            </p>
+          </div>
+          <div class="topic-footer">
+            <span>Khám phá Tổ chức</span>
+            <span class="topic-link">Xem thêm &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. C++ & STL -->
+    <div class="wiki-section" data-cat="cpp">
+      <div class="section-header">
+        <div class="section-icon" style="background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary);"><cp-icon name="bolt" size="sm"></cp-icon> </div>
+        <h2 class="section-title">Lập trình C++ & Thư viện STL</h2>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-card" onclick="openTopic('cpp_stl')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-easy">Cơ bản</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">Độ phức tạp O(1) - O(log N)</span>
+            </div>
+            <h3 class="topic-name">Thư viện chuẩn C++ STL toàn tập</h3>
+            <p class="topic-summary">Làm chủ vector, pair, set, map, unordered_map, priority_queue và các hàm thuật toán sort, lower_bound, upper_bound.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Bài tập liên quan: <strong>APLUS, SUMA</strong></span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('bin_search')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-easy">Cơ bản</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(log N)</span>
+            </div>
+            <h3 class="topic-name">Tìm kiếm nhị phân & Chặt nhị phân kết quả</h3>
+            <p class="topic-summary">Kỹ thuật tìm kiếm nhị phân trên mảng đã sắp xếp và ứng dụng chặt nhị phân tìm kiếm nghiệm tối ưu (Binary Search on Answer).</p>
+          </div>
+          <div class="topic-footer">
+            <span>Ứng dụng: Tối ưu tìm kiếm</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('two_pointers')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(N)</span>
+            </div>
+            <h3 class="topic-name">Kỹ thuật Hai con trỏ & Cửa sổ trượt (Sliding Window)</h3>
+            <p class="topic-summary">Tối ưu độ phức tạp từ O(N^2) về O(N) cho các bài toán xử lý mảng con liên tiếp, tổng lớn nhất, đếm phần tử thỏa mãn điều kiện.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Ứng dụng: Dãy con liên tiếp</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Cấu trúc dữ liệu -->
+    <div class="wiki-section" data-cat="ds">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><cp-icon name="tree" size="sm"></cp-icon> </div>
+        <h2 class="section-title">Cấu trúc dữ liệu (Data Structures)</h2>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-card" onclick="openTopic('segtree')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-hard">Nâng cao</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(log N) / truy vấn</span>
+            </div>
+            <h3 class="topic-name">Cây phân đoạn (Segment Tree & Lazy Propagation)</h3>
+            <p class="topic-summary">Cấu trúc dữ liệu kinh điển giải quyết bài toán cập nhật giá trị đoạn và truy vấn tổng, min/max trên đoạn trong O(log N).</p>
+          </div>
+          <div class="topic-footer">
+            <span>Bài tập: <strong>TREE, RMQ</strong></span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('fenwick')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(log N)</span>
+            </div>
+            <h3 class="topic-name">Cây chỉ số nhị phân (Binary Indexed Tree / Fenwick Tree)</h3>
+            <p class="topic-summary">Cấu trúc siêu ngắn gọn, tiết kiệm bộ nhớ, hỗ trợ cập nhật điểm và truy vấn tiền tố (Prefix Sum) cực kỳ nhanh chóng.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Code 10 dòng C++</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('dsu')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(alpha(N)) ~ O(1)</span>
+            </div>
+            <h3 class="topic-name">Disjoint Set Union (DSU)</h3>
+            <p class="topic-summary">Cấu trúc các tập hợp rời nhau với kỹ thuật nén đường đi (Path Compression) và gộp theo kích thước (Union by Rank).</p>
+          </div>
+          <div class="topic-footer">
+            <span>Dùng cho Kruskal & Đồ thị</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Quy hoạch động -->
+    <div class="wiki-section" data-cat="dp">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><cp-icon name="puzzle" size="sm"></cp-icon> </div>
+        <h2 class="section-title">Quy hoạch động (Dynamic Programming)</h2>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-card" onclick="openTopic('knapsack')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Cơ bản - TB</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(N * W)</span>
+            </div>
+            <h3 class="topic-name">Bài toán cái túi (0/1 Knapsack & Unbounded)</h3>
+            <p class="topic-summary">Nền tảng của tư duy quy hoạch động: định nghĩa mảng trạng thái, công thức truy hồi và kỹ thuật tối ưu mảng 1 chiều.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Bài tập: <strong>KNAPSACK</strong></span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('lis')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(N log N)</span>
+            </div>
+            <h3 class="topic-name">Dãy con tăng dài nhất (Longest Increasing Subsequence - LIS)</h3>
+            <p class="topic-summary">Từ lời giải O(N^2) cơ bản đến phương pháp tối ưu O(N log N) kết hợp tìm kiếm nhị phân hoặc Fenwick Tree.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Thuật toán kinh điển</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('bitmask_dp')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-hard">Nâng cao</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(2^N * N)</span>
+            </div>
+            <h3 class="topic-name">Quy hoạch động trạng thái (Bitmask DP)</h3>
+            <p class="topic-summary">Sử dụng biểu diễn nhị phân để lưu trữ trạng thái tập hợp con trong các bài toán Người du lịch (TSP) và phân công công việc.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Chuẩn thi HSG Quốc gia</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Lý thuyết đồ thị -->
+    <div class="wiki-section" data-cat="graph">
+      <div class="section-header">
+        <div class="section-icon" style="background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: #a855f7;"><cp-icon name="globe" size="sm"></cp-icon> </div>
+        <h2 class="section-title">Lý thuyết đồ thị (Graph Theory)</h2>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-card" onclick="openTopic('dijkstra')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(E log V)</span>
+            </div>
+            <h3 class="topic-name">Đường đi ngắn nhất với thuật toán Dijkstra</h3>
+            <p class="topic-summary">Tìm đường đi ngắn nhất từ một đỉnh nguồn trên đồ thị có trọng số không âm kết hợp hàng đợi ưu tiên (priority_queue).</p>
+          </div>
+          <div class="topic-footer">
+            <span>Bài tập: <strong>GRAPH, DIJKSTRA</strong></span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('mst')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-medium">Trung bình</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(E log E)</span>
+            </div>
+            <h3 class="topic-name">Cây khung nhỏ nhất (Kruskal & Prim)</h3>
+            <p class="topic-summary">Tìm tập cạnh có tổng trọng số nhỏ nhất liên thông toàn bộ các đỉnh của đồ thị kết hợp cấu trúc DSU.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Thuật toán tham lam</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+
+        <div class="topic-card" onclick="openTopic('lca')">
+          <div>
+            <div class="topic-badge-row">
+              <span class="topic-level level-hard">Nâng cao</span>
+              <span style="color: var(--color-text-muted); font-size: 0.8rem;">O(log N) / truy vấn</span>
+            </div>
+            <h3 class="topic-name">Tổ tiên chung gần nhất (Lowest Common Ancestor - LCA)</h3>
+            <p class="topic-summary">Kỹ thuật nhảy nhị phân (Binary Lifting) tìm tổ tiên chung gần nhất và khoảng cách giữa 2 đỉnh bất kỳ trên cây.</p>
+          </div>
+          <div class="topic-footer">
+            <span>Cấu trúc cây chuyên sâu</span>
+            <span class="topic-link">Đọc chuyên đề &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Article Detail Modal -->
+  <div class="wiki-modal" id="wikiModal">
+    <div class="wiki-modal-box">
+      <button class="wiki-modal-close" onclick="closeModal()">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer style="background: var(--color-bg-secondary); border-top: 1px solid var(--color-border-subtle); padding: 2.5rem 0; margin-top: auto;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; color: var(--color-text-muted); font-size: 0.88rem;">
+      <div>&copy; 2026 CodeProOJ • CodePro Wiki Competitive Programming Platform. All rights reserved.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/" style="color: var(--color-primary); text-decoration: none;">Trang chủ</a>
+        <a href="/problems" style="color: var(--color-text-secondary); text-decoration: none;">Kho bài tập</a>
+        <a href="/contests" style="color: var(--color-text-secondary); text-decoration: none;">Cuộc thi</a>
+        <a href="/ranking" style="color: var(--color-text-secondary); text-decoration: none;">Bảng xếp hạng</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script>
+    const TOPIC_DETAILS = {
+      about_oj: {
+        title: "Giới thiệu nền tảng CodeProOJ",
+        badge: "Tổng quan • Online Judge",
+        content: `
+          <p><strong>CodeProOJ</strong> là hệ thống chấm bài lập trình thi đấu trực tuyến (Online Judge), lấy cảm hứng từ các nền tảng thi đấu như Codeforces và ClueOJ. Hệ thống phục vụ học sinh chuyên Tin, sinh viên và cộng đồng yêu thích thuật toán trên toàn quốc.</p>
+          <h4>Các tính năng cốt lõi:</h4>
+          <ul>
+            <li><strong>Máy chấm tự động thời gian thực (Judge Server):</strong> Đánh giá mã nguồn trong môi trường Sandbox cô lập an toàn, đo lường chính xác thời gian chạy (Time Limit) và dung lượng RAM (Memory Limit).</li>
+            <li><strong>Hỗ trợ đa ngôn ngữ:</strong> C++17/20, Python 3, Java, Pascal/FreePascal... với trình biên dịch cập nhật mới nhất.</li>
+            <li><strong>Đa dạng thể thức kỳ thi (Contests):</strong> Hỗ trợ thể thức ICPC (xếp hạng theo số bài AC và thời gian phạt Penalty) và thể thức IOI-style (chấm điểm chi tiết theo từng Subtask/Testcase).</li>
+            <li><strong>Mô hình Tổ chức (Organizations):</strong> Cho phép các trường THPT Chuyên, trường Đại học và Câu lạc bộ Tin học tạo không gian học tập riêng, quản lý thành viên và tổ chức các kỳ thi nội bộ.</li>
+            <li><strong>Hệ thống Elo Rating phân cấp:</strong> Xếp hạng trực quan qua các cấp bậc Newbie, Pupil, Specialist, Candidate Master, Master, Grandmaster cùng biểu đồ biến động lịch sử chi tiết.</li>
+          </ul>
+        `
+      },
+      guide_steps: {
+        title: "Quy trình 5 bước luyện tập & thi đấu",
+        badge: "Hướng dẫn • Người mới bắt đầu",
+        content: `
+          <p>Để bắt đầu luyện tập và thi đấu hiệu quả trên CodeProOJ, bạn chỉ cần thực hiện 5 bước đơn giản sau:</p>
+          <ol style="padding-left: 1.25rem; line-height: 1.8;">
+            <li><strong>Bước 1 - Đăng ký tài khoản:</strong> Tạo tài khoản tại trang Đăng ký, cập nhật ảnh đại diện và tham gia vào Tổ chức của trường/CLB bạn đang theo học.</li>
+            <li><strong>Bước 2 - Lựa chọn bài tập phù hợp:</strong> Vào mục <em>Bài tập (Problems)</em>, sử dụng bộ lọc để chọn mức độ khó (Dễ, Trung bình, Khó) hoặc chủ đề thuật toán (DP, Graph, Greedy, Cấu trúc dữ liệu).</li>
+            <li><strong>Bước 3 - Viết code & Kiểm thử mẫu:</strong> Đọc kỹ đề bài, quy cách dữ liệu đầu vào (Input) và đầu ra (Output). Kiểm tra với các test ví dụ trước khi nộp.</li>
+            <li><strong>Bước 4 - Nộp bài (Submit Code):</strong> Chọn đúng ngôn ngữ biên dịch (khuyên dùng C++20), dán mã nguồn và nhấn nút Nộp bài. Hệ thống sẽ trả kết quả chi tiết từng testcase sau vài giây.</li>
+            <li><strong>Bước 5 - Tham gia Cuộc thi (Contest):</strong> Theo dõi lịch các kỳ thi sắp diễn ra trên trang Cuộc thi, đăng ký và tranh tài trực tiếp cùng hàng trăm thí sinh khác để thăng hạng Rating.</li>
+          </ol>
+        `
+      },
+      verdicts_explained: {
+        title: "Ý nghĩa các trạng thái chấm bài (Verdicts)",
+        badge: "Quy chuẩn • Trạng thái máy chấm",
+        content: `
+          <p>Khi bạn nộp bài, hệ thống Sandbox sẽ biên dịch và chạy thử chương trình của bạn trên toàn bộ các testcase bí mật. Dưới đây là ý nghĩa các kết quả máy chấm trả về:</p>
+          <table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem;">
+            <tr style="background: var(--color-card); border-bottom: 1px solid var(--color-border);">
+              <th style="padding:8px 12px; text-align:left;">Ký hiệu</th>
+              <th style="padding:8px 12px; text-align:left;">Tên trạng thái</th>
+              <th style="padding:8px 12px; text-align:left;">Ý nghĩa & Cách khắc phục</th>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-subtle);">
+              <td style="padding:8px 12px; color: #10b981; font-weight:bold;">AC</td>
+              <td style="padding:8px 12px;">Accepted</td>
+              <td style="padding:8px 12px;">Bài giải chính xác 100%, chạy đúng thời gian và bộ nhớ. Chúc mừng bạn!</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-subtle);">
+              <td style="padding:8px 12px; color: #ef4444; font-weight:bold;">WA</td>
+              <td style="padding:8px 12px;">Wrong Answer</td>
+              <td style="padding:8px 12px;">Kết quả in ra sai khác so với đáp án chuẩn. Kiểm tra lại thuật toán, các trường hợp biên (corner cases).</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-subtle);">
+              <td style="padding:8px 12px; color: #f59e0b; font-weight:bold;">TLE</td>
+              <td style="padding:8px 12px;">Time Limit Exceeded</td>
+              <td style="padding:8px 12px;">Chương trình chạy quá thời gian giới hạn (thường 1.0s). Cần tối ưu độ phức tạp thời gian thuật toán từ O(N²) xuống O(N log N) hoặc thêm Fast I/O.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-subtle);">
+              <td style="padding:8px 12px; color: #f97316; font-weight:bold;">MLE</td>
+              <td style="padding:8px 12px;">Memory Limit Exceeded</td>
+              <td style="padding:8px 12px;">Chương trình ngốn quá nhiều RAM cho phép (thường 256MB). Giảm kích thước mảng tĩnh hoặc giải phóng bộ nhớ thừa.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--color-border-subtle);">
+              <td style="padding:8px 12px; color: #a855f7; font-weight:bold;">RTE</td>
+              <td style="padding:8px 12px;">Runtime Error</td>
+              <td style="padding:8px 12px;">Chương trình dừng đột ngột: do truy cập ngoài biên mảng (Index Out of Bounds), chia cho 0 (Divide by Zero), hoặc đệ quy quá sâu gây tràn Stack.</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 12px; color: var(--color-text-muted); font-weight:bold;">CE</td>
+              <td style="padding:8px 12px;">Compilation Error</td>
+              <td style="padding:8px 12px;">Lỗi cú pháp không thể biên dịch. Bấm vào chi tiết bài nộp để xem log thông báo lỗi từ trình biên dịch g++.</td>
+            </tr>
+          </table>
+        `
+      },
+      cpp_best_practices: {
+        title: "Mẹo viết code C++ chuẩn & Fast I/O",
+        badge: "Kinh nghiệm • Tối ưu hiệu năng",
+        content: `
+          <p>Để tránh bị dính lỗi TLE do thao tác đọc/ghi dữ liệu chậm trong C++, hãy áp dụng ngay cấu trúc template chuẩn dưới đây:</p>
+          <div class="code-preview">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+int main() {
+    // 1. Tối ưu tốc độ đọc/ghi dữ liệu (Fast I/O)
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    if (cin >> n) {
+        vector&lt;int&gt; a(n);
+        for (int i = 0; i &lt; n; i++) cin >> a[i];
+
+        // 2. Dùng '\n' thay vì endl để tránh flush bộ đệm liên tục
+        cout &lt;&lt; a[0] &lt;&lt; '\n';
+    }
+    return 0;
+}</div>
+          <h4>Những điều quan trọng cần nhớ:</h4>
+          <ul>
+            <li><strong>Không in thừa văn bản:</strong> Tuyệt đối không viết <code>cout &lt;&lt; "Nhap n = ";</code> vì máy chấm tự động sẽ so sánh từng ký tự và coi đó là lỗi WA.</li>
+            <li><strong>Không dùng lệnh hệ thống:</strong> Không thêm <code>system("pause");</code> hay <code>#include &lt;conio.h&gt;</code> vì môi trường Linux Sandbox sẽ báo lỗi RTE.</li>
+            <li><strong>Hàm main phải trả về 0:</strong> Luôn kết thúc với <code>return 0;</code> để báo hiệu chương trình kết thúc thành công.</li>
+          </ul>
+        `
+      },
+      contest_formats: {
+        title: "Thể thức thi đấu, Penalty & Freeze",
+        badge: "Quy chế • Luật thi đấu",
+        content: `
+          <p>CodeProOJ hỗ trợ 2 thể thức thi đấu lập trình phổ biến nhất hiện nay:</p>
+          <h4>1. Thể thức ICPC:</h4>
+          <ul>
+            <li>Mỗi bài tập chỉ có 2 trạng thái: Đã giải được (AC) hoặc Chưa giải được.</li>
+            <li><strong>Xếp hạng:</strong> Thí sinh giải được nhiều bài hơn sẽ xếp trên. Nếu bằng số bài, thí sinh có tổng thời gian phạt (Penalty) thấp hơn sẽ xếp trên.</li>
+            <li><strong>Cách tính Penalty:</strong> Thời điểm nộp bài AC (tính theo phút từ lúc bắt đầu thi) + 20 phút phạt cho mỗi lần nộp sai (WA, TLE, RTE) trước đó.</li>
+          </ul>
+          <h4>2. Thể thức IOI-style:</h4>
+          <ul>
+            <li>Bài tập được chia thành nhiều Subtask (ví dụ: Subtask 1: N ≤ 100, Subtask 2: N ≤ 10⁵).</li>
+            <li>Điểm của bạn bằng tổng điểm các Subtask bạn vượt qua. Điểm bài thi là điểm cao nhất trong tất cả các lần nộp.</li>
+          </ul>
+          <h4>3. Cơ chế đóng băng bảng xếp hạng (Freeze Scoreboard):</h4>
+          <p>Trong 60 phút cuối của kỳ thi, bảng xếp hạng sẽ được đóng băng. Bạn vẫn nộp bài và nhận kết quả bình thường, nhưng đối thủ sẽ chỉ thấy trạng thái bài nộp đang chờ giải mã (Pending). Kết quả chung cuộc sẽ được hé lộ đầy cảm xúc trong lễ bế mạc!</p>
+        `
+      },
+      org_feature: {
+        title: "Mô hình Tổ chức dành cho Trường học & CLB",
+        badge: "Cộng đồng • Quản trị độc lập",
+        content: `
+          <p><strong>Tổ chức (Organization)</strong> trên CodeProOJ là một không gian sinh hoạt học thuật thu nhỏ dành riêng cho các trường THPT Chuyên, các khoa CNTT Đại học và các Câu lạc bộ lập trình.</p>
+          <h4>Đặc quyền của Tổ chức:</h4>
+          <ul>
+            <li><strong>Trang cộng đồng riêng biệt:</strong> Tên định danh slug độc quyền (ví dụ: <code>/organizations/codeprooj</code> hoặc <code>/organizations/ams</code>).</li>
+            <li><strong>Quản lý thành viên & phân quyền:</strong> Chủ sở hữu (Owner) có thể phê duyệt thành viên, phân cấp vai trò Quản lý (Manager), Giáo viên (Teacher) và Thành viên (Member).</li>
+            <li><strong>Kỳ thi nội bộ:</strong> Tạo các cuộc thi riêng chỉ dành cho học sinh trong trường, đặt mật mã truy cập hoặc phân lịch thi định kỳ.</li>
+            <li><strong>Kho bài tập chuyên đề nội bộ:</strong> Xây dựng ngân hàng đề bồi dưỡng đội tuyển tin học độc quyền của nhà trường.</li>
+          </ul>
+        `
+      },
+
+      cpp_stl: {
+        title: "Thư viện chuẩn C++ STL toàn tập (Standard Template Library)",
+        badge: "Cơ bản • O(1) - O(log N)",
+        content: `
+          <p>Thư viện chuẩn C++ (STL) là vũ khí quan trọng nhất của mọi lập trình viên Competitive Programming. STL cung cấp các cấu trúc dữ liệu và giải thuật đã được tối ưu hóa tối đa.</p>
+          <h4>1. std::vector - Mảng động</h4>
+          <p>Hỗ trợ thêm/xóa phần tử ở cuối trong thời gian trung bình O(1), truy xuất ngẫu nhiên O(1).</p>
+          <div class="code-preview">vector&lt;int&gt; a;
+a.push_back(10);
+a.push_back(20);
+sort(a.begin(), a.end()); // Sắp xếp tăng dần O(N log N)
+for (int x : a) cout &lt;&lt; x &lt;&lt; " ";</div>
+          <h4>2. std::set & std::map - Cây đỏ đen (Red-Black Tree)</h4>
+          <p>Lưu trữ các phần tử phân biệt và luôn duy trì thứ tự sắp xếp trong O(log N) cho mỗi thao tác thêm, xóa, tìm kiếm.</p>
+          <h4>3. std::priority_queue - Hàng đợi ưu tiên (Heap)</h4>
+          <p>Luôn cho phép lấy ra phần tử lớn nhất (hoặc nhỏ nhất) trong O(1) và đẩy phần tử mới trong O(log N). Là nền tảng của thuật toán Dijkstra.</p>
+        `
+      },
+      segtree: {
+        title: "Cây phân đoạn (Segment Tree & Lazy Propagation)",
+        badge: "Nâng cao • O(log N) / truy vấn",
+        content: `
+          <p>Segment Tree là một cây nhị phân đầy đủ mà mỗi nút quản lý một đoạn con [L, R] của mảng. Nút gốc quản lý toàn bộ đoạn [1, N].</p>
+          <h4>Ứng dụng chính:</h4>
+          <ul>
+            <li>Truy vấn tổng đoạn, phần tử nhỏ nhất/lớn nhất đoạn trong O(log N).</li>
+            <li>Cập nhật giá trị một phần tử (Point Update) trong O(log N).</li>
+            <li>Cập nhật giá trị cả một đoạn (Range Update) trong O(log N) với kỹ thuật <strong>Lazy Propagation</strong>.</li>
+          </ul>
+          <div class="code-preview">void update(int id, int l, int r, int pos, int val) {
+    if (l == r) {
+        tree[id] = val;
+        return;
+    }
+    int mid = (l + r) / 2;
+    if (pos <= mid) update(id * 2, l, mid, pos, val);
+    else update(id * 2 + 1, mid + 1, r, pos, val);
+    tree[id] = max(tree[id * 2], tree[id * 2 + 1]);
+}</div>
+        `
+      },
+      knapsack: {
+        title: "Bài toán cái túi (0/1 Knapsack Problem)",
+        badge: "Cơ bản - TB • O(N * W)",
+        content: `
+          <p>Cho N đồ vật, mỗi đồ vật có trọng lượng W[i] và giá trị V[i]. Hãy chọn một số đồ vật sao cho tổng trọng lượng không vượt quá S và tổng giá trị thu được là lớn nhất.</p>
+          <h4>Công thức truy hồi:</h4>
+          <p>Gọi <code>dp[w]</code> là giá trị lớn nhất đạt được với cái túi có sức chứa w.</p>
+          <div class="code-preview">for (int i = 1; i <= n; i++) {
+    for (int w = S; w >= weight[i]; w--) {
+        dp[w] = max(dp[w], dp[w - weight[i]] + value[i]);
+    }
+}
+cout &lt;&lt; dp[S] &lt;&lt; "\\n";</div>
+          <p><em>Lưu ý:</em> Vòng lặp thứ hai phải duyệt ngược từ S về weight[i] để đảm bảo mỗi đồ vật chỉ được chọn tối đa một lần.</p>
+        `
+      },
+      dijkstra: {
+        title: "Thuật toán tìm đường đi ngắn nhất Dijkstra",
+        badge: "Trung bình • O(E log V)",
+        content: `
+          <p>Thuật toán Dijkstra giải quyết bài toán tìm đường đi ngắn nhất từ một đỉnh nguồn cố định đến tất cả các đỉnh còn lại trên đồ thị có trọng số cạnh không âm.</p>
+          <h4>Ý tưởng thuật toán:</h4>
+          <p>Tại mỗi bước, thuật toán luôn chọn đỉnh u chưa thăm có khoảng cách d[u] nhỏ nhất hiện tại bằng cách sử dụng <code>std::priority_queue</code>, sau đó nới lỏng (relax) tất cả các cạnh kề với u.</p>
+          <div class="code-preview">priority_queue&lt;pair&lt;long long, int&gt;, vector&lt;pair&lt;long long, int&gt;&gt;, greater&lt;pair&lt;long long, int&gt;&gt;&gt; pq;
+d[s] = 0;
+pq.push({0, s});
+while (!pq.empty()) {
+    auto [du, u] = pq.top(); pq.pop();
+    if (du > d[u]) continue;
+    for (auto edge : adj[u]) {
+        int v = edge.to; long long w = edge.weight;
+        if (d[v] > d[u] + w) {
+            d[v] = d[u] + w;
+            pq.push({d[v], v});
+        }
+    }
+}</div>
+        `
+      }
+    };
+
+    function openTopic(key) {
+      const topic = TOPIC_DETAILS[key] || {
+        title: "Chuyên đề thuật toán CodePro Wiki",
+        badge: "Chuyên sâu",
+        content: "<p>Nội dung chuyên đề đang được cập nhật thêm các ví dụ thực chiến và bài tập ứng dụng. Bạn có thể luyện tập các bài toán liên quan trong kho bài tập.</p>"
+      };
+
+      document.getElementById('modalContent').innerHTML = `
+        <span style="font-size:0.8rem; font-weight:700; color: var(--color-primary); text-transform:uppercase;">${topic.badge}</span>
+        <h2 style="font-size:1.75rem; color: var(--color-text); margin:0.5rem 0 1rem 0;">${topic.title}</h2>
+        <div style="color: var(--color-text-secondary); line-height:1.6;">${topic.content}</div>
+        <div style="margin-top:1.5rem; text-align:right;">
+          <a href="/problems" class="btn btn-primary" style="padding:0.5rem 1.25rem; font-size:0.88rem; text-decoration:none;">Vào kho bài tập rèn luyện &rarr;</a>
+        </div>
+      `;
+      document.getElementById('wikiModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('wikiModal').style.display = 'none';
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('.wiki-section').forEach(sec => {
+        if (cat === 'all' || sec.getAttribute('data-cat') === cat) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    }
+
+    function handleSearch() {
+      const q = document.getElementById('wikiSearchInput').value.toLowerCase().trim();
+      document.querySelectorAll('.topic-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    // Close on outside click
+    document.getElementById('wikiModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('wikiModal')) closeModal();
+    });
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

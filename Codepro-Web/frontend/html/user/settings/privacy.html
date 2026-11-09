@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <title>Đang chuyển hướng... | CodeProOJ</title>
+  <meta http-equiv="refresh" content="0; url=/frontend/html/profile/settings.html?tab=privacy">
+  <script>
+    const search = window.location.search;
+    const target = "/frontend/html/profile/settings.html?tab=privacy";
+    const sep = target.includes('?') ? '&' : '?';
+    const finalUrl = search ? (target + (search.startsWith('?') ? sep + search.slice(1) : sep + search)) : target;
+    window.location.replace(finalUrl);
+  </script>
+  <style>
+    body { background: var(--color-bg-secondary); color: var(--color-text-muted); font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div>Đang chuyển hướng đến <a href="/frontend/html/profile/settings.html?tab=privacy" style="color: var(--color-primary);">Đang chuyển hướng...</a>...</div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

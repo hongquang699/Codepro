@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cảnh báo đăng nhập tài khoản CodeProOJ</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #e2e8f0; margin: 0; padding: 24px; }
+    .card { max-width: 520px; margin: 0 auto; background: #1e293b; border-radius: 12px; border: 1px solid #334155; padding: 32px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .brand-title { font-size: 22px; font-weight: 700; color: #38bdf8; text-align: center; margin-bottom: 24px; }
+    h2 { font-size: 20px; color: #f8fafc; margin-bottom: 12px; text-align: center; }
+    p { font-size: 15px; line-height: 1.6; color: #94a3b8; margin: 8px 0; }
+    .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    .info-table td { padding: 10px; border-bottom: 1px solid #334155; }
+    .info-table td.label { color: #94a3b8; width: 35%; }
+    .info-table td.val { color: #f8fafc; font-weight: 600; }
+    .notice { font-size: 13px; color: #64748b; border-top: 1px solid #334155; padding-top: 16px; margin-top: 24px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand-title">CodeProOJ Security Alert</div>
+    <h2>Phát hiện đăng nhập mới</h2>
+    <p>Xin chào <strong>{{ username }}</strong>,</p>
+    <p>Tài khoản của bạn vừa được đăng nhập thành công với các thông tin sau:</p>
+
+    <table class="info-table">
+      <tr>
+        <td class="label">Thời gian:</td>
+        <td class="val">{{ timestamp }}</td>
+      </tr>
+      <tr>
+        <td class="label">Địa chỉ IP:</td>
+        <td class="val">{{ ip_address }}</td>
+      </tr>
+      <tr>
+        <td class="label">Thiết bị / OS:</td>
+        <td class="val">{{ device_os }}</td>
+      </tr>
+      <tr>
+        <td class="label">Trình duyệt:</td>
+        <td class="val">{{ browser }}</td>
+      </tr>
+    </table>
+
+    <p style="font-size: 13px; color: #ef4444;">Nếu bạn KHÔNG thực hiện thao tác đăng nhập này, hãy đổi mật khẩu tài khoản ngay lập tức và liên hệ ban quản trị để bảo vệ tài khoản của bạn.</p>
+
+    <div class="notice">
+      &copy; 2026 CodeProOJ Platform.
+    </div>
+  </div>
+</body>
+</html>

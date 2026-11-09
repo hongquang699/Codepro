@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Đề Bài Kỳ Thi | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">📝 Danh Sách Đề Bài Trong Kỳ Thi</h3>
+          <div>
+            <button onclick="openAddProblemModal()" class="ca-btn ca-btn-primary">
+              <cp-icon name="plus" size="sm"></cp-icon> Thêm Đề Bài
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="width:70px;text-align:center;">Mã</th>
+                <th>Tên Bài Tập</th>
+                <th style="text-align:center;">Điểm</th>
+                <th style="text-align:center;">Độ Khó</th>
+                <th style="text-align:center;">Trạng Thái</th>
+                <th style="text-align:center;">Đã Giải</th>
+                <th style="text-align:center;">Bài Nộp</th>
+                <th style="text-align:right;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="problemsTbody">
+              <tr><td colspan="8" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách bài...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Problem Modal -->
+  <div class="ca-modal-overlay" id="addProblemModal">
+    <div class="ca-modal-box" style="max-width:620px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">📝 Thêm Đề Bài Vào Kỳ Thi</h3>
+        <button onclick="closeAddProblemModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <div style="display:flex;gap:.5rem;margin-bottom:1.25rem;border-bottom: 1px solid var(--color-border-subtle);padding-bottom:.75rem;">
+        <button type="button" id="tabProbNew" onclick="switchProbTab('new')" class="ca-btn ca-btn-primary" style="padding:.4rem .9rem;font-size:.82rem;">
+          Tạo đề mới
+        </button>
+        <button type="button" id="tabProbExisting" onclick="switchProbTab('existing')" class="ca-btn ca-btn-secondary" style="padding:.4rem .9rem;font-size:.82rem;">
+          Chọn bài có sẵn
+        </button>
+      </div>
+
+      <!-- Mode 1: Create New -->
+      <form id="formCreateProb" onsubmit="event.preventDefault(); submitCreateProblem();">
+        <div class="ca-grid-2">
+          <div class="ca-form-group">
+            <label class="ca-form-label">Ký hiệu trong đề (Prefix)</label>
+            <input type="text" id="new_p_prefix" class="ca-input" placeholder="A, B, C..." style="font-family:monospace;text-transform:uppercase;">
+          </div>
+          <div class="ca-form-group">
+            <label class="ca-form-label">Mã bài (Code) *</label>
+            <input type="text" id="new_p_code" required class="ca-input" placeholder="VD: SUM_ARRAY" style="font-family:monospace;text-transform:uppercase;">
+          </div>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Tên bài tập *</label>
+          <input type="text" id="new_p_name" required class="ca-input" placeholder="Ví dụ: Tổng Các Số Trong Dãy">
+        </div>
+        <div class="ca-grid-2">
+          <div class="ca-form-group">
+            <label class="ca-form-label">Điểm số (Score)</label>
+            <input type="number" id="new_p_points" class="ca-input" value="100">
+          </div>
+          <div class="ca-form-group">
+            <label class="ca-form-label">Giới hạn thời gian (s)</label>
+            <input type="number" step="0.1" id="new_p_time" class="ca-input" value="1.0">
+          </div>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Nội dung đề bài (Markdown / KaTeX)</label>
+          <textarea id="new_p_desc" class="ca-textarea" rows="4" placeholder="Cho mảng A gồm N phần tử..."></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;">
+          <button type="button" onclick="closeAddProblemModal()" class="ca-btn ca-btn-secondary">Hủy</button>
+          <button type="submit" class="ca-btn ca-btn-primary">Tạo đề bài</button>
+        </div>
+      </form>
+
+      <!-- Mode 2: Link Existing -->
+      <form id="formLinkProb" style="display:none;" onsubmit="event.preventDefault(); submitLinkProblem();">
+        <div class="ca-grid-2">
+          <div class="ca-form-group">
+            <label class="ca-form-label">Ký hiệu trong đề (Prefix)</label>
+            <input type="text" id="link_p_prefix" class="ca-input" placeholder="A, B, C..." style="font-family:monospace;text-transform:uppercase;">
+          </div>
+          <div class="ca-form-group">
+            <label class="ca-form-label">Điểm số (Score)</label>
+            <input type="number" id="link_p_points" class="ca-input" value="100">
+          </div>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Mã bài tập từ hệ thống (Problem Code) *</label>
+          <input type="text" id="link_p_code" required class="ca-input" placeholder="Ví dụ: APLUS, SUMA, KNAPSACK...">
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;">
+          <button type="button" onclick="closeAddProblemModal()" class="ca-btn ca-btn-secondary">Hủy</button>
+          <button type="submit" class="ca-btn ca-btn-primary">Gán vào kỳ thi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Statement Modal -->
+  <div class="ca-modal-overlay" id="statementModal">
+    <div class="ca-modal-box" style="max-width:750px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 id="stmtModalTitle" style="margin:0;color: var(--color-text);font-size:1.15rem;">Chỉnh Sửa Đề Bài</h3>
+        <button onclick="closeStatementModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); saveStatement();">
+        <input type="hidden" id="stmt_prob_code">
+        <div class="ca-form-group">
+          <label class="ca-form-label">Tên bài tập</label>
+          <input type="text" id="stmt_prob_name" class="ca-input">
+        </div>
+        <div class="ca-grid-2">
+          <div class="ca-form-group">
+            <label class="ca-form-label">Giới hạn thời gian (s)</label>
+            <input type="number" step="0.1" id="stmt_prob_time" class="ca-input">
+          </div>
+          <div class="ca-form-group">
+            <label class="ca-form-label">Giới hạn bộ nhớ (KB)</label>
+            <input type="number" id="stmt_prob_memory" class="ca-input">
+          </div>
+        </div>
+        <div class="ca-form-group">
+          <label class="ca-form-label">Nội dung đề bài (Markdown)</label>
+          <textarea id="stmt_prob_content" class="ca-textarea" rows="10" style="font-family:monospace;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;">
+          <button type="button" onclick="closeStatementModal()" class="ca-btn ca-btn-secondary">Hủy</button>
+          <button type="submit" class="ca-btn ca-btn-primary">💾 Lưu Đề Bài</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Testcase Modal -->
+  <div class="ca-modal-overlay" id="testcasesModal">
+    <div class="ca-modal-box" style="max-width:750px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 id="tcModalTitle" style="margin:0;color: var(--color-text);font-size:1.15rem;">Quản Lý Bộ Test</h3>
+        <button onclick="closeTestcasesModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Add Test Form -->
+      <div style="background: var(--color-bg);padding:1rem;border: 1px solid var(--color-border-subtle);border-radius:8px;margin-bottom:1.25rem;">
+        <h4 style="margin:0 0 .75rem 0;color: var(--color-primary);font-size:.88rem;">➕ Thêm Testcase Mới</h4>
+        <input type="hidden" id="tc_prob_code">
+        <div class="ca-grid-2">
+          <div class="ca-form-group">
+            <label class="ca-form-label">Đầu vào (Input)</label>
+            <textarea id="new_tc_in" class="ca-textarea" rows="3" style="font-family:monospace;" placeholder="Nhập dữ liệu vào..."></textarea>
+          </div>
+          <div class="ca-form-group">
+            <label class="ca-form-label">Đầu ra (Output)</label>
+            <textarea id="new_tc_out" class="ca-textarea" rows="3" style="font-family:monospace;" placeholder="Nhập kết quả mẫu..."></textarea>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button type="button" onclick="submitAddTestcase()" class="ca-btn ca-btn-success" style="padding:.4rem .9rem;font-size:.82rem;">
+            Lưu testcase
+          </button>
+        </div>
+      </div>
+
+      <!-- Testcase List -->
+      <div style="max-height:240px;overflow-y:auto;">
+        <table class="ca-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tệp Input</th>
+              <th>Tệp Output</th>
+              <th>Kích thước</th>
+              <th style="text-align:right;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="tcTbody">
+            <tr><td colspan="5" style="text-align:center;padding:1.5rem;color: var(--color-text-muted);">Chưa có testcase nào.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('problems', contestKey);
+    ContestAdminUI.renderHeader('Quản Lý Đề Bài', `Danh sách các bài toán trong kỳ thi ${contestKey}`);
+
+    async function loadProblems() {
+      const res = await ContestAdminAPI.getProblems(contestKey);
+      const tbody = document.getElementById('problemsTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có đề bài nào trong kỳ thi.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(p => `
+        <tr>
+          <td style="font-family:monospace;font-weight:800;color: var(--color-primary);text-align:center;font-size:1.05rem;">
+            ${p.prefix}
+          </td>
+          <td>
+            <div style="font-weight:700;color: #fff;">${p.name}</div>
+            <div style="font-size:.74rem;color: var(--color-text-muted);font-family:monospace;">${p.code} &bull; ${p.time_limit}s &bull; ${Math.round(p.memory_limit/1024)}MB</div>
+          </td>
+          <td style="text-align:center;font-weight:700;">${p.points}</td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;background: ${p.difficulty === 'easy' ? 'rgba(16,185,129,.15);color: #10b981;' : (p.difficulty === 'medium' ? 'rgba(245,158,11,.15);color: #f59e0b;' : 'rgba(239,68,68,.15);color: #ef4444;')}">
+              ${p.difficulty.toUpperCase()}
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <span class="ca-badge ca-badge-running">READY</span>
+          </td>
+          <td style="text-align:center;font-weight:700;color: #10b981;">${p.solved_count}</td>
+          <td style="text-align:center;font-weight:700;">${p.submissions_count}</td>
+          <td style="text-align:right;white-space:nowrap;">
+            <button onclick="openStatementModal('${p.code}')" class="ca-btn ca-btn-secondary" style="padding:.28rem .6rem;font-size:.76rem;margin-right:3px;">
+              Đề bài
+            </button>
+            <button onclick="openTestcasesModal('${p.code}')" class="ca-btn ca-btn-secondary" style="padding:.28rem .6rem;font-size:.76rem;margin-right:3px;">
+              Testcase
+            </button>
+            <button onclick="rejudgeProblem('${p.code}')" class="ca-btn ca-btn-secondary" style="padding:.28rem .6rem;font-size:.76rem;margin-right:3px;">
+              Rejudge
+            </button>
+            <button onclick="removeProblem('${p.code}')" class="ca-btn ca-btn-danger" style="padding:.28rem .6rem;font-size:.76rem;">
+              Gỡ
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function switchProbTab(mode) {
+      document.getElementById('tabProbNew').className = mode === 'new' ? 'ca-btn ca-btn-primary' : 'ca-btn ca-btn-secondary';
+      document.getElementById('tabProbExisting').className = mode === 'existing' ? 'ca-btn ca-btn-primary' : 'ca-btn ca-btn-secondary';
+      document.getElementById('formCreateProb').style.display = mode === 'new' ? 'block' : 'none';
+      document.getElementById('formLinkProb').style.display = mode === 'existing' ? 'block' : 'none';
+    }
+
+    function openAddProblemModal() {
+      document.getElementById('addProblemModal').classList.add('open');
+    }
+    function closeAddProblemModal() {
+      document.getElementById('addProblemModal').classList.remove('open');
+    }
+
+    async function submitCreateProblem() {
+      const code = document.getElementById('new_p_code').value.trim().toUpperCase();
+      const prefix = document.getElementById('new_p_prefix').value.trim().toUpperCase();
+      const name = document.getElementById('new_p_name').value.trim();
+      const points = parseFloat(document.getElementById('new_p_points').value) || 100;
+      const time_limit = parseFloat(document.getElementById('new_p_time').value) || 1.0;
+      const description = document.getElementById('new_p_desc').value.trim();
+
+      const res = await ContestAdminAPI.addProblem(contestKey, {
+        is_new: true, code, prefix, name, points, time_limit, description
+      });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeAddProblemModal();
+        loadProblems();
+      }
+    }
+
+    async function submitLinkProblem() {
+      const code = document.getElementById('link_p_code').value.trim().toUpperCase();
+      const prefix = document.getElementById('link_p_prefix').value.trim().toUpperCase();
+      const points = parseFloat(document.getElementById('link_p_points').value) || 100;
+
+      const res = await ContestAdminAPI.addProblem(contestKey, {
+        is_new: false, code, prefix, points
+      });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeAddProblemModal();
+        loadProblems();
+      }
+    }
+
+    async function removeProblem(code) {
+      if (!confirm(`Bạn có chắc chắn muốn gỡ bài tập ${code} khỏi kỳ thi?`)) return;
+      const res = await ContestAdminAPI.removeProblem(contestKey, code);
+      alert(res.message || res.error);
+      loadProblems();
+    }
+
+    async function rejudgeProblem(code) {
+      if (!confirm(`Bạn có chắc chắn muốn rejudge toàn bộ bài nộp của ${code}?`)) return;
+      const res = await ContestAdminAPI.rejudge(contestKey, { problem_code: code });
+      alert(res.message || res.error);
+    }
+
+    // Statement Modal
+    async function openStatementModal(code) {
+      const res = await ContestAdminAPI.getStatement(contestKey, code);
+      if (res.data) {
+        document.getElementById('stmtModalTitle').textContent = `Chỉnh Sửa Đề Bài: ${code}`;
+        document.getElementById('stmt_prob_code').value = code;
+        document.getElementById('stmt_prob_name').value = res.data.name;
+        document.getElementById('stmt_prob_time').value = res.data.time_limit;
+        document.getElementById('stmt_prob_memory').value = res.data.memory_limit;
+        document.getElementById('stmt_prob_content').value = res.data.statement;
+        document.getElementById('statementModal').classList.add('open');
+      }
+    }
+    function closeStatementModal() {
+      document.getElementById('statementModal').classList.remove('open');
+    }
+
+    async function saveStatement() {
+      const code = document.getElementById('stmt_prob_code').value;
+      const statement = document.getElementById('stmt_prob_content').value;
+      const name = document.getElementById('stmt_prob_name').value;
+      const time_limit = document.getElementById('stmt_prob_time').value;
+      const memory_limit = document.getElementById('stmt_prob_memory').value;
+
+      const res = await ContestAdminAPI.updateStatement(contestKey, code, statement);
+      alert(res.message || res.error);
+      closeStatementModal();
+      loadProblems();
+    }
+
+    // Testcase Modal
+    async function openTestcasesModal(code) {
+      document.getElementById('tcModalTitle').textContent = `Bộ Test Bài Tập: ${code}`;
+      document.getElementById('tc_prob_code').value = code;
+      document.getElementById('testcasesModal').classList.add('open');
+      loadTestcases(code);
+    }
+    function closeTestcasesModal() {
+      document.getElementById('testcasesModal').classList.remove('open');
+    }
+
+    async function loadTestcases(code) {
+      const res = await ContestAdminAPI.getTestcases(contestKey, code);
+      const tbody = document.getElementById('tcTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color: var(--color-text-muted);">Chưa có testcase nào.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = res.data.map(t => `
+        <tr>
+          <td style="font-family:monospace;font-weight:700;color: var(--color-primary);">#${t.id}</td>
+          <td style="font-family:monospace;">${t.input_file}</td>
+          <td style="font-family:monospace;">${t.output_file || '—'}</td>
+          <td>${t.input_size} B / ${t.output_size} B</td>
+          <td style="text-align:right;">
+            <button onclick="deleteTc('${code}', '${t.id}')" class="ca-btn ca-btn-danger" style="padding:.2rem .5rem;font-size:.74rem;">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function submitAddTestcase() {
+      const code = document.getElementById('tc_prob_code').value;
+      const input = document.getElementById('new_tc_in').value;
+      const output = document.getElementById('new_tc_out').value;
+      if (!input && !output) {
+        alert('Vui lòng nhập input hoặc output!');
+        return;
+      }
+      const res = await ContestAdminAPI.addTestcase(contestKey, code, { input, output });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        document.getElementById('new_tc_in').value = '';
+        document.getElementById('new_tc_out').value = '';
+        loadTestcases(code);
+      }
+    }
+
+    async function deleteTc(code, id) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa testcase #${id}?`)) return;
+      const res = await ContestAdminAPI.deleteTestcase(contestKey, code, id);
+      alert(res.message || res.error);
+      loadTestcases(code);
+    }
+
+    loadProblems();
+  </script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+/**
+ * CodeProOJ - Modern Global Design System & Theme Engine
+ * Features:
+ * - High-end typography (Plus Jakarta Sans & JetBrains Mono)
+ * - Complete Dark / Light mode color variables
+ * - No underline design across all links
+ * - Clean elevation, card borders, and smooth transitions
+ */
+
+/* Serve the primary UI fonts locally so page rendering does not wait on Google Fonts. */
+@import url('/frontend/css/global/fonts.css');
+
+/* ══════════════════════════════════════════════════════════════════════
+   1. COLOR TOKENS: LIGHT (DEFAULT) — HẢI ĐỒ & BẢNG THỦY TRIỀU
+   Chart-paper ground, deep-sea ink, one alert color reserved for change.
+   ══════════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="light"] {
+  --color-primary: #0a5c8f;
+  --color-primary-hover: #08486f;
+  --color-primary-active: #063a5a;
+  --color-primary-glow: rgba(10, 92, 143, 0.16);
+  --color-primary-subtle: rgba(10, 92, 143, 0.08);
+
+  --color-success: #16734a;
+  --color-success-bg: rgba(22, 115, 74, 0.12);
+  --color-danger: #b4232d;
+  --color-danger-bg: rgba(180, 35, 45, 0.11);
+  --color-warning: #a35a00;
+  --color-warning-bg: rgba(163, 90, 0, 0.12);
+  --color-info: #0a6d9c;
+  /* The one alert color: a row or value that has just changed. */
+  --color-alert: #d4520a;
+  --color-alert-bg: rgba(212, 82, 10, 0.12);
+
+  /* Chart-paper background & surfaces */
+  --color-bg: #eef3f5;
+  --color-bg-secondary: #e3ecef;
+  --color-surface: #fbfdfd;
+  --color-surface-hover: #f0f6f7;
+  --color-card: #fbfdfd;
+  --color-card-hover: #f5f9fa;
+  --color-card-border: #c6d5db;
+  --color-border: #c6d5db;
+  --color-border-subtle: #dbe6ea;
+
+  /* Ink typography */
+  --color-text: #0b2236;
+  --color-text-secondary: #2c4558;
+  --color-text-muted: #4d6678;
+  --color-text-dim: #587181;
+
+  /* Component tokens */
+  --navbar-bg: rgba(251, 253, 253, 0.92);
+  --navbar-border: rgba(11, 34, 54, 0.14);
+  --table-header-bg: #e1ebee;
+  --table-border: #cfdde2;
+  --table-row-even: #f4f8f9;
+  --table-row-hover: rgba(10, 92, 143, 0.07);
+  --code-bg: #e3ecef;
+  --code-color: #0a5c8f;
+  --input-bg: #ffffff;
+  --input-border: #9fb3bd;
+  --input-focus-border: #0a5c8f;
+  --pill-bg: #e3ecef;
+  --modal-bg: #fbfdfd;
+
+  /* Elevation: hairline, chart-like */
+  --shadow-sm: 0 1px 0 rgba(11, 34, 54, 0.05);
+  --shadow-md: 0 2px 6px -1px rgba(11, 34, 54, 0.10);
+  --shadow-lg: 0 10px 20px -6px rgba(11, 34, 54, 0.16);
+
+  /* Fonts */
+  --font-family-base: 'Be Vietnam Pro', 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Border radius: precise, not consumer-soft */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   2. COLOR TOKENS: DARK — NIGHT CHART
+   ══════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --color-primary: #4fb0e6;
+  --color-primary-hover: #7cc6ef;
+  --color-primary-active: #a4d8f4;
+  --color-primary-glow: rgba(79, 176, 230, 0.25);
+  --color-primary-subtle: rgba(79, 176, 230, 0.12);
+
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.15);
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(248, 113, 113, 0.15);
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.15);
+  --color-info: #38bdf8;
+  --color-alert: #ff8a3d;
+  --color-alert-bg: rgba(255, 138, 61, 0.16);
+
+  --color-bg: #07131f;
+  --color-bg-secondary: #0b1c2b;
+  --color-surface: #0e2233;
+  --color-surface-hover: #14304a;
+  --color-card: #0e2233;
+  --color-card-hover: #123049;
+  --color-card-border: #1d3a50;
+  --color-border: #1d3a50;
+  --color-border-subtle: #162d40;
+
+  --color-text: #e8f1f5;
+  --color-text-secondary: #c2d3dc;
+  --color-text-muted: #93abb9;
+  --color-text-dim: #6f8a9a;
+
+  --navbar-bg: rgba(11, 28, 43, 0.88);
+  --navbar-border: rgba(232, 241, 245, 0.10);
+  --table-header-bg: #12293c;
+  --table-border: #1d3a50;
+  --table-row-even: rgba(232, 241, 245, 0.025);
+  --table-row-hover: rgba(79, 176, 230, 0.09);
+  --code-bg: #050e17;
+  --code-color: #7cc6ef;
+  --input-bg: #0b1c2b;
+  --input-border: #2c4d66;
+  --input-focus-border: #4fb0e6;
+  --pill-bg: rgba(232, 241, 245, 0.07);
+  --modal-bg: #0e2233;
+
+  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px -4px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   3. GLOBAL TYPOGRAPHY, RESET & NO-UNDERLINE RULE
+   ══════════════════════════════════════════════════════════════════════ */
+html {
+  font-family: var(--font-family-base);
+  color-scheme: light dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* STRICT NO-UNDERLINE ACROSS ALL WEBPAGES AS EXPLICITLY REQUESTED */
+a, a:visited, a:hover, a:focus, a:active,
+.nav-links a, .nav-links a:hover,
+.ranking-tab, .ranking-tab:hover,
+.btn-hero, .btn-hero:hover,
+.more-link, .more-link:hover,
+.prob-link, .prob-link:hover,
+.title-link, .title-link:hover,
+.code-badge, .code-badge:hover,
+.admin-nav-item, .admin-nav-item:hover,
+.footer-links a, .footer-links a:hover {
+  text-decoration: none !important;
+}
+
+/* Links gentle highlight instead of underline */
+a {
+  color: var(--color-primary);
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+  opacity: 0.92;
+}
+
+/* Clean Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* Tables in Light & Dark Mode */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background: var(--table-header-bg) !important;
+  color: var(--color-text-muted) !important;
+  border-bottom: 1px solid var(--table-border) !important;
+  font-weight: 700;
+}
+
+td {
+  border-bottom: 1px solid var(--table-border) !important;
+  color: var(--color-text);
+}
+
+tbody tr:hover {
+  background: var(--table-row-hover) !important;
+}
+
+/* Card, Input & Modal components */
+.card, .home-card, .profile-card, .table-card, .filter-card, .submissions-card, .ranking-card, .sidebar-card, .stat-card-item, .stat-box, .wiki-preview-card, .modal-card, .example-box {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-card-border) !important;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+input, select, textarea,
+.search-input, .filter-select, .filter-input, .ranking-input, .ranking-select, .lang-dropdown {
+  background-color: var(--input-bg) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus,
+.search-input:focus, .filter-select:focus, .filter-input:focus, .ranking-input:focus, .ranking-select:focus {
+  border-color: var(--input-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
+}
+
+/* Navbar theme adaptation */
+.navbar {
+  background: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--navbar-border) !important;
+}
+
+.brand-text {
+  color: var(--color-text) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   4. FULL COMPREHENSIVE LIGHT THEME OVERRIDES (100% LIGHT MODE)
+   ══════════════════════════════════════════════════════════════════════ */
+[data-theme="light"] body,
+[data-theme="light"] .page-wrapper,
+[data-theme="light"] .ranking-page,
+[data-theme="light"] .container-main,
+[data-theme="light"] main,
+[data-theme="light"] .hero-container {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .app-footer,
+[data-theme="light"] footer {
+  background: var(--color-surface) !important;
+  border-top: 1px solid var(--color-border) !important;
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="light"] .app-footer .footer-copyright,
+[data-theme="light"] footer div {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="light"] .app-footer a,
+[data-theme="light"] footer a {
+  color: var(--color-primary) !important;
+}
+
+[data-theme="light"] .statement-content,
+[data-theme="light"] .prob-tab-panel {
+  background: var(--color-surface) !important;
+  color: var(--color-text-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .statement-content h1,
+[data-theme="light"] .statement-content h2,
+[data-theme="light"] .statement-content h3,
+[data-theme="light"] .statement-content strong,
+[data-theme="light"] .prob-title,
+[data-theme="light"] .page-hdr h1 {
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .statement-content pre {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .statement-content code {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent) !important;
+  color: var(--color-primary-hover) !important;
+}
+
+[data-theme="light"] .example-box,
+[data-theme="light"] .example-header {
+  background: var(--color-surface-hover) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .example-pre {
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .editor-wrapper,
+[data-theme="light"] .editor-bar {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] textarea#codeArea {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .prob-tabs {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .prob-tab {
+  color: var(--color-text-muted) !important;
+}
+
+[data-theme="light"] .prob-tab.active {
+  color: var(--color-primary) !important;
+  border-bottom-color: var(--color-primary) !important;
+  background: var(--color-surface) !important;
+}
+
+[data-theme="light"] .btn-hero-secondary,
+[data-theme="light"] .btn-reset,
+[data-theme="light"] .btn-secondary,
+[data-theme="light"] .page-btn,
+[data-theme="light"] .tag-btn:not(.active),
+[data-theme="light"] .ranking-tab:not(.active) {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] .btn-hero-secondary:hover,
+[data-theme="light"] .btn-reset:hover,
+[data-theme="light"] .page-btn:hover,
+[data-theme="light"] .tag-btn:not(.active):hover,
+[data-theme="light"] .ranking-tab:not(.active):hover {
+  background: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .title-link,
+[data-theme="light"] .ranking-title-group h1,
+[data-theme="light"] .list-title,
+[data-theme="light"] .home-card-title {
+  color: var(--color-text) !important;
+}
+
+[data-theme="light"] .tag-chip,
+[data-theme="light"] .pill-tag {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent) !important;
+  color: var(--color-primary) !important;
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
+[data-theme="light"] .meta-pill {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Dark inline surfaces belong to panels; resolve them to the shared light surface. */
+[data-theme="light"] [style*="background: #0"],
+[data-theme="light"] [style*="background:#0"],
+[data-theme="light"] [style*="background: #1"],
+[data-theme="light"] [style*="background:#1"],
+[data-theme="light"] [style*="background: #23"],
+[data-theme="light"] [style*="background:#23"] {
+  background: var(--color-card) !important;
+  border-color: var(--color-card-border) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   5. THEME & LANGUAGE CONTROLLER BUTTONS STYLING
+   ══════════════════════════════════════════════════════════════════════ */
+.theme-toggle-btn, .lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--pill-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.theme-toggle-btn:hover, .lang-toggle-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   6. LIGHT THEME COMPONENT COLORS
+   Shared semantic colors for pages with or without site-refresh.css.
+   ══════════════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-success-bg: rgba(22, 128, 79, .11);
+  --color-danger-bg: rgba(185, 42, 51, .10);
+  --color-warning-bg: rgba(161, 93, 0, .12);
+  --color-info-bg: rgba(2, 109, 173, .10);
+  --color-accent: var(--color-accent);
+}
+
+[data-theme="light"] :is(.card, .home-card, .profile-card, .table-card, .filter-card,
+  .submissions-card, .ranking-card, .sidebar-card, .stat-card-item, .stat-box,
+  .wiki-preview-card, .modal-card, .panel, .auth-card, .admin-card, .admin-panel,
+  .admin-section, .dashboard-card, .settings-card, .worker-card, .queue-card,
+  .language-card, .monitoring-card, .log-card, .form-card, .content-card) {
+  background-color: var(--color-card) !important;
+  border-color: var(--color-card-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] :is(.admin-sidebar, .admin-nav, .sidebar, .side, .page-sidebar) {
+  background-color: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] :is(.admin-sidebar a, .admin-nav a, .sidebar a, .side a, .page-sidebar a) {
+  color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] :is(.admin-sidebar a:hover, .admin-nav a:hover, .sidebar a:hover,
+  .side a:hover, .page-sidebar a:hover, .admin-sidebar a.active, .admin-nav a.active,
+  .sidebar a.active, .side a.active, .page-sidebar a.active) {
+  background-color: var(--color-primary-subtle) !important;
+  color: var(--color-primary) !important;
+}
+
+[data-theme="light"] :is(table, .data-table, .prob-tbl, .ranking-table,
+  .submissions-table, .table-responsive) {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="light"] :is(tbody tr:nth-child(even), .table-row:nth-child(even)) {
+  background-color: var(--table-row-even);
+}
+
+[data-theme="light"] :is(th, .table-header, .data-table thead, .prob-tbl thead,
+  .ranking-table thead, .submissions-table thead) {
+  background-color: var(--table-header-bg) !important;
+  color: var(--color-text-secondary) !important;
+  border-color: var(--table-border) !important;
+}
+
+[data-theme="light"] :is(td, th, tr, .table-row) {
+  border-color: var(--table-border) !important;
+}
+
+[data-theme="light"] :is(.filter-bar, .filter-panel, .search-panel, .toolbar,
+  .tabs, .tab-list, .pagination, .breadcrumb, .admin-toolbar) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+[data-theme="light"] :is(.badge, .status-badge, .status-pill, .tag-chip, .pill-tag, .meta-pill) {
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] :is(.badge-success, .status-success, .status-online, .verdict-ac,
+  .text-success) { color: #16734a !important; }
+[data-theme="light"] :is(.badge-danger, .status-danger, .status-error, .verdict-wa,
+  .text-danger) { color: #b4232d !important; }
+[data-theme="light"] :is(.badge-warning, .status-warning, .text-warning) { color: #8a5000 !important; }
+
+[data-theme="light"] :is(pre, .code-block, .code-panel, .terminal, .editor-wrapper,
+  .editor-bar, .monaco-editor, .cm-editor) {
+  background-color: var(--code-bg);
+  border-color: var(--color-border);
+}
+
+[data-theme="light"] :is(.app-footer, footer) {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-muted) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   7. HẢI ĐỒ & BẢNG THỦY TRIỀU: signature language
+   Tabular numerals for every score, hairline rules, one alert color for
+   rows that just changed rank (the row stays lit until it is noticed).
+   ══════════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="light"] { --color-on-primary: #ffffff; }
+[data-theme="dark"] { --color-on-primary: #04202f; color-scheme: dark; }
+
+/* Text on a filled primary control must follow the theme. */
+:is(.btn-primary, .auth-btn-primary, .btn-contest-submit-cta, .btn-main-submit,
+  .ca-btn-primary, .comm-btn-primary, .btn-hero:not(.btn-hero-secondary),
+  .tag-btn.active, .ranking-tab.active, .page-btn.active) {
+  color: var(--color-on-primary) !important;
+}
+
+/* Numbers align by place value everywhere. */
+table, td, th, .score, .rank, .rating, .penalty, .count, .stat-value,
+.stat-number, .code-badge, time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Table headers read as chart legends: small, quiet, ruled. */
+th {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Scoreboard rows */
+.rank-cell { font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.rank-cell.rank-top { color: var(--color-primary); }
+.rank-cell.rank-1::after,
+.rank-cell.rank-2::after,
+.rank-cell.rank-3::after {
+  content: "";
+  display: inline-block;
+  width: 0.4rem; height: 0.4rem;
+  margin-left: 0.35rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  opacity: 1;
+  vertical-align: middle;
+}
+.rank-cell.rank-2::after { opacity: 0.6; }
+.rank-cell.rank-3::after { opacity: 0.35; }
+.score-cell { font-weight: 700; font-size: 1.05rem; color: var(--color-success); font-variant-numeric: tabular-nums; }
+.penalty-cell { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.user-link { font-weight: 600; color: var(--color-primary); }
+.scoreboard-message { text-align: center; padding: 2rem; color: var(--color-text-muted); }
+.scoreboard-message.is-error { color: var(--color-danger); }
+
+/* A row that moved: the alert color holds until the visitor notices it. */
+tr.rank-changed > td { background: var(--color-alert-bg) !important; }
+tr.rank-changed > td:first-child { box-shadow: inset 3px 0 0 var(--color-alert); }
+tr.rank-changed[data-change="up"] > td:first-child::before { content: "▲"; color: var(--color-alert); margin-right: 0.3rem; font-size: 0.7em; }
+tr.rank-changed[data-change="down"] > td:first-child::before { content: "▼"; color: var(--color-alert); margin-right: 0.3rem; font-size: 0.7em; }
+tr[data-user]:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }

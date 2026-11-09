@@ -1,0 +1,12 @@
+<form id="twoFactorForm" class="auth-form">
+  <div class="auth-form-group">
+    <label class="auth-label" for="twoFactorCode">Mã xác thực 6 chữ số</label>
+    <div class="auth-input-wrap">
+      <input type="text" id="twoFactorCode" class="auth-input" placeholder="000000" maxlength="8" pattern="[0-9A-Za-z]+" autofocus required style="text-align: center; font-size: 1.3rem; letter-spacing: 4px;">
+    </div>
+    <span class="auth-subtitle" style="font-size: 0.8rem; margin-top: 4px;">Nhập mã từ Google Authenticator hoặc mã dự phòng của bạn</span>
+  </div>
+  <button type="submit" id="twoFactorSubmitBtn" class="auth-btn-primary">
+    <span>Xác nhận</span>
+  </button>
+</form>

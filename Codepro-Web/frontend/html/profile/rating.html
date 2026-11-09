@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biểu đồ Rating | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <style>
+    /* Rating Legend Strip */
+    .rating-tier-legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+      padding: 0.65rem 1rem;
+      background: color-mix(in srgb, var(--color-card) 60%, transparent);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+    .legend-tier-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+    .legend-tier-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <!-- Rating Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="num" id="cardCurrentRating" style="color: var(--color-text-muted);">0</div>
+        <div class="desc">Rating hiện tại</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="cardMaxRating" style="color: var(--color-text-muted);">0</div>
+        <div class="desc">Rating cao nhất</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="cardRank" style="color: var(--color-text-muted); font-size: 1.35rem;">Unrated</div>
+        <div class="desc">Cấp bậc Elo</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="cardContestsCount" style="color: #a855f7;">0</div>
+        <div class="desc">Số kỳ thi đã tham gia</div>
+      </div>
+    </div>
+
+    <!-- Rating Graph Card -->
+    <div class="profile-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem;">
+        <h3 class="profile-card-title" style="margin: 0;">📈 Biểu đồ lịch sử biến động Rating</h3>
+      </div>
+
+      <!-- Rating Tiers Legend -->
+      <div class="rating-tier-legend">
+        <span style="color: var(--color-text-muted); font-weight:700; margin-right:4px;">HỆ THỐNG MÀU:</span>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #94a3b8;"></span> <span style="color: var(--color-text-muted);">&lt; 1200 Newbie</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #06b6d4;"></span> <span style="color: var(--color-primary);">1200-1399 Pupil</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #10b981;"></span> <span style="color: #10b981;">1400-1599 Specialist</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: var(--color-primary);"></span> <span style="color: var(--color-primary);">1600-1899 Expert</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #a855f7;"></span> <span style="color: #a855f7;">1900-2099 Candidate Master</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #f97316;"></span> <span style="color: #f97316;">2100-2399 Master</span></div>
+        <div class="legend-tier-item"><span class="legend-tier-dot" style="background: #ef4444;"></span> <span style="color: #ef4444;">2400+ Grandmaster</span></div>
+      </div>
+
+      <div id="ratingSvgChart" style="width: 100%; min-height: 280px; display: flex; align-items: center; justify-content: center;">
+        <div style="color: var(--color-text-muted);">Đang vẽ biểu đồ rating...</div>
+      </div>
+    </div>
+
+    <!-- Rating History Events Table -->
+    <div class="profile-card">
+      <h3 class="profile-card-title"><cp-icon name="document" size="sm"></cp-icon> Lịch sử chi tiết các mốc Rating</h3>
+      <div style="overflow-x: auto;">
+        <table class="profile-table">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">#</th>
+              <th>Kỳ thi / Sự kiện</th>
+              <th style="width: 120px; text-align: center;">Rating cũ</th>
+              <th style="width: 120px; text-align: center;">Rating mới</th>
+              <th style="width: 120px; text-align: center;">Thay đổi</th>
+              <th style="width: 100px; text-align: center;">Thứ hạng</th>
+              <th style="width: 140px;">Ngày ghi nhận</th>
+            </tr>
+          </thead>
+          <tbody id="ratingHistoryTbody">
+            <tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Đang tải lịch sử...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    // ── Competitive Programming Rating Tiers ───────────────────
+    const RATING_TIERS = [
+      { min: 2400, max: 3500, name: 'Grandmaster',      color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' },
+      { min: 2100, max: 2399, name: 'Master',            color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' },
+      { min: 1900, max: 2099, name: 'Candidate Master', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.12)' },
+      { min: 1600, max: 1899, name: 'Expert',            color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)' },
+      { min: 1400, max: 1599, name: 'Specialist',        color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
+      { min: 1200, max: 1399, name: 'Pupil',             color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
+      { min: 0,    max: 1199, name: 'Newbie',            color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.08)' }
+    ];
+
+    function getRatingTier(rating) {
+      return RATING_TIERS.find(t => rating >= t.min) || RATING_TIERS[RATING_TIERS.length - 1];
+    }
+
+    function getRatingColor(rating) {
+      return getRatingTier(rating).color;
+    }
+
+    async function init() {
+      const data = await ProfileAPI.getOverview(username);
+      document.title = `Rating - ${data.profile.display_name || username} (@${username})`;
+      ProfileAPI.renderHeader('profileHeaderContainer', data, 'rating');
+
+      const r = data.rating || {};
+      const contestsCount = Number(r.contest_count || data.statistics?.contests || 0);
+      const ratingVal = (contestsCount > 0 && r.rating !== undefined && r.rating !== null) ? Number(r.rating) : (contestsCount > 0 ? (Number(data.profile?.rating) || 0) : 0);
+      const rankName = contestsCount > 0 ? (r.rank || data.profile?.rank || 'Newbie') : 'Unrated';
+      const rankColor = contestsCount > 0 ? ProfileAPI.getRankColor(rankName, ratingVal) : '#94a3b8';
+
+      document.getElementById('cardCurrentRating').textContent = ratingVal;
+      document.getElementById('cardCurrentRating').style.color = rankColor;
+      const maxVal = contestsCount > 0 ? ((r.max_rating !== undefined && r.max_rating !== null) ? Number(r.max_rating) : ratingVal) : 0;
+      document.getElementById('cardMaxRating').textContent = maxVal;
+      document.getElementById('cardMaxRating').style.color = contestsCount > 0 ? ProfileAPI.getRankColor(null, maxVal) : '#94a3b8';
+      document.getElementById('cardRank').textContent = rankName;
+      document.getElementById('cardRank').style.color = rankColor;
+      document.getElementById('cardContestsCount').textContent = contestsCount;
+
+      // Load rating history
+      try {
+        const histRes = await ProfileAPI.getRatingHistory(username);
+        let history = histRes.history || [];
+
+        // If user has not participated in rated contests, keep history empty
+        if (contestsCount === 0 || ratingVal === 0) {
+          history = [];
+        }
+
+        renderHistoryTable(history);
+        renderSvgChart(history, ratingVal);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderHistoryTable(history) {
+      const tbody = document.getElementById('ratingHistoryTbody');
+      if (!history || history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Chưa có lịch sử biến động rating (Rating hiện tại: 0 - Unrated).</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = history.map((h, i) => {
+        const ch = h.change || 0;
+        const chColor = ch > 0 ? '#10b981' : (ch < 0 ? '#ef4444' : '#94a3b8');
+        const chText = ch > 0 ? `+${ch}` : `${ch}`;
+        const tier = getRatingTier(h.new_rating);
+
+        return `
+          <tr>
+            <td style="text-align: center; color: var(--color-text-muted);">${i + 1}</td>
+            <td style="font-weight: 700; color: var(--color-text);">${h.contest_name || 'Kỳ thi'}</td>
+            <td style="text-align: center; color: var(--color-text-muted); font-family: monospace;">${h.old_rating}</td>
+            <td style="text-align: center; font-weight: 800; color: ${tier.color}; font-family: monospace;">${h.new_rating}</td>
+            <td style="text-align: center; font-weight: 800; color: ${chColor}; font-family: monospace;">${chText}</td>
+            <td style="text-align: center; color: #f59e0b; font-weight: 700;">${h.rank ? '#' + h.rank : '—'}</td>
+            <td style="color: var(--color-text-muted); font-size: 0.85rem;">${h.date || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderSvgChart(history, currentRating = 0) {
+      const c = document.getElementById('ratingSvgChart');
+      if (!history || history.length === 0 || currentRating === 0) {
+        c.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;color: var(--color-text-muted);gap:0.75rem;padding:2rem;">
+            <div style="font-size:3rem;font-weight:900;color: var(--color-text-dim);font-family:monospace;">0</div>
+            <div style="font-size:1.05rem;font-weight:700;color: var(--color-text-secondary);">Chưa có dữ liệu đồ thị rating</div>
+            <div style="font-size:0.85rem;color: var(--color-text-dim);max-width:480px;text-align:center;">
+              Tài khoản hiện đang có Rating là <strong>0 (Unrated)</strong>. Đồ thị sẽ tự động kích hoạt và ghi nhận lịch sử sau khi bạn tham gia kỳ thi có tính rate đầu tiên.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const ratings = history.map(h => h.new_rating);
+      const rawMin = Math.min(...ratings);
+      const rawMax = Math.max(...ratings);
+
+      // Pad range to comfortably show adjacent rating tier boundaries
+      const minR = Math.max(900, Math.floor((rawMin - 150) / 300) * 300);
+      const maxR = Math.max(minR + 600, Math.ceil((rawMax + 200) / 300) * 300);
+      const range = maxR - minR || 1;
+
+      const w = 900;
+      const h = 340;
+      const padLeft = 65;
+      const padRight = 140;
+      const padTop = 30;
+      const padBottom = 40;
+      const chartW = w - padLeft - padRight;
+      const chartH = h - padTop - padBottom;
+
+      const yOf = (r) => padTop + chartH - ((r - minR) / range) * chartH;
+      const xOf = (i) => padLeft + (ratings.length === 1 ? chartW / 2 : (i / (ratings.length - 1)) * chartW);
+
+      // 1. Draw Background Rating Bands & Threshold Lines
+      let bandsSvg = '';
+      let gridLinesSvg = '';
+
+      RATING_TIERS.forEach(t => {
+        const topVal = Math.min(maxR, t.max);
+        const botVal = Math.max(minR, t.min);
+        if (topVal > botVal) {
+          const yTop = yOf(topVal);
+          const yBot = yOf(botVal);
+          const bandHeight = yBot - yTop;
+
+          // Background colored strip
+          bandsSvg += `<rect x="${padLeft}" y="${yTop}" width="${chartW}" height="${bandHeight}" fill="${t.bg}"/>`;
+          
+          // Threshold line & label at tier minimum
+          if (t.min >= minR && t.min <= maxR) {
+            const lineY = yOf(t.min);
+            gridLinesSvg += `
+              <line x1="${padLeft}" y1="${lineY}" x2="${padLeft + chartW}" y2="${lineY}" stroke="${t.color}" stroke-opacity="0.35" stroke-dasharray="4,4"/>
+              <text x="${padLeft - 10}" y="${lineY + 4}" fill="#94a3b8" font-size="11" font-weight="700" text-anchor="end" font-family="monospace">${t.min}</text>
+              <text x="${padLeft + chartW + 8}" y="${lineY + 4}" fill="${t.color}" font-size="11" font-weight="700">${t.name}</text>
+            `;
+          }
+        }
+      });
+
+      // 2. Data Points
+      const pts = ratings.map((r, i) => ({
+        x: xOf(i),
+        y: yOf(r),
+        r,
+        tier: getRatingTier(r),
+        h: history[i]
+      }));
+
+      // 3. Colored Segments & Gradient Defs
+      let defsSvg = '';
+      let segmentsSvg = '';
+
+      if (pts.length > 1) {
+        for (let i = 1; i < pts.length; i++) {
+          const p1 = pts[i - 1];
+          const p2 = pts[i];
+          const gradId = `seg_grad_${i}`;
+
+          defsSvg += `
+            <linearGradient id="${gradId}" x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="${p1.tier.color}"/>
+              <stop offset="100%" stop-color="${p2.tier.color}"/>
+            </linearGradient>
+          `;
+
+          segmentsSvg += `
+            <line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="url(#${gradId})" stroke-width="3.5" stroke-linecap="round"/>
+          `;
+        }
+      }
+
+      // 4. Data Nodes & Glow Effect
+      let nodesSvg = '';
+      pts.forEach((p, idx) => {
+        const isCurrent = idx === pts.length - 1;
+        const changeVal = p.h.change || 0;
+        const changeStr = changeVal > 0 ? `+${changeVal}` : `${changeVal}`;
+        const tooltip = `${p.h.contest_name || 'Kỳ thi'}\nRank: #${p.h.rank || '—'}\nRating: ${p.r} (${changeStr})\nNgày: ${p.h.date || '—'}`;
+
+        nodesSvg += `
+          <g class="chart-point" style="cursor: pointer;">
+            ${isCurrent ? `
+              <circle cx="${p.x}" cy="${p.y}" r="12" fill="${p.tier.color}" fill-opacity="0.25">
+                <animate attributeName="r" values="8;13;8" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="fill-opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            ` : ''}
+            <circle cx="${p.x}" cy="${p.y}" r="5.5" fill="${p.tier.color}" stroke="#ffffff" stroke-width="2.5">
+              <title>${tooltip}</title>
+            </circle>
+            <text x="${p.x}" y="${p.y - 12}" fill="${p.tier.color}" font-size="11" font-weight="800" text-anchor="middle" font-family="monospace">${p.r}</text>
+          </g>
+        `;
+      });
+
+      // 5. Assemble Complete Responsive SVG
+      c.innerHTML = `
+        <div style="width: 100%; overflow-x: auto; padding: 0.5rem 0;">
+          <svg viewBox="0 0 ${w} ${h}" style="width: 100%; min-width: 650px; max-height: 360px; overflow: visible;">
+            <defs>
+              ${defsSvg}
+            </defs>
+
+            <!-- 1. Background Rating Bands -->
+            ${bandsSvg}
+
+            <!-- 2. Axes & Grid Lines -->
+            <line x1="${padLeft}" y1="${padTop}" x2="${padLeft}" y2="${padTop + chartH}" stroke="#475569" stroke-width="1.5"/>
+            <line x1="${padLeft}" y1="${padTop + chartH}" x2="${padLeft + chartW}" y2="${padTop + chartH}" stroke="#475569" stroke-width="1.5"/>
+            ${gridLinesSvg}
+
+            <!-- 3. Multi-Colored Line Segments -->
+            ${segmentsSvg}
+
+            <!-- 4. Data Nodes -->
+            ${nodesSvg}
+          </svg>
+        </div>
+      `;
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

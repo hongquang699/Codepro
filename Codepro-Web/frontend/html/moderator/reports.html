@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xử Lý Báo Cáo Vi Phạm | Trung Tâm Kiểm Duyệt (Moderator Center)</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/moderator/moderator.css">
+  <style>
+    .mod-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .mod-sidebar { background: var(--color-bg-secondary); border-right: 1px solid var(--color-border); padding: 1.5rem 1rem; }
+    .mod-main { padding: 2rem; background: var(--color-bg); overflow-y: auto; }
+    .mod-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 0.35rem; }
+    .mod-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .mod-nav-item.active { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .badge-count { margin-left: auto; background: #ef4444; color: #fff; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="mod-layout">
+    <aside class="mod-sidebar">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;padding-left:0.5rem;">
+        <span style="font-size:1.75rem;"><cp-icon name="shield" size="sm"></cp-icon> </span>
+        <div>
+          <div style="font-weight:800;color: #fff;font-size:1.1rem;">MODERATOR</div>
+          <div style="font-size:0.75rem;color: #f59e0b;">Kiểm duyệt Nội dung</div>
+        </div>
+      </div>
+      <a href="/frontend/html/moderator/index.html" class="mod-nav-item "><cp-icon name="chart" size="sm"></cp-icon> Tổng quan</a>
+      <a href="/frontend/html/moderator/reports.html" class="mod-nav-item active"><span>🚩</span> Báo cáo vi phạm <span class="badge-count">5</span></a>
+      <a href="/frontend/html/moderator/comments.html" class="mod-nav-item "><span><cp-icon name="send" size="sm"></cp-icon> </span> Bình luận & Thảo luận</a>
+      <a href="/frontend/html/moderator/posts.html" class="mod-nav-item "><cp-icon name="edit" size="sm"></cp-icon> Bài viết Blog</a>
+      <a href="/frontend/html/moderator/users.html" class="mod-nav-item "><cp-icon name="user" size="sm"></cp-icon> Xử lý Tài khoản</a>
+      <a href="/frontend/html/moderator/moderation-log.html" class="mod-nav-item "><span>📜</span> Lịch sử Xử lý</a>
+      <a href="/" class="mod-nav-item" style="margin-top:3rem;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="mod-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <h1 style="font-size:1.75rem;color: var(--color-text);font-weight:800;">Xử Lý Báo Cáo Vi Phạm</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Hệ thống kiểm duyệt & bảo vệ cộng đồng CodeProOJ</p>
+        </div>
+      </div>
+      
+<div class="card" style="padding: 1.5rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h3 style="color: var(--color-text);">Danh sách Báo cáo Vi phạm Toàn sàn</h3>
+    <button class="btn btn-secondary" onclick="alert('Đã làm mới danh sách báo cáo');">🔄 Tải lại</button>
+  </div>
+  <table class="table" style="width:100%;">
+    <thead>
+      <tr><th>Mã BC</th><th>Mục vi phạm</th><th>Nội dung tố cáo</th><th>Tình trạng</th><th>Hành động</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>#REP-102</td><td>Bình luận xúc phạm</td><td>"Lời lẽ thù địch trong thread trao đổi bài VOI24"</td><td><span style="color: #ef4444;">Chưa xử lý</span></td><td><button class="btn btn-primary" onclick="alert('Đã xử lý cảnh cáo!');" style="padding:0.3rem 0.8rem;">Xử lý</button></td></tr>
+      <tr><td>#REP-101</td><td>AI Cheating</td><td>"Nộp code sinh bởi ChatGPT trong contest HSG"</td><td><span style="color: #10b981;">Đã xử lý (Ban)</span></td><td><button class="btn btn-secondary" onclick="alert('Xem chi tiết án phạt');" style="padding:0.3rem 0.8rem;">Xem log</button></td></tr>
+    </tbody>
+  </table>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

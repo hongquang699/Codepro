@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lời mời Thành viên | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              ✉️ Lời Mời Gia Nhập Tổ Chức
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Gửi lời mời trực tiếp tới username hoặc email cùng vai trò tương ứng.
+            </p>
+          </div>
+          <div>
+            <button onclick="openInviteModal()" class="btn-org-cta" style="font-size:.84rem;">
+              <cp-icon name="plus" size="sm"></cp-icon> Gửi lời mời mới
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Người được mời</th>
+                <th>Email</th>
+                <th style="text-align:center;">Vai trò chỉ định</th>
+                <th>Người gửi mời</th>
+                <th style="text-align:center;">Trạng thái</th>
+                <th style="text-align:right;">Ngày gửi</th>
+              </tr>
+            </thead>
+            <tbody id="adminInvsTbody">
+              <tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách lời mời...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Invite Modal -->
+  <div class="org-modal-overlay" id="inviteModal">
+    <div class="org-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">✉️ Gửi Lời Mời Tham Gia</h3>
+        <button onclick="closeInviteModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitInvite();">
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Tên người dùng (Username) *</label>
+          <input type="text" id="inv_username" class="org-admin-input" required placeholder="Nhập username">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Email liên hệ (Tùy chọn)</label>
+          <input type="email" id="inv_email" class="org-admin-input" placeholder="user@gmail.com">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Vai trò trao quyền *</label>
+          <select id="inv_role_id" class="org-admin-select"></select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeInviteModal()" class="btn-org-outline">Hủy</button>
+          <button type="submit" class="btn-org-cta">Gửi lời mời</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'invitations');
+
+    function openInviteModal() {
+      document.getElementById('inviteModal').classList.add('open');
+    }
+    function closeInviteModal() {
+      document.getElementById('inviteModal').classList.remove('open');
+    }
+
+    async function loadInvitations() {
+      const res = await OrgAPI.getAdminInvitations(slug);
+      const tbody = document.getElementById('adminInvsTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có lời mời nào được gửi.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(i => `
+        <tr>
+          <td><strong style="color: var(--color-primary);">${i.invitee_username}</strong></td>
+          <td style="color: var(--color-text-muted);">${i.email || '—'}</td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:4px;background: var(--color-bg);border: 1px solid var(--color-border);color: var(--color-text);">
+              ${i.role_name}
+            </span>
+          </td>
+          <td style="color: var(--color-text-secondary);">${i.inviter_username}</td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:4px;background: rgba(245,158,11,.15);color: #f59e0b;">
+              ${i.status.toUpperCase()}
+            </span>
+          </td>
+          <td style="text-align:right;color: var(--color-text-dim);font-size:.82rem;">
+            ${new Date(i.created_at).toLocaleDateString('vi-VN')}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadRolesDropdown() {
+      const res = await OrgAPI.getAdminRoles(slug);
+      const sel = document.getElementById('inv_role_id');
+      if (res.data) {
+        sel.innerHTML = res.data.map(r => `
+          <option value="${r.id}">${r.name}</option>
+        `).join('');
+      }
+    }
+
+    async function submitInvite() {
+      const username = document.getElementById('inv_username').value;
+      const email = document.getElementById('inv_email').value;
+      const role_id = document.getElementById('inv_role_id').value;
+
+      const res = await OrgAPI.sendInvitation(slug, { username, email, role_id });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeInviteModal();
+        loadInvitations();
+      }
+    }
+
+    loadRolesDropdown();
+    loadInvitations();
+  </script>
+</body>
+</html>

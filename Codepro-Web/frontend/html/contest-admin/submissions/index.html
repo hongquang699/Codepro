@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Bài Nộp &amp; Chấm Lại | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <!-- Filters & Action Bar -->
+      <div class="ca-panel" style="margin-bottom:1.25rem;">
+        <div class="ca-panel-body" style="padding:.9rem 1.25rem;">
+          <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="filterUser" class="ca-input" style="max-width:180px;" placeholder="Lọc theo thí sinh...">
+            <input type="text" id="filterProb" class="ca-input" style="max-width:160px;" placeholder="Lọc mã bài...">
+            <select id="filterResult" class="ca-select" style="max-width:150px;">
+              <option value="">Tất cả kết quả</option>
+              <option value="AC">AC (Chính xác)</option>
+              <option value="WA">WA (Sai kết quả)</option>
+              <option value="TLE">TLE (Quá thời gian)</option>
+              <option value="MLE">MLE (Quá bộ nhớ)</option>
+              <option value="CE">CE (Lỗi biên dịch)</option>
+              <option value="RTE">RTE (Lỗi chạy)</option>
+            </select>
+            <button onclick="applyFilters()" class="ca-btn ca-btn-primary" style="padding:.5rem 1rem;">
+              Tìm kiếm
+            </button>
+            <div style="margin-left:auto;">
+              <button onclick="rejudgeEntireContest()" class="ca-btn ca-btn-danger">
+                🔄 Rejudge toàn bộ kỳ thi
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submissions Table -->
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title">📄 Danh Sách Bài Nộp Trong Kỳ Thi</h3>
+          <span id="subsCountBadge" style="font-size:.8rem;color: var(--color-text-muted);font-weight:700;">Đang tải...</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th style="width:85px;">ID</th>
+                <th>Thí Sinh</th>
+                <th>Bài Tập</th>
+                <th style="text-align:center;">Ngôn Ngữ</th>
+                <th style="text-align:center;">Kết Quả</th>
+                <th style="text-align:center;">Điểm</th>
+                <th style="text-align:center;">Thời Gian</th>
+                <th style="text-align:center;">Bộ Nhớ</th>
+                <th style="text-align:center;">Thời Điểm</th>
+                <th style="text-align:right;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="subsTbody">
+              <tr><td colspan="10" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải bài nộp...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Submission Detail / Source Modal -->
+  <div class="ca-modal-overlay" id="subDetailModal">
+    <div class="ca-modal-box" style="max-width:850px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h3 id="subModalTitle" style="margin:0;color: var(--color-text);font-size:1.15rem;">Chi Tiết Bài Nộp</h3>
+        <button onclick="closeSubDetailModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <div id="subMetaInfo" style="display:flex;gap:1.5rem;background: var(--color-bg);padding:.75rem 1rem;border-radius:8px;border: 1px solid var(--color-border-subtle);margin-bottom:1rem;flex-wrap:wrap;font-size:.85rem;">
+        <!-- Meta details -->
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:.78rem;font-weight:700;color: var(--color-text-secondary);text-transform:uppercase;margin-bottom:.4rem;">Mã nguồn bài nộp (Source Code):</div>
+        <pre id="subSourceCode" style="background: #050811;border: 1px solid var(--color-border-subtle);border-radius:8px;padding:1rem;font-family:monospace;font-size:.84rem;max-height:260px;overflow-y:auto;color: var(--color-text);white-space:pre-wrap;"></pre>
+      </div>
+
+      <div>
+        <div style="font-size:.78rem;font-weight:700;color: var(--color-text-secondary);text-transform:uppercase;margin-bottom:.4rem;">Chi tiết từng Testcase:</div>
+        <div style="max-height:180px;overflow-y:auto;">
+          <table class="ca-table">
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Trạng thái</th>
+                <th>Thời gian</th>
+                <th>Bộ nhớ</th>
+                <th>Điểm</th>
+              </tr>
+            </thead>
+            <tbody id="subCasesTbody">
+              <tr><td colspan="5" style="text-align:center;padding:1rem;color: var(--color-text-muted);">Không có dữ liệu testcase chi tiết.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;">
+        <button type="button" onclick="closeSubDetailModal()" class="ca-btn ca-btn-secondary">Đóng</button>
+        <button type="button" id="btnModalRejudge" class="ca-btn ca-btn-primary">🔄 Chấm lại bài này</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('submissions', contestKey);
+    ContestAdminUI.renderHeader('Bài Nộp &amp; Chấm Lại', `Giám sát bài nộp và điều phối rejudge kỳ thi ${contestKey}`);
+
+    async function loadSubmissions() {
+      const filters = {};
+      const u = document.getElementById('filterUser').value.trim();
+      const p = document.getElementById('filterProb').value.trim();
+      const r = document.getElementById('filterResult').value;
+      if (u) filters.user = u;
+      if (p) filters.problem = p;
+      if (r) filters.result = r;
+
+      const res = await ContestAdminAPI.getSubmissions(contestKey, filters);
+      const tbody = document.getElementById('subsTbody');
+      const countEl = document.getElementById('subsCountBadge');
+
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Không có bài nộp nào phù hợp.</td></tr>';
+        countEl.textContent = '0 bài';
+        return;
+      }
+
+      countEl.textContent = `${res.data.length} bài nộp`;
+      tbody.innerHTML = res.data.map(s => `
+        <tr>
+          <td style="font-family:monospace;font-weight:700;color: var(--color-primary);">#${s.id}</td>
+          <td><strong style="color: #fff;">${s.user}</strong></td>
+          <td><span style="font-weight:700;color: #fff;">${s.problem_code}</span></td>
+          <td style="text-align:center;color: var(--color-text-muted);font-size:.78rem;">${s.language}</td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:800;padding:.2rem .55rem;border-radius:6px;background: ${s.result === 'AC' ? 'rgba(16,185,129,.15);color: #10b981;' : (s.result === 'WA' ? 'rgba(239,68,68,.15);color: #ef4444;' : 'rgba(245,158,11,.15);color: #f59e0b;')}">
+              ${s.result}
+            </span>
+          </td>
+          <td style="text-align:center;font-weight:800;color: ${s.score > 0 ? '#10b981' : '#ef4444'};">${s.score}</td>
+          <td style="text-align:center;font-size:.8rem;color: var(--color-text-secondary);">${s.time_used}s</td>
+          <td style="text-align:center;font-size:.8rem;color: var(--color-text-secondary);">${s.memory_used}MB</td>
+          <td style="text-align:center;font-size:.76rem;color: var(--color-text-muted);">${s.date}</td>
+          <td style="text-align:right;white-space:nowrap;">
+            <button onclick="viewDetail(${s.id})" class="ca-btn ca-btn-secondary" style="padding:.25rem .55rem;font-size:.75rem;margin-right:3px;">
+              Xem
+            </button>
+            <button onclick="rejudgeSingle(${s.id})" class="ca-btn ca-btn-secondary" style="padding:.25rem .55rem;font-size:.75rem;color: var(--color-primary);">
+              Rejudge
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function applyFilters() {
+      loadSubmissions();
+    }
+
+    async function viewDetail(subId) {
+      const res = await ContestAdminAPI.getSubmissionDetail(contestKey, subId);
+      if (!res.data) return;
+      const s = res.data;
+
+      document.getElementById('subModalTitle').textContent = `Chi Tiết Bài Nộp #${s.id} - ${s.user} (${s.problem_code})`;
+      document.getElementById('subMetaInfo').innerHTML = `
+        <div>Kết quả: <strong style="color: ${s.result === 'AC' ? '#10b981' : '#ef4444'};">${s.result} (${s.points}đ)</strong></div>
+        <div>Ngôn ngữ: <strong>${s.language}</strong></div>
+        <div>Thời gian: <strong>${s.time}s</strong></div>
+        <div>Bộ nhớ: <strong>${Math.round(s.memory/1024)}MB</strong></div>
+      `;
+      document.getElementById('subSourceCode').textContent = s.source_code || '// Không có mã nguồn';
+
+      const casesTbody = document.getElementById('subCasesTbody');
+      if (s.testcases && s.testcases.length > 0) {
+        casesTbody.innerHTML = s.testcases.map(tc => `
+          <tr>
+            <td style="font-family:monospace;font-weight:700;">#${tc.case}</td>
+            <td><span style="font-weight:700;color: ${tc.status === 'AC' ? '#10b981' : '#ef4444'};">${tc.status}</span></td>
+            <td>${tc.time}s</td>
+            <td>${Math.round(tc.memory/1024)}MB</td>
+            <td>${tc.points}đ</td>
+          </tr>
+        `).join('');
+      } else {
+        casesTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color: var(--color-text-muted);">Không có dữ liệu testcase chi tiết.</td></tr>';
+      }
+
+      document.getElementById('btnModalRejudge').onclick = () => {
+        rejudgeSingle(s.id);
+        closeSubDetailModal();
+      };
+
+      document.getElementById('subDetailModal').classList.add('open');
+    }
+
+    function closeSubDetailModal() {
+      document.getElementById('subDetailModal').classList.remove('open');
+    }
+
+    async function rejudgeSingle(subId) {
+      if (!confirm(`Xác nhận gửi chấm lại bài nộp #${subId}?`)) return;
+      const res = await ContestAdminAPI.rejudge(contestKey, { submission_id: subId });
+      alert(res.message || res.error);
+      loadSubmissions();
+    }
+
+    async function rejudgeEntireContest() {
+      if (!confirm(`CẢNH BÁO NGUY HIỂM: Bạn có chắc chắn muốn rejudge TOÀN BỘ bài thi trong ${contestKey}?`)) return;
+      const res = await ContestAdminAPI.rejudge(contestKey, {});
+      alert(res.message || res.error);
+      loadSubmissions();
+    }
+
+    loadSubmissions();
+  </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Thông báo Tổ chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/organization/admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div class="org-admin-layout">
+      <aside id="orgAdminSidebar"></aside>
+
+      <section class="org-admin-content">
+        <div class="org-admin-header">
+          <div>
+            <h2 style="font-size:1.45rem;font-weight:800;color: var(--color-text);margin:0;">
+              📢 Quản Lý Thông Báo Chính Thức
+            </h2>
+            <p style="font-size:.84rem;color: var(--color-text-muted);margin-top:2px;">
+              Phát hành thông báo khẩn, lịch bảo trì và thông tin quan trọng tới toàn bộ thành viên.
+            </p>
+          </div>
+          <div>
+            <button onclick="openCreateAnnModal()" class="btn-org-cta" style="font-size:.84rem;">
+              <cp-icon name="plus" size="sm"></cp-icon> Phát hành thông báo mới
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table-custom" style="width:100%;">
+            <thead>
+              <tr>
+                <th>Tiêu đề thông báo</th>
+                <th style="text-align:center;">Phân loại</th>
+                <th>Nội dung tóm tắt</th>
+                <th style="text-align:center;">Ngày đăng</th>
+                <th style="text-align:center;">Trạng thái</th>
+                <th style="text-align:right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminAnnTbody">
+              <tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải danh sách thông báo...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Create Announcement Modal -->
+  <div class="org-modal-overlay" id="createAnnModal">
+    <div class="org-modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="margin:0;color: var(--color-text);font-size:1.15rem;">📢 Phát Hành Thông Báo Mới</h3>
+        <button onclick="closeCreateAnnModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.3rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="event.preventDefault(); submitCreateAnn();">
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Tiêu đề thông báo *</label>
+          <input type="text" id="ann_title" class="org-admin-input" required placeholder="Nhập tiêu đề">
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Loại thông báo (Badge Type) *</label>
+          <select id="ann_badge_type" class="org-admin-select">
+            <option value="info">Info (Thông tin chung - Xanh dương)</option>
+            <option value="success">Success (Thành công / Chúc mừng - Xanh lá)</option>
+            <option value="warning">Warning (Cảnh báo / Lịch thi - Vàng)</option>
+            <option value="danger">Danger (Khẩn cấp / Bảo trì - Đỏ)</option>
+          </select>
+        </div>
+        <div class="org-admin-form-group">
+          <label class="org-admin-label">Nội dung thông báo *</label>
+          <textarea id="ann_content" class="org-admin-textarea" rows="4" required placeholder="Chi tiết nội dung thông báo..."></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;">
+          <button type="button" onclick="closeCreateAnnModal()" class="btn-org-outline">Hủy</button>
+          <button type="submit" class="btn-org-cta">Phát hành ngay</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script src="/frontend/js/organization/admin.js"></script>
+  <script>
+    const slug = OrgAPI.getOrgSlugFromUrl();
+    OrgAdmin.renderSidebar(slug, 'announcements');
+
+    function openCreateAnnModal() {
+      document.getElementById('createAnnModal').classList.add('open');
+    }
+    function closeCreateAnnModal() {
+      document.getElementById('createAnnModal').classList.remove('open');
+    }
+
+    async function loadAnnouncements() {
+      const res = await OrgAPI.getAnnouncements(slug);
+      const tbody = document.getElementById('adminAnnTbody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có thông báo nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = res.data.map(a => `
+        <tr>
+          <td>
+            <strong style="color: var(--color-text);">${a.title}</strong>
+          </td>
+          <td style="text-align:center;">
+            <span style="font-size:.76rem;font-weight:700;padding:2px 8px;border-radius:4px;background: var(--color-bg);border: 1px solid var(--color-border);color: var(--color-primary);">
+              ${a.badge_type.toUpperCase()}
+            </span>
+          </td>
+          <td style="color: var(--color-text-secondary);font-size:.85rem;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${a.content}
+          </td>
+          <td style="text-align:center;color: var(--color-text-muted);font-size:.82rem;">
+            ${new Date(a.created_at).toLocaleDateString('vi-VN')}
+          </td>
+          <td style="text-align:center;">
+            <span style="color: #10b981;font-weight:700;font-size:.82rem;">● Đang phát</span>
+          </td>
+          <td style="text-align:right;">
+            <button onclick="deleteAnn(${a.id}, '${a.title.replace(/'/g, "\\'")}')" class="btn-org-outline" style="padding:.3rem .65rem;font-size:.78rem;color: #ef4444;border-color: rgba(239,68,68,.3);">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function submitCreateAnn() {
+      const title = document.getElementById('ann_title').value;
+      const badge_type = document.getElementById('ann_badge_type').value;
+      const content = document.getElementById('ann_content').value;
+
+      const res = await OrgAPI.createAnnouncement(slug, { title, badge_type, content });
+      alert(res.message || res.error);
+      if (res.status === 201) {
+        closeCreateAnnModal();
+        loadAnnouncements();
+      }
+    }
+
+    async function deleteAnn(id, title) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa thông báo "${title}" không?`)) return;
+      const res = await OrgAPI.deleteAnnouncement(slug, id);
+      alert(res.message || res.error);
+      if (res.status === 200) {
+        loadAnnouncements();
+      }
+    }
+
+    loadAnnouncements();
+  </script>
+</body>
+</html>

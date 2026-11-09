@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Xếp Hạng Tổ Chức | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/organization/organization.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="org-container">
+    <div id="orgHeaderTarget"></div>
+
+    <div class="org-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h3 class="org-panel-title">🏆 Bảng Xếp Hạng Nội Bộ (<span id="rankingTotal">0</span> thành viên)</h3>
+          <p style="color: var(--color-text-muted);font-size:.85rem;margin-top:2px;">Xếp theo điểm xếp hạng Elo quốc tế &amp; số bài toán thuật toán đã giải.</p>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="table-custom" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:70px;text-align:center;">Hạng</th>
+              <th>Thành viên</th>
+              <th style="text-align:center;">Vai trò</th>
+              <th style="text-align:center;">Elo Rating</th>
+              <th style="text-align:center;">Cấp bậc</th>
+              <th style="text-align:center;">Bài đã giải</th>
+              <th style="text-align:right;">Điểm tổng</th>
+            </tr>
+          </thead>
+          <tbody id="rankingTbody">
+            <tr><td colspan="7" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Đang tải bảng xếp hạng...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/organization/organization-api.js"></script>
+  <script>
+    (async () => {
+      const slug = OrgAPI.getOrgSlugFromUrl();
+      const orgRes = await OrgAPI.getOrg(slug);
+      if (orgRes.status === 200 && orgRes.data) {
+        OrgAPI.renderHeader(orgRes.data, 'ranking');
+      }
+
+      const res = await OrgAPI.getRanking(slug);
+      const tbody = document.getElementById('rankingTbody');
+      const objects = res.data ? res.data.objects : [];
+      document.getElementById('rankingTotal').textContent = objects.length;
+
+      if (objects.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem;color: var(--color-text-muted);">Chưa có dữ liệu xếp hạng.</td></tr>';
+        return;
+      }
+
+      function getTierColor(rating) {
+        if (rating >= 2600) return '#ef4444';
+        if (rating >= 2200) return '#f97316';
+        if (rating >= 1900) return '#a855f7';
+        if (rating >= 1600) return '#3b82f6';
+        if (rating >= 1400) return '#06b6d4';
+        if (rating >= 1200) return '#10b981';
+        return '#94a3b8';
+      }
+
+      tbody.innerHTML = objects.map(u => {
+        const medal = u.rank === 1 ? '🥇' : (u.rank === 2 ? '🥈' : (u.rank === 3 ? '🥉' : `#${u.rank}`));
+        const tierColor = getTierColor(u.rating);
+
+        return `
+          <tr>
+            <td style="text-align:center;font-weight:800;font-size:${u.rank <= 3 ? '1.2rem' : '.95rem'};color: ${u.rank <= 3 ? '#fbbf24' : '#64748b'};">
+              ${medal}
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:.65rem;">
+                <div style="width:34px;height:34px;border-radius:50%;background: var(--color-card);display:flex;align-items:center;justify-content:center;font-weight:800;color: ${tierColor};border: 1px solid var(--color-border);">
+                  ${u.username.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:.35rem;">
+                    <a href="/profile/${u.username}" style="font-weight:700;color: ${tierColor};text-decoration:none;">${u.username}</a>
+                    ${u.is_verified ? `
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12L11 14L15 10M12 3L13.91 4.26L16.14 3.73L17.55 5.48L19.78 5.74L20.31 7.97L22.06 9.38L21.53 11.61L22.79 13.52L21.53 15.43L22.06 17.66L20.31 19.07L19.78 21.3L17.55 21.56L16.14 23.31L13.91 22.78L12 24.04L10.09 22.78L7.86 23.31L6.45 21.56L4.22 21.3L3.69 19.07L1.94 17.66L2.47 15.43L1.21 13.52L2.47 11.61L1.94 9.38L3.69 7.97L4.22 5.74L6.45 5.48L7.86 3.73L10.09 4.26L12 3Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.2"/>
+                        <path d="M8.5 12.5L11 15L16 9" stroke="white" stroke-width="2"/>
+                      </svg>
+                    ` : ''}
+                  </div>
+                  <div style="font-size:.78rem;color: var(--color-text-muted);">${u.display_name}</div>
+                </div>
+              </div>
+            </td>
+            <td style="text-align:center;">
+              <span style="font-size:.76rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;background: rgba(255,255,255,.08);color: ${u.role_color};">
+                ${u.role}
+              </span>
+            </td>
+            <td style="text-align:center;">
+              <strong style="color: ${tierColor};font-size:1.05rem;">${u.rating}</strong>
+            </td>
+            <td style="text-align:center;">
+              <span style="font-size:.78rem;font-weight:700;color: ${tierColor};">
+                ${u.display_rank}
+              </span>
+            </td>
+            <td style="text-align:center;font-weight:700;color: var(--color-text);">
+              ${u.solved_count.toLocaleString()}
+            </td>
+            <td style="text-align:right;font-weight:700;color: var(--color-text-secondary);">
+              ${u.points.toLocaleString()}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    })();
+  </script>
+</body>
+</html>

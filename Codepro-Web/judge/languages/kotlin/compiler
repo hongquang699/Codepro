@@ -1,0 +1,4 @@
+#!/bin/bash
+SOURCE=$1
+DEST=$2
+kotlinc $SOURCE -include-runtime -d $DEST.jar

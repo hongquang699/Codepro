@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo tài khoản mới | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/auth/register.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card register-card">
+      <div class="auth-header">
+        <a href="/" class="auth-logo-wrap" title="Về trang chủ">
+          <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="8" fill="#2563EB"/>
+            <path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <h1 class="auth-title">Tạo tài khoản</h1>
+        <p class="auth-subtitle">Gia nhập cộng đồng lập trình thi đấu CodeProOJ</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert"></div>
+
+      <form id="registerForm" class="auth-form">
+        <div class="auth-form-group">
+          <label class="auth-label" for="username">Username</label>
+          <div class="auth-input-wrap">
+            <input type="text" id="username" class="auth-input" placeholder="Ví dụ: coder_2026" required autocomplete="username" autofocus>
+          </div>
+          <span class="auth-field-error" id="usernameError"></span>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="email">Email</label>
+          <div class="auth-input-wrap">
+            <input type="email" id="email" class="auth-input" placeholder="tenban@example.com" required autocomplete="email">
+          </div>
+          <span class="auth-field-error" id="emailError"></span>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="password">Mật khẩu</label>
+          <div class="auth-input-wrap">
+            <input type="password" id="password" class="auth-input" placeholder="••••••••••••••" required autocomplete="new-password">
+            <button type="button" id="togglePasswordBtn" class="auth-input-icon" aria-label="Hiện mật khẩu">
+              <i data-icon="eye"></i>
+            </button>
+          </div>
+          <span class="auth-field-error" id="passwordError"></span>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="passwordConfirm">Xác nhận mật khẩu</label>
+          <div class="auth-input-wrap">
+            <input type="password" id="passwordConfirm" class="auth-input" placeholder="••••••••••••••" required autocomplete="new-password">
+            <button type="button" id="toggleConfirmPasswordBtn" class="auth-input-icon" aria-label="Hiện mật khẩu">
+              <i data-icon="eye"></i>
+            </button>
+          </div>
+          <span class="auth-field-error" id="passwordConfirmError"></span>
+        </div>
+
+        <label class="auth-checkbox-group">
+          <input type="checkbox" id="termsAgreed" checked required>
+          <span>Tôi đồng ý với <a href="/frontend/html/help/rules.html" target="_blank" class="auth-link">Điều khoản</a> và Chính sách của hệ thống</span>
+        </label>
+
+        <button type="submit" id="registerSubmitBtn" class="auth-btn-primary">
+          <span>ĐĂNG KÝ</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Đã có tài khoản? <a href="/login" class="auth-link">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/auth/auth.js"></script>
+  <script src="/frontend/js/auth/register.js"></script>
+</body>
+</html>

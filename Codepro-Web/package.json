@@ -1,0 +1,36 @@
+{
+  "name": "coding-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive Online Judge and Competitive Programming Learning Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "worker": "node apps/worker/index.js",
+    "lint": "eslint .",
+    "test": "jest tests/",
+    "build:obfuscate": "node scripts/protect_frontend.js --obfuscate",
+    "restore:frontend": "node scripts/protect_frontend.js --restore",
+    "status:protection": "node scripts/protect_frontend.js --status",
+    "protect:backend": "python scripts/protect_backend.py --compile"
+  },
+  "keywords": ["online-judge", "competitive-programming", "algorithms", "codeprooj", "codeforces"],
+  "author": "Coding Platform Core Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^6.0.0",
+    "pg": "^8.11.5",
+    "ioredis": "^5.4.1",
+    "bullmq": "^5.7.9",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "jest": "^29.7.0",
+    "eslint": "^8.57.1"
+  }
+}

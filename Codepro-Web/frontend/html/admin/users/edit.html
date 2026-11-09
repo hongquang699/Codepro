@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <title>Chuyển hướng Chỉnh Sửa Người Dùng | CodeProOJ</title>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const u = params.get('user') || params.get('username') || '';
+    window.location.replace(u ? `/admin/users/detail?user=${u}` : '/admin/users');
+  </script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body style="background: var(--color-bg);color: var(--color-text-muted);font-family:sans-serif;padding:3rem;text-align:center;">
+  <p>Đang chuyển hướng tới chi tiết người dùng...</p>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

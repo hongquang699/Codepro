@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xem Mã Nguồn | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <style>
+    /* Code viewer */
+    .code-viewer-wrap {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .code-viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      padding: 0.75rem 1.25rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .code-viewer-header .lang-badge {
+      background: #1d4ed833;
+      color: var(--color-primary);
+      border: 1px solid #1d4ed860;
+      border-radius: 5px;
+      padding: 0.2rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    .code-viewer-header .meta-info {
+      font-size: 0.82rem;
+      color: #8b949e;
+    }
+    .copy-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .copy-btn:hover { background: #30363d; }
+    .copy-btn.copied { color: #22c55e; border-color: #22c55e40; }
+
+    /* Line-numbered code block */
+    .code-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 0.845rem;
+      line-height: 1.6;
+      tab-size: 4;
+    }
+    .code-table td { padding: 0; }
+    .line-num {
+      color: #6e7681;
+      text-align: right;
+      user-select: none;
+      padding: 0 1rem 0 1.25rem;
+      min-width: 3rem;
+      border-right: 1px solid #21262d;
+      vertical-align: top;
+    }
+    .line-code {
+      color: #e6edf3;
+      padding: 0 1.5rem;
+      white-space: pre;
+      vertical-align: top;
+    }
+    .code-table tr:hover .line-num,
+    .code-table tr:hover .line-code {
+      background: #161b2266;
+    }
+
+    /* Syntax highlight classes (basic) */
+    .kw { color: #ff7b72; }
+    .str { color: #a5d6ff; }
+    .cmt { color: #8b949e; font-style: italic; }
+    .num { color: #79c0ff; }
+    .fn { color: #d2a8ff; }
+    .pp { color: #f0883e; }
+
+    .access-denied {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--color-text-muted);
+    }
+    .access-denied .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .access-denied h2 { color: var(--color-text); margin-bottom: 0.5rem; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .info-cell {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 0.85rem 1.1rem;
+    }
+    .info-cell .label { font-size: 0.75rem; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.07em; }
+    .info-cell .value { font-size: 1rem; color: var(--color-text); font-weight: 700; margin-top: 0.2rem; }
+    .verdict-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Breadcrumb -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+      <a id="btnBackToResult" href="#" style="color: var(--color-primary); text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+        &larr; Quay lại kết quả bài nộp
+      </a>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="copy-btn" id="copyBtn" onclick="copyCode()">
+          📋 Sao chép mã nguồn
+        </button>
+        <a id="btnToResult" href="#" class="copy-btn" style="text-decoration:none;">
+          📊 Xem kết quả
+        </a>
+      </div>
+    </div>
+
+    <!-- Submission meta -->
+    <div class="contest-hero-card" style="padding: 1.25rem 1.75rem; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <div style="font-size: 0.8rem; color: var(--color-text-dim); font-weight: 700; text-transform: uppercase;">Mã nguồn bài nộp</div>
+          <h1 id="subTitle" style="font-size: 1.4rem; color: var(--color-text); font-weight: 800; margin-top: 0.2rem;">
+            Submission #------
+          </h1>
+        </div>
+        <div id="verdictDisplay"></div>
+      </div>
+    </div>
+
+    <!-- Info grid -->
+    <div class="info-grid" id="infoGrid">
+      <div class="info-cell"><div class="label">Thí sinh</div><div class="value" id="subUser">--</div></div>
+      <div class="info-cell"><div class="label">Ngôn ngữ</div><div class="value" id="subLang">--</div></div>
+      <div class="info-cell"><div class="label">Bài</div><div class="value" id="subProblem">--</div></div>
+      <div class="info-cell"><div class="label">Thời gian nộp</div><div class="value" id="subTime">--</div></div>
+    </div>
+
+    <!-- Code viewer -->
+    <div id="codeSection">
+      <div class="code-viewer-wrap">
+        <div class="code-viewer-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span class="lang-badge" id="langBadge">C++</span>
+            <span class="meta-info" id="lineCount"></span>
+          </div>
+          <span class="meta-info" id="charCount"></span>
+        </div>
+        <div style="overflow-x: auto; max-height: 72vh; overflow-y: auto;">
+          <table class="code-table" id="codeTable">
+            <tbody id="codeBody">
+              <tr>
+                <td class="line-num">⋯</td>
+                <td class="line-code" style="color: var(--color-text-muted);">Đang tải mã nguồn...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access denied -->
+    <div class="access-denied" id="accessDenied" style="display:none;">
+      <div class="icon"><cp-icon name="lock" size="sm"></cp-icon> </div>
+      <h2>Không thể xem mã nguồn</h2>
+      <p id="accessMsg">Bạn không có quyền xem mã nguồn của bài nộp này.</p>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const subId = urlParams.get('id') || urlParams.get('submission');
+    const contestKey = urlParams.get('contest');
+    const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+    const token = localStorage.getItem('token');
+
+    let rawCode = '';
+
+    // Back links
+    const resultUrl = contestKey
+      ? `/contests/${contestKey}/submissions/${subId}`
+      : `/submissions/${subId}`;
+    document.getElementById('btnBackToResult').href = resultUrl;
+    document.getElementById('btnToResult').href = resultUrl;
+
+    const VERDICT_MAP = {
+      'AC': { text: 'Accepted', color: '#22c55e', bg: '#14532d33' },
+      'WA': { text: 'Wrong Answer', color: '#ef4444', bg: '#7f1d1d33' },
+      'TLE': { text: 'Time Limit', color: '#f59e0b', bg: '#78350f33' },
+      'MLE': { text: 'Memory Limit', color: '#a855f7', bg: '#4c1d9533' },
+      'RTE': { text: 'Runtime Error', color: '#f97316', bg: '#7c2d1233' },
+      'CE': { text: 'Compile Error', color: '#64748b', bg: '#0f172a' },
+      'P': { text: 'Đang chấm...', color: '#38bdf8', bg: '#0c4a6e33' },
+      'G': { text: 'Đang chấm...', color: '#38bdf8', bg: '#0c4a6e33' },
+    };
+
+    function escapeHtml(s) {
+      return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function renderCode(code, lang) {
+      rawCode = code;
+      const lines = code.split('\n');
+      document.getElementById('lineCount').textContent = `${lines.length} dòng`;
+      document.getElementById('charCount').textContent = `${code.length.toLocaleString()} ký tự`;
+      document.getElementById('langBadge').textContent = lang || 'Code';
+
+      const tbody = document.getElementById('codeBody');
+      tbody.innerHTML = lines.map((line, i) => `
+        <tr>
+          <td class="line-num">${i + 1}</td>
+          <td class="line-code">${escapeHtml(line) || ' '}</td>
+        </tr>
+      `).join('');
+    }
+
+    function copyCode() {
+      if (!rawCode) return;
+      navigator.clipboard.writeText(rawCode).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.textContent = '✓ Đã sao chép!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = '📋 Sao chép mã nguồn';
+        }, 2000);
+      });
+    }
+
+    async function loadSubmission() {
+      if (!subId) {
+        document.getElementById('accessDenied').style.display = 'block';
+        document.getElementById('accessMsg').textContent = 'Không tìm thấy mã bài nộp trong URL.';
+        document.getElementById('codeSection').style.display = 'none';
+        return;
+      }
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Token ${token}`;
+
+        const res = await fetch(`${API}/api/v1/submissions/${subId}/`, { headers });
+
+        if (res.status === 403 || res.status === 401) {
+          document.getElementById('accessDenied').style.display = 'block';
+          document.getElementById('accessMsg').textContent =
+            'Bạn chưa đăng nhập hoặc không có quyền xem mã nguồn của bài nộp này.';
+          document.getElementById('codeSection').style.display = 'none';
+          return;
+        }
+
+        if (!res.ok) throw new Error('API error ' + res.status);
+
+        const sub = await res.json();
+
+        // Title & verdict
+        document.title = `Mã nguồn #${subId} | CodeProOJ`;
+        document.getElementById('subTitle').textContent = `Submission #${subId}`;
+
+        const vInfo = VERDICT_MAP[sub.result || sub.status] || { text: sub.result || '—', color: '#94a3b8', bg: '#1e293b' };
+        document.getElementById('verdictDisplay').innerHTML = `
+          <span class="verdict-badge" style="background: ${vInfo.bg}; color: ${vInfo.color}; border: 1px solid ${vInfo.color}40;">
+            ${vInfo.text}
+          </span>`;
+
+        // Meta
+        document.getElementById('subUser').textContent = sub.user || sub.author || '—';
+        document.getElementById('subLang').textContent = sub.language_name || sub.language || '—';
+        document.getElementById('subProblem').textContent = (sub.problem_label ? `${sub.problem_label} – ` : '') + (sub.problem_name || sub.problem || '—');
+        document.getElementById('subTime').textContent = sub.date
+          ? new Date(sub.date).toLocaleString('vi-VN')
+          : (sub.created_at ? new Date(sub.created_at).toLocaleString('vi-VN') : '—');
+
+        // Source code
+        const code = sub.source_code || sub.source || null;
+        if (!code) {
+          document.getElementById('accessDenied').style.display = 'block';
+          document.getElementById('accessMsg').textContent =
+            'Mã nguồn không khả dụng. Đây có thể là do bài nộp chưa cho phép xem hoặc cuộc thi chưa kết thúc.';
+          document.getElementById('codeSection').style.display = 'none';
+          return;
+        }
+
+        renderCode(code, sub.language_name || sub.language);
+      } catch(e) {
+        document.getElementById('accessDenied').style.display = 'block';
+        document.getElementById('accessMsg').textContent = `Lỗi tải dữ liệu: ${e.message}`;
+        document.getElementById('codeSection').style.display = 'none';
+      }
+    }
+
+    loadSubmission();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  judge-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codeprooj-judge-server
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JUDGE_AUTH_TOKEN=${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
+      - JUDGE_PROBLEM_DATA_DIR=/app/problem-data/problems
+    volumes:
+      - ./storage:/app/judge-system/storage
+      - ./logs:/app/judge-system/logs
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data/problems:/app/problem-data/problems:ro
+    networks:
+      - judge-net
+
+  judge-worker-extra:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codeprooj-judge-worker-node-03
+    restart: unless-stopped
+    command: ["python3", "worker/worker.py", "worker-3", "http://judge-server:9999"]
+    depends_on:
+      - judge-server
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JUDGE_AUTH_TOKEN=${JUDGE_AUTH_TOKEN:?Set JUDGE_AUTH_TOKEN in .env}
+      - JUDGE_PROBLEM_DATA_DIR=/app/problem-data/problems
+    volumes:
+      - ./storage:/app/judge-system/storage
+      - ./logs:/app/judge-system/logs
+      - ${CODEPRO_DATA_ROOT:?Set CODEPRO_DATA_ROOT in .env}/problem-data/problems:/app/problem-data/problems:ro
+    networks:
+      - judge-net
+
+networks:
+  judge-net:
+    driver: bridge

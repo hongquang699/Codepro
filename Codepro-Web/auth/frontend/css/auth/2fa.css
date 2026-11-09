@@ -1,0 +1,50 @@
+/* frontend/css/auth/2fa.css */
+@import url('./auth.css');
+
+.twofa-card {
+  max-width: 460px;
+}
+
+.twofa-qr-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  width: 180px;
+  height: 180px;
+  margin: 1.5rem auto;
+}
+
+.twofa-secret-box {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px dashed #0284c7;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  color: #38bdf8;
+  text-align: center;
+  margin: 1rem 0;
+  user-select: all;
+}
+
+.backup-codes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  margin: 1rem 0;
+}
+
+.backup-code-item {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  text-align: center;
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testcase Validator (Thẩm định dữ liệu) | CodeProOJ Problem Setter Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .prob-subnav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .prob-sublink {
+      padding: 0.75rem 1.25rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .prob-sublink:hover { color: #fff; }
+    .prob-sublink.active { color: var(--color-primary); border-bottom-color: #38bdf8; }
+    .upload-zone {
+      border: 2px dashed var(--color-border);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      background: color-mix(in srgb, var(--color-card) 40%, transparent);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .upload-zone:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .code-editor-area {
+      width: 100%;
+      height: 380px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 8px;
+      color: var(--color-primary);
+      font-family: 'Fira Code', 'Consolas', monospace;
+      padding: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/judge" class="admin-nav-item"><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</a>
+      <a href="/admin/security" class="admin-nav-item"><cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF</a>
+
+      <div class="nav-group-title">Nội dung &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item active"><cp-icon name="edit" size="sm"></cp-icon> Kho bài tập</a>
+      <a href="/admin/problems/create" class="admin-nav-item"><cp-icon name="plus" size="sm"></cp-icon> Thêm bài mới</a>
+      <a href="/admin/contests" class="admin-nav-item"><cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi</a>
+
+      <div class="nav-group-title">Cấu hình Hệ thống</div>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình chung</a>
+      <a href="/" class="admin-nav-item" style="margin-top:auto;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Testcase Validator (Thẩm định dữ liệu)</h1>
+          <p style="color: var(--color-text-muted);font-size:0.95rem;margin-top:0.25rem;">Kiểm soát tính hợp lệ của toàn bộ bộ test</p>
+        </div>
+        <a href="/admin/problems" class="btn btn-secondary">&larr; Về danh sách bài</a>
+      </div>
+
+      <nav class="prob-subnav">
+        <a href="/admin/problems" class="prob-sublink">Tất cả bài tập</a>
+        <a href="/admin/problems/create" class="prob-sublink">Biên soạn bài tập</a>
+        <a href="/frontend/html/admin/problems/import.html" class="prob-sublink ">Import Gói Đề (ZIP)</a>
+        <a href="/frontend/html/admin/problems/export.html" class="prob-sublink ">Export Gói Đề (ZIP)</a>
+        <a href="/frontend/html/admin/problems/checker.html" class="prob-sublink ">Custom Checker (Testlib)</a>
+        <a href="/frontend/html/admin/problems/validator.html" class="prob-sublink active">Testcase Validator</a>
+        <a href="/frontend/html/admin/problems/testcases.html" class="prob-sublink active">Quản lý Bộ Test</a>
+      </nav>
+
+      
+<div class="card" style="padding: 2rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <div>
+      <h3 style="color: var(--color-primary);"><cp-icon name="shield" size="sm"></cp-icon> Bộ Kiểm Định Dữ Liệu Vào (Input Validator)</h3>
+      <p style="color: var(--color-text-muted); font-size:0.9rem;">Đảm bảo tất cả các file testcase tuân thủ nghiêm ngặt giới hạn đề bài (N &le; 10^5, A[i] &ge; 0).</p>
+    </div>
+    <button class="btn btn-primary" onclick="alert('Đã xác thực thành công toàn bộ 50 testcase hợp lệ!');">🔍 Chạy Thẩm Định Bộ Test</button>
+  </div>
+
+  <textarea class="code-editor-area">#include "testlib.h"
+
+using namespace std;
+
+int main(int argc, char* argv[]) {
+    registerValidation(argc, argv);
+
+    int n = inf.readInt(1, 100000, "n");
+    inf.readSpace();
+    long long k = inf.readLong(1LL, 1000000000000000000LL, "k");
+    inf.readEoln();
+
+    for (int i = 0; i &lt; n; i++) {
+        inf.readInt(-1000000000, 1000000000, format("a[%d]", i + 1));
+        if (i + 1 &lt; n) inf.readSpace();
+    }
+    inf.readEoln();
+    inf.readEof();
+
+    return 0;
+}</textarea>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

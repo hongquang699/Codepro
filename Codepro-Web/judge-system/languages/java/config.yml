@@ -1,0 +1,6 @@
+name: Java 17
+extension: .java
+compiled: true
+executable: Solution.class
+time_limit_multiplier: 2.0
+memory_limit_multiplier: 2.0

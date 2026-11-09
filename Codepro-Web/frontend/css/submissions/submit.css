@@ -1,0 +1,422 @@
+/* ══════════════════════════════════════════════════════════════════════
+   TMATHCODING STYLE - DIRECT SUBMIT & JUDGE WIDGET
+   ══════════════════════════════════════════════════════════════════════ */
+
+.submit-page-container {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2.5rem 1rem;
+}
+
+.tmath-submit-card {
+  width: 100%;
+  max-width: 480px;
+  background: #151d2f;
+  border: 1px solid #243048;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  color: var(--color-text);
+}
+
+/* ── Card Header ───────────────────────────────── */
+.tmath-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+}
+
+.tmath-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  text-transform: uppercase;
+}
+
+.tmath-judge-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ── Form Controls & Language Dropdown ─────────── */
+.tmath-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.tmath-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tmath-select,
+.tmath-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: #0d1424;
+  border: 1px solid #283750;
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.tmath-select:focus,
+.tmath-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+/* ── Code Editor Block ─────────────────────────── */
+.tmath-editor-box {
+  background: #090e18;
+  border: 1px solid #233047;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tmath-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: #141c2c;
+  border-bottom: 1px solid #233047;
+  font-size: 0.78rem;
+}
+
+.editor-lang-name {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.editor-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.tmath-tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.tmath-tool-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tmath-char-count {
+  font-size: 0.72rem;
+  color: var(--color-text-dim);
+  margin-left: 0.25rem;
+}
+
+.tmath-code-textarea {
+  width: 100%;
+  height: 280px;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* ── Action Buttons ────────────────────────────── */
+.tmath-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.btn-tmath-submit {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary));
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.btn-tmath-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 45%, transparent);
+}
+
+.btn-tmath-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-tmath-custom-test {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: color-mix(in srgb, var(--color-card) 50%, transparent);
+  border: 1px solid #283750;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-tmath-custom-test:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-border);
+  color: #ffffff;
+}
+
+/* ── Section Dividers ──────────────────────────── */
+.tmath-divider {
+  height: 1px;
+  background: #243048;
+  margin: 0.25rem 0;
+}
+
+/* ── Technical Specifications Section ─────────── */
+.tmath-specs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.tmath-section-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tmath-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+}
+
+.tmath-spec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tmath-spec-label {
+  color: var(--color-text-muted);
+}
+
+.tmath-spec-value {
+  font-weight: 700;
+}
+
+.spec-time { color: #f59e0b; }
+.spec-mem { color: var(--color-accent); }
+.spec-io { color: var(--color-primary); }
+.spec-size { color: var(--color-text); }
+.spec-worker { color: #10b981; }
+
+/* ── Author Section ────────────────────────────── */
+.tmath-author-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tmath-author-content {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.tmath-author-content strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* ── Alert & Live Result Feedback ─────────────── */
+.tmath-feedback-box {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.tmath-feedback-box.error {
+  display: flex;
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--color-danger);
+}
+
+.tmath-feedback-box.success {
+  display: flex;
+  background: rgba(22, 163, 74, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: var(--color-success);
+}
+
+/* ── Custom Test Modal ─────────────────────────── */
+.tmath-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-card) 80%, transparent);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.tmath-modal-card {
+  width: 100%;
+  max-width: 560px;
+  background: #151d2f;
+  border: 1px solid #243048;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.tmath-modal-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: #101625;
+  border-bottom: 1px solid #243048;
+}
+
+.tmath-modal-hdr h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tmath-modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.tmath-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.tmath-modal-bdy {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tmath-custom-textarea {
+  width: 100%;
+  height: 100px;
+  background: #090e18;
+  border: 1px solid #283750;
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+  outline: none;
+}
+
+.tmath-custom-out {
+  min-height: 80px;
+  background: #090e18;
+  border: 1px solid #283750;
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: var(--color-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

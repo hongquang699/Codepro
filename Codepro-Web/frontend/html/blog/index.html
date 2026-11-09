@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Kỹ Thuật &amp; Thuật Toán | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <style>
+    .blog-header-hero { background: radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 15%, transparent), transparent 70%), var(--color-bg); border-bottom: 1px solid var(--color-border-subtle); padding: 3rem 0; margin-bottom: 2rem; }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+    .hero-sub { color: var(--color-text-muted); font-size: 1.05rem; max-width: 650px; }
+    .tag-filter-bar { display: flex; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .tag-pill { background: var(--color-card); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); padding: 0.4rem 0.9rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
+    .tag-pill:hover, .tag-pill.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+    .blog-layout { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: flex-start; }
+    @media(max-width: 992px) { .blog-layout { grid-template-columns: 1fr; } }
+    .post-card { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 12px; padding: 1.6rem; margin-bottom: 1.25rem; transition: transform 0.15s, border-color 0.15s; text-decoration: none; display: block; color: inherit; }
+    .post-card:hover { transform: translateY(-2px); border-color: var(--color-primary); }
+    .post-title { font-size: 1.35rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.6rem; }
+    .post-excerpt { color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem; }
+    .post-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--color-text-dim); }
+    .author-info { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-secondary); font-weight: 600; }
+    .author-avatar-sm { width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/contests">Cuộc thi</a></li>
+        <li><a href="/ranking">Xếp hạng</a></li>
+        <li><a href="/submissions">Bài nộp</a></li>
+        <li><a href="/forum">Diễn đàn</a></li>
+        <li><a href="/blog" class="active">Blog</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/login" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/register" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <div class="blog-header-hero">
+    <div class="container">
+      <h1 class="hero-title">Blog Kỹ Thuật &amp; Thuật Toán</h1>
+      <p class="hero-sub">Tổng hợp các bài viết chuyên sâu về Giải thuật, Cấu trúc dữ liệu, Luyện thi HSG Quốc gia và kinh nghiệm lập trình thi đấu.</p>
+      
+      <div class="tag-filter-bar">
+        <a href="javascript:filterTag('')" class="tag-pill active" id="tagAll">Tất cả bài viết</a>
+        <a href="javascript:filterTag('dp')" class="tag-pill">Quy hoạch động</a>
+        <a href="javascript:filterTag('graph')" class="tag-pill">Đồ thị</a>
+        <a href="javascript:filterTag('tree')" class="tag-pill">Cây &amp; Segment Tree</a>
+        <a href="javascript:filterTag('math')" class="tag-pill">Số học &amp; Tổ hợp</a>
+        <a href="javascript:filterTag('icpc')" class="tag-pill">ICPC &amp; HSG Tin</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Layout -->
+  <main class="container">
+    <div class="blog-layout">
+      <!-- Left Column: Posts List -->
+      <div id="postsContainer">
+        <div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải danh sách bài viết...</div>
+      </div>
+
+      <!-- Right Column: Sidebar -->
+      <aside>
+        <div class="card" style="margin-bottom:1.5rem;">
+          <h3 style="margin-top:0;font-size:1.1rem;color: var(--color-text);">✍️ Đóng góp bài viết</h3>
+          <p style="font-size:0.88rem;color: var(--color-text-muted);line-height:1.5;">
+            Bạn có thuật toán thú vị hoặc lời giải hay? Hãy chia sẻ kiến thức cùng cộng đồng CodeProOJ!
+          </p>
+          <a href="/frontend/html/community/posts/create.html" class="btn btn-primary" style="display:block;text-align:center;width:100%;margin-top:1rem;">Viết bài mới</a>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0;font-size:1.1rem;color: var(--color-text);">🔥 Chuyên mục phổ biến</h3>
+          <ul style="list-style:none;padding:0;margin:0;font-size:0.9rem;">
+            <li style="padding:0.6rem 0;border-bottom: 1px solid var(--color-border-subtle);display:flex;justify-content:space-between;">
+              <span style="color: var(--color-text-secondary);">Quy hoạch động bao lồi (CHT)</span>
+              <span style="color: var(--color-text-dim);">14 bài</span>
+            </li>
+            <li style="padding:0.6rem 0;border-bottom: 1px solid var(--color-border-subtle);display:flex;justify-content:space-between;">
+              <span style="color: var(--color-text-secondary);">Heavy-Light Decomposition</span>
+              <span style="color: var(--color-text-dim);">8 bài</span>
+            </li>
+            <li style="padding:0.6rem 0;border-bottom: 1px solid var(--color-border-subtle);display:flex;justify-content:space-between;">
+              <span style="color: var(--color-text-secondary);">Suffix Automaton</span>
+              <span style="color: var(--color-text-dim);">6 bài</span>
+            </li>
+            <li style="padding:0.6rem 0;display:flex;justify-content:space-between;">
+              <span style="color: var(--color-text-secondary);">FFT &amp; Nhân đa thức</span>
+              <span style="color: var(--color-text-dim);">5 bài</span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    let allPosts = [];
+
+    const defaultArticles = [
+      {
+        slug: "tong-quan-quy-hoach-dong-hsg",
+        title: "Tổng quan các dạng bài Quy hoạch động thường gặp trong đề thi HSG Quốc gia",
+        author: "admin",
+        publish_on: "2026-09-28",
+        excerpt: "Quy hoạch động (Dynamic Programming) là một trong những chủ đề trọng tâm chiếm tỷ lệ điểm rất cao trong kỳ thi HSG Tin học. Bài viết này tổng hợp các tư duy tối ưu trạng thái, DP trên cây và DP chữ số...",
+        tags: ["dp", "hsg", "algorithms"],
+        read_time: "8 phút đọc"
+      },
+      {
+        slug: "segment-tree-lazy-propagation",
+        title: "Kỹ thuật Lazy Propagation trên cây phân đoạn Segment Tree (IT)",
+        author: "quang_pro",
+        publish_on: "2026-09-25",
+        excerpt: "Khi cần cập nhật giá trị trên một đoạn [L, R] và truy vấn giá trị trong thời gian O(log N), Lazy Propagation là chìa khóa giúp chúng ta trì hoãn việc cập nhật xuống các nút con...",
+        tags: ["tree", "data-structures"],
+        read_time: "6 phút đọc"
+      },
+      {
+        slug: "kinh-nghiem-chien-thuat-icpc",
+        title: "Chiến thuật phối hợp đồng đội và quản lý thời gian trong kỳ thi ICPC",
+        author: "codepro_admin",
+        publish_on: "2026-09-20",
+        excerpt: "Trong kỳ thi 5 tiếng với 1 chiếc máy tính duy nhất cho 3 người, kỹ năng phân chia bài, code nhanh không bug và debug trên giấy quyết định hơn 60% tấm vé vào vòng Chung kết Quốc tế...",
+        tags: ["icpc", "tips"],
+        read_time: "10 phút đọc"
+      }
+    ];
+
+    async function loadBlogs() {
+      try {
+        const res = await fetch('/api/v2/blogs');
+        const json = await res.json();
+        const apiPosts = json.data?.objects || json.data?.items || json.data?.results || [];
+        allPosts = apiPosts.length > 0 ? apiPosts : defaultArticles;
+        renderPosts(allPosts);
+      } catch (err) {
+        allPosts = defaultArticles;
+        renderPosts(allPosts);
+      }
+    }
+
+    function renderPosts(posts) {
+      const container = document.getElementById('postsContainer');
+      if (posts.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color: var(--color-text-muted);">Không có bài viết nào phù hợp.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <a href="/blog/${p.slug}" class="post-card">
+          <h2 class="post-title">${p.title}</h2>
+          <p class="post-excerpt">${p.excerpt || (p.body ? p.body.slice(0, 180) + '...' : '')}</p>
+          <div class="post-meta">
+            <div class="author-info">
+              <div class="author-avatar-sm">${(p.author_name || p.author || 'A').charAt(0).toUpperCase()}</div>
+              <span>${p.author_name || p.author}</span>
+            </div>
+            <div>
+              <span>📅 ${p.publish_on ? new Date(p.publish_on).toLocaleDateString('vi-VN') : 'Mới cập nhật'}</span> &bull;
+              <span>⏱️ ${p.read_time || '5 phút đọc'}</span>
+            </div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function filterTag(tag) {
+      document.querySelectorAll('.tag-pill').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+      if (!tag) {
+        renderPosts(allPosts);
+      } else {
+        const filtered = allPosts.filter(p => p.tags && p.tags.includes(tag));
+        renderPosts(filtered);
+      }
+    }
+
+    // Check user auth
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+      const u = Auth.getUser();
+      document.getElementById('navAuth').innerHTML = `
+        <a href="/profile/${u.username}" class="btn btn-secondary"><cp-icon name="user" size="sm"></cp-icon> @${u.username}</a>
+        <button onclick="Auth.logout()" class="btn btn-danger" style="margin-left:0.5rem;">Đăng xuất</button>
+      `;
+    }
+
+    loadBlogs();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

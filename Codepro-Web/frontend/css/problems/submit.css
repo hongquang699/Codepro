@@ -1,0 +1,145 @@
+@import url('/frontend/css/global/theme.css');
+
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - Problem Submit Page Styling
+   ══════════════════════════════════════════════════════════════════════ */
+
+body {
+  background: var(--color-bg, var(--color-bg-secondary));
+  color: var(--color-text, var(--color-text));
+  font-family: var(--font-family-base);
+}
+
+.submit-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.card-submit {
+  background: var(--color-card, var(--color-card));
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: 14px;
+  padding: 2rem;
+}
+
+.card-submit h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text, #fff);
+  margin-bottom: .4rem;
+}
+
+.card-submit p {
+  color: var(--color-text-muted);
+  font-size: .9rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+.form-group label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: .45rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: .65rem 1rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: 8px;
+  color: #fff;
+  font-size: .9rem;
+  outline: none;
+}
+
+.form-control:focus { border-color: var(--color-primary); }
+
+/* Editor */
+.editor-box {
+  border: 1px solid var(--color-border, var(--color-border));
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b1120;
+  margin-bottom: 1.25rem;
+}
+
+.editor-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .6rem 1rem;
+  background: rgba(255, 255, 255, .04);
+  border-bottom: 1px solid var(--color-border, var(--color-border));
+  font-size: .78rem;
+}
+
+textarea#sourceCode {
+  width: 100%;
+  min-height: 380px;
+  background: transparent;
+  color: var(--color-text);
+  border: none;
+  padding: 1rem 1.25rem;
+  font-family: 'Fira Code', Consolas, monospace;
+  font-size: .88rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  tab-size: 4;
+}
+
+.btn-submit-main {
+  padding: .85rem 2rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.btn-submit-main:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.btn-submit-main:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Result box */
+.result-alert {
+  padding: 1.25rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  display: none;
+  text-align: center;
+}
+
+.result-alert.show { display: block; }
+.ra-AC { background: #065f4622; border: 1px solid #10b98155; color: #34d399; }
+.ra-WA { background: #7f1d1d22; border: 1px solid #ef444455; color: #f87171; }
+.ra-other { background: #78350f22; border: 1px solid #f59e0b55; color: #fbbf24; }

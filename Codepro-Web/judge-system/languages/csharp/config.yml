@@ -1,0 +1,6 @@
+name: C# (.NET 8)
+extension: .cs
+compiled: true
+executable: Solution
+time_limit_multiplier: 1.5
+memory_limit_multiplier: 1.5

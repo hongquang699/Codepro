@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác thực hai bước (2FA) | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/auth/2fa.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card twofa-card">
+      <div class="auth-header">
+        <div class="auth-logo-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h1 class="auth-title">Xác thực hai bước</h1>
+        <p class="auth-subtitle">Tài khoản <strong id="displayUser">bạn</strong> yêu cầu mã xác thực bảo vệ</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert"></div>
+
+      <form id="twoFactorForm" class="auth-form">
+        <div class="auth-form-group">
+          <label class="auth-label" for="twoFactorCode">Mã từ ứng dụng Authenticator</label>
+          <div class="auth-input-wrap">
+            <input type="text" id="twoFactorCode" class="auth-input" placeholder="000000" maxlength="8" pattern="[0-9A-Za-z]+" required autofocus style="text-align: center; font-size: 1.4rem; letter-spacing: 4px;">
+          </div>
+          <span class="auth-subtitle" style="font-size: 0.8rem; margin-top: 4px; text-align: center;">Mã 6 chữ số hoặc mã khôi phục 8 ký tự</span>
+        </div>
+
+        <button type="submit" id="twoFactorSubmitBtn" class="auth-btn-primary">
+          <span>XÁC NHẬN</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Gặp sự cố đăng nhập? <a href="/login" class="auth-link">Quay lại đăng nhập</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/auth/auth.js"></script>
+  <script src="/frontend/js/auth/2fa.js"></script>
+</body>
+</html>

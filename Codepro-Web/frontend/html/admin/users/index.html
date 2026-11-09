@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Người Dùng &amp; Phân Quyền | CodeProOJ Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    a, a:hover { text-decoration: none !important; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-content-wide { background: var(--color-card, var(--color-card)); border: 1px solid var(--border-color, var(--color-border-subtle)); border-radius: 14px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 1.6rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .role-badge-admin { background: #dc2626; color: #fff; font-weight: 800; font-size: .72rem; padding: .18rem .5rem; border-radius: 4px; }
+    .role-badge-setter { background: var(--color-accent); color: #fff; font-weight: 800; font-size: .72rem; padding: .18rem .5rem; border-radius: 4px; }
+    .role-badge-user { background: var(--color-surface-hover); color: var(--color-text-secondary); font-weight: 600; font-size: .72rem; padding: .18rem .5rem; border-radius: 4px; }
+    .verified-box { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+    .verified-icon-svg { vertical-align: middle; display: inline-block; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+      </a>
+      <a href="/admin/security" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+        <span class="nav-badge" id="navShieldBadge" style="background: #10b981;color: #fff;">WAF ON</span>
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+      <a href="/admin/contests/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Tạo kỳ thi mới
+      </a>
+      <a href="/admin/blogs" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/organizations" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Quản lý Tổ chức
+      </a>
+      <a href="/admin/users" class="admin-nav-item active">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+    </aside>
+
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div class="topbar-title">
+          <h1><cp-icon name="users" size="sm"></cp-icon> Quản Lý Thành Viên &amp; Phân Quyền (User Management)</h1>
+          <p>Điều chỉnh điểm Elo Rating, hồ sơ cá nhân, cấp Tích Xanh chính chủ, đổi mật khẩu và phân quyền quản trị.</p>
+        </div>
+        <div style="display:flex;gap:.5rem;">
+          <input type="text" id="userSearchInput" placeholder="Tìm theo username hoặc email..." style="background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:8px;color: var(--color-text, #fff);padding:.45rem .85rem;font-size:.85rem;width:280px;outline: none;" oninput="renderUsersTable()">
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div style="display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <button onclick="setUserFilter('all')" id="uFlt-all" class="btn-act" style="background: var(--color-primary);color: #fff;">Tất cả (<span id="uCountAll">0</span>)</button>
+        <button onclick="setUserFilter('verified')" id="uFlt-verified" class="btn-act">Tích xanh (<span id="uCountVerified">0</span>)</button>
+        <button onclick="setUserFilter('admin')" id="uFlt-admin" class="btn-act">Quản trị viên (<span id="uCountAdmin">0</span>)</button>
+        <button onclick="setUserFilter('teacher')" id="uFlt-teacher" class="btn-act">Giáo viên (<span id="uCountTeacher">0</span>)</button>
+        <button onclick="setUserFilter('setter')" id="uFlt-setter" class="btn-act">Problem Setter (<span id="uCountSetter">0</span>)</button>
+        <button onclick="setUserFilter('user')" id="uFlt-user" class="btn-act">Thành viên (<span id="uCountUser">0</span>)</button>
+      </div>
+
+      <!-- Users Table -->
+      <div class="panel-box">
+        <div style="overflow-x:auto;">
+          <table class="admin-tbl">
+            <thead>
+              <tr>
+                <th style="width:230px;">Tài khoản &amp; Tên</th>
+                <th>Email</th>
+                <th style="width:110px;text-align:center;">Vai trò</th>
+                <th style="width:130px;text-align:center;">Rating / Hạng</th>
+                <th style="width:100px;text-align:center;">Tích xanh</th>
+                <th style="width:90px;text-align:center;">Bài đã giải</th>
+                <th style="width:110px;text-align:center;">Trạng thái</th>
+                <th style="width:220px;text-align:right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody">
+              <tr><td colspan="8" style="text-align:center;padding:3rem;color: var(--color-text-dim);">Đang tải danh sách người dùng...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════════ MODAL: CHỈNH SỬA HỒ SƠ & PHÂN QUYỀN ══════════════ -->
+  <div class="modal-overlay" id="userEditModal">
+    <div class="modal-content-wide">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom: 1px solid var(--border-color, var(--color-border-subtle));padding-bottom:.65rem;">
+        <div>
+          <h3 style="margin:0;color: var(--color-text, #fff);font-size:1.15rem;display:flex;align-items:center;gap:.4rem;">
+            ✏️ Quản Trị Thành Viên: <span id="modalUsername" style="color: var(--color-primary);">admin</span>
+          </h3>
+          <div style="font-size:.78rem;color: var(--color-text-muted, var(--color-text-muted));margin-top:2px;">Cập nhật hồ sơ, xếp hạng Elo, mật khẩu và trạng thái xác minh.</div>
+        </div>
+        <button onclick="closeUserModal()" style="background: none;border: none;color: var(--color-text-muted);font-size:1.35rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:1.1rem;">
+        <!-- Verified Checkmark Grant Card -->
+        <div class="verified-box">
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <svg class="verified-icon-svg" width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12L11 14L15 10M12 3L13.91 4.26L16.14 3.73L17.55 5.48L19.78 5.74L20.31 7.97L22.06 9.38L21.53 11.61L22.79 13.52L21.53 15.43L22.06 17.66L20.31 19.07L19.78 21.3L17.55 21.56L16.14 23.31L13.91 22.78L12 24.04L10.09 22.78L7.86 23.31L6.45 21.56L4.22 21.3L3.69 19.07L1.94 17.66L2.47 15.43L1.21 13.52L2.47 11.61L1.94 9.38L3.69 7.97L4.22 5.74L6.45 5.48L7.86 3.73L10.09 4.26L12 3Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8.5 12.5L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <div style="font-weight:700;color: var(--color-primary);font-size:.92rem;">Cấp Tích Xanh chính chủ (Verified Badge)</div>
+              <div style="font-size:.78rem;color: var(--color-text-muted, var(--color-text-muted));">Hiển thị huy hiệu xác minh trên trang cá nhân, bảng xếp hạng và các bài nộp.</div>
+            </div>
+          </div>
+          <input type="checkbox" id="modalVerifiedInput" style="width:20px;height:20px;cursor:pointer;accent-color:#0284c7;">
+        </div>
+
+        <!-- 2 Columns: Display Name & Email -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));margin-bottom:.35rem;">Tên hiển thị (Display Name):</label>
+            <input type="text" id="modalDisplayNameInput" placeholder="Ví dụ: Nguyễn Văn A" style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem;font-size:.88rem;box-sizing:border-box;outline: none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));margin-bottom:.35rem;">Địa chỉ Email:</label>
+            <input type="email" id="modalEmailInput" placeholder="user@domain.com" style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem;font-size:.88rem;box-sizing:border-box;outline: none;">
+          </div>
+        </div>
+
+        <!-- 2 Columns: Rating with Preview & Role -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;">
+              <label style="font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));">Điểm Elo Rating:</label>
+              <span id="modalRankBadge" style="font-size:.75rem;font-weight:800;padding:.15rem .45rem;border-radius:4px;background: var(--color-surface-hover);color: #fff;">Newbie</span>
+            </div>
+            <input type="number" id="modalRatingInput" placeholder="Ví dụ: 1500" style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem;font-size:.88rem;box-sizing:border-box;outline: none;" oninput="updateRankPreview()">
+          </div>
+          <div>
+            <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));margin-bottom:.35rem;">Vai trò trong hệ thống (Role):</label>
+            <select id="modalRoleSelect" style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem;font-size:.88rem;outline: none;">
+              <option value="admin">Quản trị viên tối cao (Admin / Superuser)</option>
+              <option value="teacher">Giáo viên (Teacher / Có quyền tạo tổ chức)</option>
+              <option value="setter">Người ra đề (Problem Setter / Staff)</option>
+              <option value="user">Thành viên thông thường (Standard User)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- About / Bio -->
+        <div>
+          <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));margin-bottom:.35rem;">Tiểu sử giới thiệu (Bio / About):</label>
+          <textarea id="modalAboutInput" rows="2" placeholder="Thông tin trường học, sở trường thuật toán..." style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem;font-size:.88rem;box-sizing:border-box;outline: none;resize:vertical;"></textarea>
+        </div>
+
+        <!-- Password Reset with Eye Toggle -->
+        <div>
+          <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted, var(--color-text-muted));margin-bottom:.35rem;">Đặt lại mật khẩu mới (Bỏ trống nếu không đổi):</label>
+          <div style="position:relative;">
+            <input type="password" id="modalPasswordInput" placeholder="Nhập mật khẩu mới cho tài khoản..." style="width:100%;background: var(--color-surface, var(--color-bg));border: 1px solid var(--border-color, var(--color-border));border-radius:6px;color: var(--color-text, #fff);padding:.55rem 2.5rem .55rem .55rem;font-size:.88rem;box-sizing:border-box;outline: none;">
+            <button type="button" onclick="togglePasswordVisibility()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background: none;border: none;color: var(--color-text-muted);cursor:pointer;font-size:1rem;" title="Xem/Ẩn mật khẩu">👁️</button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.15rem;">
+          <input type="checkbox" id="modalActiveInput" checked style="width:16px;height:16px;cursor:pointer;">
+          <label for="modalActiveInput" style="font-size:.85rem;color: var(--color-text, var(--color-text-secondary));cursor:pointer;font-weight:600;">Kích hoạt tài khoản (Bỏ chọn để khóa tài khoản không cho đăng nhập)</label>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.75rem;border-top: 1px solid var(--border-color, var(--color-border-subtle));padding-top:1rem;">
+          <button onclick="closeUserModal()" class="btn-top btn-top-secondary">Hủy</button>
+          <button onclick="saveUserChanges()" id="btnSaveUser" class="btn-top btn-top-primary">💾 Lưu thông tin &amp; Phân quyền</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+    let usersData = [];
+    let currentFilter = 'all';
+    let selectedUser = null;
+
+    function getRankInfo(rating) {
+      const r = parseInt(rating) || 0;
+      if (r >= 2600) return { name: 'Grandmaster', color: '#ef4444' };
+      if (r >= 2200) return { name: 'Master', color: '#f59e0b' };
+      if (r >= 1900) return { name: 'Candidate Master', color: '#a855f7' };
+      if (r >= 1600) return { name: 'Expert', color: '#3b82f6' };
+      if (r >= 1400) return { name: 'Specialist', color: '#06b6d4' };
+      if (r >= 1200) return { name: 'Pupil', color: '#10b981' };
+      return { name: 'Newbie', color: '#94a3b8' };
+    }
+
+    const verifiedSvgSmall = `
+      <svg class="verified-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-left:4px;" title="Tài khoản đã xác minh (Tích xanh)">
+        <path d="M9 12L11 14L15 10M12 3L13.91 4.26L16.14 3.73L17.55 5.48L19.78 5.74L20.31 7.97L22.06 9.38L21.53 11.61L22.79 13.52L21.53 15.43L22.06 17.66L20.31 19.07L19.78 21.3L17.55 21.56L16.14 23.31L13.91 22.78L12 24.04L10.09 22.78L7.86 23.31L6.45 21.56L4.22 21.3L3.69 19.07L1.94 17.66L2.47 15.43L1.21 13.52L2.47 11.61L1.94 9.38L3.69 7.97L4.22 5.74L6.45 5.48L7.86 3.73L10.09 4.26L12 3Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8.5 12.5L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+
+    async function loadUsers() {
+      try {
+        const resp = await fetch(`${API}/api/v2/users?page_size=100`);
+        const json = await resp.json();
+        usersData = json?.data?.objects || [];
+        updateCounts();
+        renderUsersTable();
+      } catch (err) {
+        document.getElementById('usersTbody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color: #f87171;">Lỗi tải người dùng: ${err.message}</td></tr>`;
+      }
+    }
+
+    function getEffectiveRole(u) {
+      if (u.is_superuser || (u.is_staff && u.role === 'admin')) return 'admin';
+      if (u.role === 'teacher') return 'teacher';
+      if (u.role === 'setter' || (u.is_staff && !u.is_superuser)) return 'setter';
+      return u.role || 'user';
+    }
+
+    function updateCounts() {
+      document.getElementById('uCountAll').textContent = usersData.length;
+      document.getElementById('uCountVerified').textContent = usersData.filter(u => u.is_verified).length;
+      document.getElementById('uCountAdmin').textContent = usersData.filter(u => getEffectiveRole(u) === 'admin').length;
+      document.getElementById('uCountTeacher').textContent = usersData.filter(u => getEffectiveRole(u) === 'teacher').length;
+      document.getElementById('uCountSetter').textContent = usersData.filter(u => getEffectiveRole(u) === 'setter').length;
+      document.getElementById('uCountUser').textContent = usersData.filter(u => getEffectiveRole(u) === 'user').length;
+    }
+
+    window.setUserFilter = function(f) {
+      currentFilter = f;
+      ['all', 'verified', 'admin', 'teacher', 'setter', 'user'].forEach(id => {
+        const b = document.getElementById('uFlt-' + id);
+        if (b) {
+          b.style.background = (id === f) ? '#2563eb' : 'rgba(255,255,255,.05)';
+          b.style.color = (id === f) ? '#fff' : '#cbd5e1';
+        }
+      });
+      renderUsersTable();
+    };
+
+    window.renderUsersTable = function() {
+      const q = (document.getElementById('userSearchInput').value || '').trim().toLowerCase();
+      const filtered = usersData.filter(u => {
+        const role = getEffectiveRole(u);
+
+        let matchF = false;
+        if (currentFilter === 'all') matchF = true;
+        else if (currentFilter === 'verified') matchF = !!u.is_verified;
+        else matchF = (role === currentFilter);
+
+        const matchQ = (u.username || '').toLowerCase().includes(q) || 
+                       (u.email || '').toLowerCase().includes(q) ||
+                       (u.display_name || '').toLowerCase().includes(q);
+        return matchF && matchQ;
+      });
+
+      const tbody = document.getElementById('usersTbody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:3rem;color: var(--color-text-dim);">Không tìm thấy người dùng nào.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const role = getEffectiveRole(u);
+        let roleBadge = '<span class="role-badge-user">USER</span>';
+        if (role === 'admin') {
+          roleBadge = '<span class="role-badge-admin">ADMIN</span>';
+        } else if (role === 'teacher') {
+          roleBadge = '<span style="background: rgba(16,185,129,0.15);color: #34d399;border: 1px solid rgba(16,185,129,0.35);font-size:.72rem;font-weight:800;padding:.2rem .55rem;border-radius:4px;display:inline-flex;align-items:center;gap:3px;" title="Giáo viên - Có quyền tạo & quản trị tổ chức">👨‍🏫 TEACHER</span>';
+        } else if (role === 'setter') {
+          roleBadge = '<span class="role-badge-setter">SETTER</span>';
+        }
+
+        const rating = u.rating || 1500;
+        const rankInfo = getRankInfo(rating);
+        const solved = u.problem_count || 0;
+        const isActive = u.is_active !== false;
+        const isVerified = !!u.is_verified;
+        const dName = u.display_name && u.display_name !== u.username ? u.display_name : '';
+
+        return `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:.6rem;">
+                <div style="width:34px;height:34px;border-radius:50%;background: color-mix(in srgb, var(--color-primary) 15%, transparent);border: 1px solid ${rankInfo.color}66;display:flex;align-items:center;justify-content:center;font-weight:700;color: ${rankInfo.color};font-size:.85rem;">
+                  ${u.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;">
+                    <a href="/profile/${u.username}" target="_blank" style="font-weight:700;color: var(--color-text, #fff);text-decoration:none;">${u.username}</a>
+                    ${isVerified ? verifiedSvgSmall : ''}
+                  </div>
+                  <div style="font-size:.74rem;color: var(--color-text-muted, var(--color-text-muted));">${dName || rankInfo.name}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:monospace;font-size:.82rem;color: var(--color-text-muted, var(--color-text-muted));">${u.email || '—'}</td>
+            <td style="text-align:center;">${roleBadge}</td>
+            <td style="text-align:center;">
+              <strong style="color: ${rankInfo.color};">${rating}</strong>
+              <div style="font-size:.7rem;color: ${rankInfo.color};opacity:0.85;">${rankInfo.name}</div>
+            </td>
+            <td style="text-align:center;">
+              ${isVerified ? '<span style="color: var(--color-primary);font-weight:700;font-size:.8rem;">✓ CÓ</span>' : '<span style="color: var(--color-text-dim);font-size:.8rem;">—</span>'}
+            </td>
+            <td style="text-align:center;font-weight:700;color: #34d399;">
+              ${solved}
+            </td>
+            <td style="text-align:center;">
+              <span class="badge-v ${isActive ? 'bv-AC' : 'bv-WA'}">${isActive ? 'HOẠT ĐỘNG' : 'ĐÃ KHÓA'}</span>
+            </td>
+            <td style="text-align:right;white-space:nowrap;">
+              <div style="display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:nowrap;">
+                <button onclick="openUserModal('${u.username}')" class="btn-act" title="Chỉnh sửa hồ sơ, rate, tích xanh, mật khẩu">✏️ Sửa hồ sơ</button>
+                <button onclick="toggleBanUser('${u.username}', ${isActive})" class="btn-act ${isActive ? 'btn-act-danger' : ''}" title="${isActive ? 'Khóa tài khoản' : 'Mở khóa'}">
+                  ${isActive ? '🔒 Khóa' : '🔓 Mở'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.openUserModal = function(username) {
+      selectedUser = usersData.find(u => u.username === username);
+      if (!selectedUser) return;
+
+      document.getElementById('modalUsername').textContent = username;
+      const role = getEffectiveRole(selectedUser);
+      document.getElementById('modalRoleSelect').value = role;
+      document.getElementById('modalActiveInput').checked = selectedUser.is_active !== false;
+      document.getElementById('modalVerifiedInput').checked = !!selectedUser.is_verified;
+      document.getElementById('modalRatingInput').value = selectedUser.rating || 1500;
+      document.getElementById('modalDisplayNameInput').value = selectedUser.display_name || '';
+      document.getElementById('modalEmailInput').value = selectedUser.email || '';
+      document.getElementById('modalAboutInput').value = selectedUser.about || '';
+      document.getElementById('modalPasswordInput').value = '';
+      
+      updateRankPreview();
+      document.getElementById('userEditModal').style.display = 'flex';
+    };
+
+    window.closeUserModal = function() {
+      document.getElementById('userEditModal').style.display = 'none';
+      selectedUser = null;
+    };
+
+    window.updateRankPreview = function() {
+      const val = document.getElementById('modalRatingInput').value;
+      const rInfo = getRankInfo(val);
+      const badge = document.getElementById('modalRankBadge');
+      badge.textContent = rInfo.name;
+      badge.style.background = rInfo.color + '22';
+      badge.style.color = rInfo.color;
+      badge.style.border = `1px solid ${rInfo.color}66`;
+    };
+
+    window.togglePasswordVisibility = function() {
+      const inp = document.getElementById('modalPasswordInput');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    };
+
+    window.saveUserChanges = async function() {
+      if (!selectedUser) return;
+      const saveBtn = document.getElementById('btnSaveUser');
+      saveBtn.disabled = true;
+      saveBtn.textContent = '⏳ Đang lưu...';
+
+      const role = document.getElementById('modalRoleSelect').value;
+      const pass = document.getElementById('modalPasswordInput').value.trim();
+      const rating = document.getElementById('modalRatingInput').value.trim();
+      const isVerified = document.getElementById('modalVerifiedInput').checked;
+      const dName = document.getElementById('modalDisplayNameInput').value.trim();
+      const email = document.getElementById('modalEmailInput').value.trim();
+      const about = document.getElementById('modalAboutInput').value.trim();
+      const isActive = document.getElementById('modalActiveInput').checked;
+
+      const payload = {
+        role: role,
+        rating: rating ? parseInt(rating) : undefined,
+        is_verified: isVerified,
+        display_name: dName,
+        email: email,
+        about: about,
+        is_active: isActive
+      };
+      if (pass) payload.password = pass;
+
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/users/${selectedUser.username}/role`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify(payload)
+        });
+        const json = await resp.json();
+        if (resp.ok) {
+          alert(`✓ Đã cập nhật thành công hồ sơ của ${selectedUser.username}!`);
+          closeUserModal();
+          loadUsers();
+        } else {
+          alert(`Lỗi: ${json?.error?.message || json?.detail || 'Không thể lưu'}`);
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 Lưu thông tin & Phân quyền';
+      }
+    };
+
+    window.toggleBanUser = async function(username, currentActive) {
+      const nextActive = !currentActive;
+      const actText = nextActive ? 'MỞ KHÓA tài khoản' : 'KHÓA tài khoản';
+      if (!confirm(`Bạn có chắc muốn ${actText} ${username}?`)) return;
+
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/users/${username}/role`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ is_active: nextActive })
+        });
+        if (resp.ok) {
+          alert(`✓ Đã ${actText} thành công!`);
+          loadUsers();
+        } else {
+          const json = await resp.json();
+          alert(`Lỗi: ${json?.error?.message || json?.detail || 'Không thể cập nhật tài khoản.'}`);
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+      }
+    };
+
+    loadUsers();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

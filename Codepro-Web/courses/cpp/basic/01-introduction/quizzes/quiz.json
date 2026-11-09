@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "question": "Kiểu dữ liệu nào lưu được số 10^18 mà không bị tràn trong C++?",
+    "options": ["int", "short", "long long", "float"],
+    "answer": 2
+  }
+]

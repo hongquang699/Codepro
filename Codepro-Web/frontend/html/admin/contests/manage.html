@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Kỳ Thi | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .tab-nav { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--color-border-subtle); margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab-btn { background: transparent; border: none; color: var(--color-text-muted); font-size: 0.92rem; font-weight: 600; padding: 0.75rem 1.25rem; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn:hover { color: var(--color-text); }
+    .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 5%, transparent); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .form-input, .form-select, .form-textarea { width: 100%; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 0.65rem 0.9rem; color: var(--color-text); font-size: 0.9rem; outline: none; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media(max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-box { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 14px; width: 100%; max-width: 550px; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .btn-freeze { background: #0284c7; color: #fff; }
+    .btn-freeze:hover { background: #0369a1; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/judge" class="admin-nav-item"><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</a>
+      <a href="/admin/security" class="admin-nav-item"><cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF</a>
+
+      <div class="nav-group-title">Nội dung thi</div>
+      <a href="/admin/problems" class="admin-nav-item"><cp-icon name="edit" size="sm"></cp-icon> Kho bài tập</a>
+      <a href="/admin/contests" class="admin-nav-item active"><cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi</a>
+      <a href="/admin/contests/create" class="admin-nav-item"><cp-icon name="plus" size="sm"></cp-icon> Tạo kỳ thi mới</a>
+      <a href="/admin/blogs" class="admin-nav-item"><cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết</a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item"><cp-icon name="users" size="sm"></cp-icon> Người dùng</a>
+      <a href="/admin/submissions" class="admin-nav-item"><cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp</a>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì</a>
+
+      <div class="sidebar-footer">
+        <div>CodeProOJ Admin v2.4</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1 id="contestTitleHeader">Quản Lý Kỳ Thi: <span id="contestKeyBadge" style="color: var(--color-primary);">...</span></h1>
+          <p id="contestSubtitle">Cấu hình thời gian, đề bài, thí sinh, đóng băng bảng điểm và rejudge kỳ thi.</p>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="btn-top btn-top-secondary" id="btnDownloadArchive" onclick="downloadContestArchive()">Tải bản lưu ZIP</button>
+          <button class="btn-top btn-top-secondary" id="btnToggleFreeze">❄️ Đóng băng bảng điểm</button>
+          <a href="#" target="_blank" id="btnViewPublicContest" class="btn-top btn-top-primary">👁️ Xem trang thi</a>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('tabSettings')"><cp-icon name="settings" size="sm"></cp-icon> Cài đặt &amp; Thời gian</button>
+        <button class="tab-btn" onclick="switchTab('tabProblems')">📝 Đề bài thi (<span id="tabCountProblems">0</span>)</button>
+        <button class="tab-btn" onclick="switchTab('tabParticipants')"><cp-icon name="users" size="sm"></cp-icon> Thí sinh (<span id="tabCountParticipants">0</span>)</button>
+        <button class="tab-btn" onclick="switchTab('tabScoreboard')"><cp-icon name="trophy" size="sm"></cp-icon> Bảng điểm trực tiếp</button>
+        <button class="tab-btn" onclick="switchTab('tabRejudge')">🔄 Chấm lại (Rejudge)</button>
+        <button class="tab-btn" onclick="switchTab('tabClarifications')"><cp-icon name="bell" size="sm"></cp-icon> Hỏi đáp &amp; Thông báo</button>
+      </div>
+
+      <!-- Tab 1: Settings -->
+      <div class="tab-pane active" id="tabSettings">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="settings" size="sm"></cp-icon> Thông tin chung &amp; Luật thi</h3>
+            <button class="btn-act" style="background: var(--color-primary);color: #fff;" onclick="saveContestSettings()">💾 Lưu thay đổi</button>
+          </div>
+          <div class="panel-bdy">
+            <form id="formContestSettings" onsubmit="event.preventDefault(); saveContestSettings();">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Tên kỳ thi</label>
+                  <input type="text" id="cfgName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mã định danh (Key)</label>
+                  <input type="text" id="cfgKey" class="form-input" readonly style="opacity:0.7;cursor:not-allowed;">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Mô tả kỳ thi</label>
+                <textarea id="cfgDescription" class="form-textarea" rows="3"></textarea>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Thể thức chấm điểm (Format)</label>
+                  <select id="cfgFormat" class="form-select">
+                    <option value="ACM/ICPC">ACM/ICPC (Penalty, chỉ tính AC)</option>
+                    <option value="IOI">IOI (Tính điểm từng subtask, điểm cao nhất)</option>
+                    <option value="Codeforces">Codeforces (Giảm điểm theo thời gian)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Thời lượng thi (phút, để trống nếu cố định thời gian)</label>
+                  <input type="number" id="cfgTimeLimit" class="form-input" placeholder="Ví dụ: 180">
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Thời gian bắt đầu</label>
+                  <input type="datetime-local" id="cfgStartTime" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Thời gian kết thúc</label>
+                  <input type="datetime-local" id="cfgEndTime" class="form-input">
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Thời điểm đóng băng bảng điểm (Freeze)</label>
+                  <input type="datetime-local" id="cfgFreezeTime" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mã truy cập / Mật khẩu (Access Code)</label>
+                  <input type="text" id="cfgAccessCode" class="form-input" placeholder="Để trống nếu công khai">
+                </div>
+              </div>
+
+              <div style="display:flex;gap:2rem;margin-top:1rem;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;">
+                  <input type="checkbox" id="cfgIsVisible" style="width:18px;height:18px;">
+                  Hiển thị công khai (Is Visible)
+                </label>
+                <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;">
+                  <input type="checkbox" id="cfgIsRated" style="width:18px;height:18px;">
+                  Tính điểm xếp hạng (Is Rated)
+                </label>
+                <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;cursor:pointer;">
+                  <input type="checkbox" id="cfgScoreboardPublic" style="width:18px;height:18px;">
+                  Bảng điểm công khai (Public Scoreboard)
+                </label>
+              </div>
+              <div class="form-group" style="margin-top:1rem;">
+                <label class="form-label" for="cfgDisplayTarget">Nơi hiển thị cuộc thi</label>
+                <select id="cfgDisplayTarget" class="form-input">
+                  <option value="both">Trên web và client</option>
+                  <option value="web">Chỉ trên web</option>
+                  <option value="client">Chỉ trên client</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Problems -->
+      <div class="tab-pane" id="tabProblems">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3>📝 Danh sách Bài thi trong Contest</h3>
+            <button class="btn-act" style="background: #10b981;color: #fff;" onclick="openAddProblemModal()"><cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập vào kỳ thi</button>
+          </div>
+          <div class="panel-bdy" style="padding:0;">
+            <table class="admin-tbl">
+              <thead>
+                <tr>
+                  <th style="width:70px;">Thứ tự</th>
+                  <th>Mã bài</th>
+                  <th>Tên bài tập</th>
+                  <th>Điểm</th>
+                  <th>Giới hạn</th>
+                  <th>Số thí sinh AC</th>
+                  <th>Tổng nộp</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="problemsTableBody">
+                <tr><td colspan="8" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Đang tải danh sách bài...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Participants -->
+      <div class="tab-pane" id="tabParticipants">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="users" size="sm"></cp-icon> Danh sách Thí sinh Tham Gia</h3>
+            <button class="btn-act" style="background: var(--color-primary);color: #fff;" onclick="openAddParticipantModal()"><cp-icon name="plus" size="sm"></cp-icon> Thêm thí sinh</button>
+          </div>
+          <div class="panel-bdy" style="padding:0;">
+            <table class="admin-tbl">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Tên tài khoản</th>
+                  <th>Tên hiển thị</th>
+                  <th>Điểm hiện tại</th>
+                  <th>Tổng thời gian</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="participantsTableBody">
+                <tr><td colspan="7" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Đang tải danh sách thí sinh...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Scoreboard -->
+      <div class="tab-pane" id="tabScoreboard">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="trophy" size="sm"></cp-icon> Bảng Điểm Trực Tiếp (Admin Live Master Standings)</h3>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn-act" onclick="loadScoreboard()">🔄 Làm mới</button>
+              <button class="btn-act" onclick="exportScoreboardCSV()"><cp-icon name="inbox" size="sm"></cp-icon> Xuất CSV</button>
+            </div>
+          </div>
+          <div class="panel-bdy" style="padding:0;overflow-x:auto;">
+            <table class="admin-tbl" id="scoreboardTable">
+              <thead id="scoreboardHeader"></thead>
+              <tbody id="scoreboardBody">
+                <tr><td colspan="10" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Đang tải bảng điểm...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Rejudge -->
+      <div class="tab-pane" id="tabRejudge">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3>🔄 Chấm Lại Toàn Bộ Kỳ Thi (Rejudge Contest)</h3>
+          </div>
+          <div class="panel-bdy">
+            <div style="background: rgba(239,68,68,0.08);border: 1px solid rgba(239,68,68,0.3);padding:1.25rem;border-radius:10px;margin-bottom:1.5rem;">
+              <h4 style="color: #f87171;margin:0 0 0.5rem 0;">⚠️ Lưu ý quan trọng</h4>
+              <p style="color: var(--color-text-secondary);font-size:0.9rem;margin:0;">
+                Tính năng này sẽ đặt lại kết quả và gửi toàn bộ các bài nộp của kỳ thi vào cụm máy chấm. Thao tác này phù hợp khi bạn vừa cập nhật lại bộ test case hoặc điểm số của các bài tập.
+              </p>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+              <div style="font-size:1.1rem;font-weight:700;color: #fff;">
+                Tổng số bài nộp trong kỳ thi: <span id="rejudgeSubCount" style="color: var(--color-primary);">0</span>
+              </div>
+            </div>
+            <button class="btn-top btn-danger" style="padding:0.75rem 1.5rem;font-size:0.95rem;" onclick="triggerContestRejudge()">
+              ⚡ Bắt đầu Chấm Lại Toàn Bộ Bài Nộp
+            </button>
+            <div id="rejudgeStatusMsg" style="margin-top:1rem;font-weight:600;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Clarifications & Announcements -->
+      <div class="tab-pane" id="tabClarifications">
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="bell" size="sm"></cp-icon> Hỏi Đáp &amp; Đính Chính Đề Bài</h3>
+          </div>
+          <div class="panel-bdy" style="padding:0;">
+            <table class="admin-tbl">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Thí sinh</th>
+                  <th>Bài tập</th>
+                  <th>Câu hỏi</th>
+                  <th>Trả lời</th>
+                  <th>Công khai</th>
+                  <th>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody id="clarificationsTableBody">
+                <tr><td colspan="7" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Chưa có câu hỏi nào.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Add Problem -->
+  <div class="modal-overlay" id="modalAddProblem">
+    <div class="modal-box">
+      <h3 style="margin-top:0;color: var(--color-text);"><cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập vào kỳ thi</h3>
+      <div class="form-group">
+        <label class="form-label">Mã bài tập (Code)</label>
+        <input type="text" id="addProbCode" class="form-input" placeholder="Ví dụ: SUMA, KNAPSACK">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Điểm số</label>
+          <input type="number" id="addProbPoints" class="form-input" value="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Thứ tự hiển thị (Order)</label>
+          <input type="number" id="addProbOrder" class="form-input" value="1">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1.5rem;">
+        <button class="btn-top btn-top-secondary" onclick="closeModals()">Hủy</button>
+        <button class="btn-top btn-top-primary" onclick="submitAddProblem()">Thêm bài</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Add Participant -->
+  <div class="modal-overlay" id="modalAddParticipant">
+    <div class="modal-box">
+      <h3 style="margin-top:0;color: var(--color-text);"><cp-icon name="plus" size="sm"></cp-icon> Thêm thí sinh vào kỳ thi</h3>
+      <div class="form-group">
+        <label class="form-label">Tên tài khoản (Username)</label>
+        <input type="text" id="addPartUsername" class="form-input" placeholder="Nhập username thí sinh">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1.5rem;">
+        <button class="btn-top btn-top-secondary" onclick="closeModals()">Hủy</button>
+        <button class="btn-top btn-top-primary" onclick="submitAddParticipant()">Thêm thí sinh</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const contestKey = params.get('contest') || params.get('key') || 'HSG_TIN_2026';
+    let contestData = null;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (activeBtn) activeBtn.classList.add('active');
+      const pane = document.getElementById(tabId);
+      if (pane) pane.classList.add('active');
+      if (tabId === 'tabScoreboard') loadScoreboard();
+    }
+
+    async function loadContestData() {
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`);
+        const json = await res.json();
+        if (json.status !== 200 || !json.data) {
+          alert('Không thể tải thông tin kỳ thi: ' + (json.error?.message || 'Lỗi server'));
+          return;
+        }
+        contestData = json.data;
+        renderContestDetails();
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi kết nối tới máy chủ: ' + err.message);
+      }
+    }
+
+    function renderContestDetails() {
+      document.getElementById('contestTitleHeader').innerHTML = `Quản Lý Kỳ Thi: <span style="color: var(--color-primary);">${contestData.name}</span>`;
+      document.getElementById('btnViewPublicContest').href = `/contest/${contestData.key}`;
+      document.getElementById('tabCountProblems').textContent = contestData.problems.length;
+      document.getElementById('tabCountParticipants').textContent = contestData.participants.length;
+      document.getElementById('rejudgeSubCount').textContent = contestData.total_submissions || 0;
+
+      // Settings form
+      document.getElementById('cfgName').value = contestData.name || '';
+      document.getElementById('cfgKey').value = contestData.key || '';
+      document.getElementById('cfgDescription').value = contestData.description || '';
+      document.getElementById('cfgFormat').value = contestData.format_name || 'ACM/ICPC';
+      document.getElementById('cfgTimeLimit').value = contestData.time_limit || '';
+      document.getElementById('cfgStartTime').value = contestData.start_time ? contestData.start_time.slice(0, 16) : '';
+      document.getElementById('cfgEndTime').value = contestData.end_time ? contestData.end_time.slice(0, 16) : '';
+      document.getElementById('cfgFreezeTime').value = contestData.freeze_time ? contestData.freeze_time.slice(0, 16) : '';
+      document.getElementById('cfgAccessCode').value = contestData.access_code || '';
+      document.getElementById('cfgIsVisible').checked = !!contestData.is_visible;
+      document.getElementById('cfgDisplayTarget').value = contestData.display_target || 'both';
+      document.getElementById('cfgIsRated').checked = !!contestData.is_rated;
+      document.getElementById('cfgScoreboardPublic').checked = !!contestData.scoreboard_public;
+
+      const btnFreeze = document.getElementById('btnToggleFreeze');
+      if (contestData.freeze_time) {
+        btnFreeze.textContent = '🔥 Mở bảng điểm (Unfreeze)';
+        btnFreeze.className = 'btn-top btn-freeze';
+      } else {
+        btnFreeze.textContent = '❄️ Đóng băng bảng điểm';
+        btnFreeze.className = 'btn-top btn-top-secondary';
+      }
+      btnFreeze.onclick = toggleFreezeStatus;
+
+      // Problems table
+      const probTbody = document.getElementById('problemsTableBody');
+      if (contestData.problems.length === 0) {
+        probTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Chưa có bài thi nào trong kỳ thi. Nhấn "Thêm bài tập" để gán bài.</td></tr>`;
+      } else {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        probTbody.innerHTML = contestData.problems.map((p, idx) => `
+          <tr>
+            <td style="font-weight:700;color: var(--color-primary);">${letters[idx] || (idx + 1)}</td>
+            <td><code>${p.code}</code></td>
+            <td><strong>${p.name}</strong></td>
+            <td><span class="badge-v bv-other">${p.points} đ</span></td>
+            <td style="font-size:0.8rem;color: var(--color-text-muted);">${p.time_limit}s / ${p.memory_limit}MB</td>
+            <td><span class="badge-v bv-AC">${p.ac_count} AC</span></td>
+            <td>${p.total_submissions} bài</td>
+            <td>
+              <button class="btn-act" style="color: #f87171;" onclick="removeProblem('${p.code}')">🗑️ Gỡ</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Participants table
+      const partTbody = document.getElementById('participantsTableBody');
+      if (contestData.participants.length === 0) {
+        partTbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Chưa có thí sinh tham gia.</td></tr>`;
+      } else {
+        partTbody.innerHTML = contestData.participants.map((u, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${u.username}</strong></td>
+            <td>${u.display_name}</td>
+            <td><span style="font-weight:700;color: #34d399;">${u.score || 0}</span></td>
+            <td>${u.cumtime || 0}s</td>
+            <td><span class="badge-v bv-AC">Hợp lệ</span></td>
+            <td>
+              <button class="btn-act" style="color: #f87171;" onclick="removeParticipant('${u.username}')">Xóa</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Clarifications table
+      const clarTbody = document.getElementById('clarificationsTableBody');
+      if (!contestData.clarifications || contestData.clarifications.length === 0) {
+        clarTbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Chưa có câu hỏi làm rõ đề bài nào.</td></tr>`;
+      } else {
+        clarTbody.innerHTML = contestData.clarifications.map(c => `
+          <tr>
+            <td>#${c.id}</td>
+            <td>${c.user}</td>
+            <td><code>${c.problem_code || 'Toàn kỳ thi'}</code></td>
+            <td>${c.question}</td>
+            <td style="color: ${c.answer ? '#34d399' : '#f59e0b'};">${c.answer || '<em>Chưa trả lời</em>'}</td>
+            <td>${c.is_public ? '✅ Công khai' : '🔒 Riêng tư'}</td>
+            <td style="font-size:0.75rem;color: var(--color-text-muted);">${new Date(c.date).toLocaleString('vi-VN')}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    async function saveContestSettings() {
+      const payload = {
+        action: 'update_settings',
+        name: document.getElementById('cfgName').value,
+        description: document.getElementById('cfgDescription').value,
+        format_name: document.getElementById('cfgFormat').value,
+        time_limit: document.getElementById('cfgTimeLimit').value || null,
+        start_time: document.getElementById('cfgStartTime').value || null,
+        end_time: document.getElementById('cfgEndTime').value || null,
+        freeze_time: document.getElementById('cfgFreezeTime').value || null,
+        access_code: document.getElementById('cfgAccessCode').value,
+        is_visible: document.getElementById('cfgIsVisible').checked,
+        display_target: document.getElementById('cfgDisplayTarget').value,
+        is_rated: document.getElementById('cfgIsRated').checked,
+        scoreboard_public: document.getElementById('cfgScoreboardPublic').checked,
+      };
+
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã lưu cài đặt!');
+        loadContestData();
+      } catch (err) {
+        alert('Lỗi khi lưu cài đặt: ' + err.message);
+      }
+    }
+
+    async function toggleFreezeStatus() {
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'toggle_freeze' })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã thay đổi trạng thái đóng băng');
+        loadContestData();
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    function openAddProblemModal() {
+      document.getElementById('modalAddProblem').style.display = 'flex';
+    }
+    function openAddParticipantModal() {
+      document.getElementById('modalAddParticipant').style.display = 'flex';
+    }
+    function closeModals() {
+      document.getElementById('modalAddProblem').style.display = 'none';
+      document.getElementById('modalAddParticipant').style.display = 'none';
+    }
+
+    async function submitAddProblem() {
+      const code = document.getElementById('addProbCode').value.trim();
+      const points = document.getElementById('addProbPoints').value;
+      const order = document.getElementById('addProbOrder').value;
+      if (!code) return alert('Vui lòng nhập mã bài tập');
+
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'add_problem', problem_code: code, points, order })
+        });
+        const json = await res.json();
+        if (json.status === 200) {
+          closeModals();
+          loadContestData();
+        } else {
+          alert('Lỗi: ' + (json.error?.message || 'Không thể thêm bài'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function removeProblem(code) {
+      if (!confirm(`Bạn có chắc muốn gỡ bài tập ${code} khỏi kỳ thi?`)) return;
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'remove_problem', problem_code: code })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã gỡ bài');
+        loadContestData();
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function submitAddParticipant() {
+      const uname = document.getElementById('addPartUsername').value.trim();
+      if (!uname) return alert('Vui lòng nhập tên tài khoản');
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'add_participant', username: uname })
+        });
+        const json = await res.json();
+        if (json.status === 200) {
+          closeModals();
+          loadContestData();
+        } else {
+          alert('Lỗi: ' + (json.error?.message || 'Không thể thêm'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function removeParticipant(uname) {
+      if (!confirm(`Bạn có chắc muốn xóa thí sinh ${uname}?`)) return;
+      try {
+        const res = await fetch(`/api/v2/admin/contest/${contestKey}/manage`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'remove_participant', username: uname })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã xóa');
+        loadContestData();
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function triggerContestRejudge() {
+      if (!confirm(`Xác nhận rejudge toàn bộ bài nộp của kỳ thi ${contestKey}? Quá trình này sẽ chấm lại và cập nhật bảng điểm!`)) return;
+      const statusDiv = document.getElementById('rejudgeStatusMsg');
+      statusDiv.innerHTML = '<span style="color: #f59e0b;">⏳ Đang gửi lệnh rejudge...</span>';
+      try {
+        const res = await fetch(`/api/v2/rejudge/contest/${contestKey}`, { method: 'POST', headers: window.adminApiHeaders() });
+        const json = await res.json();
+        statusDiv.innerHTML = `<span style="color: #10b981;">✅ ${json.data?.message || 'Đã kích hoạt rejudge thành công!'}</span>`;
+        setTimeout(loadContestData, 2000);
+      } catch (err) {
+        statusDiv.innerHTML = `<span style="color: #ef4444;">❌ Lỗi: ${err.message}</span>`;
+      }
+    }
+
+    async function loadScoreboard() {
+      const thead = document.getElementById('scoreboardHeader');
+      const tbody = document.getElementById('scoreboardBody');
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color: var(--color-text-muted);">Đang tải bảng điểm...</td></tr>';
+      try {
+        const res = await fetch(`/api/v2/contest/${contestKey}/scoreboard`);
+        const json = await res.json();
+        if (json.status !== 200 || !json.data) {
+          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color: #ef4444;">Không thể tải bảng điểm.</td></tr>';
+          return;
+        }
+        const sb = json.data;
+        const probs = sb.problems || [];
+        const rows = sb.rankings || [];
+
+        let thHtml = '<tr><th style="width:60px;">Hạng</th><th>Thí sinh</th><th style="width:80px;">Điểm</th><th style="width:90px;">Penalty</th>';
+        probs.forEach((p, idx) => {
+          thHtml += `<th style="text-align:center;">${p.code || ('P' + (idx+1))}</th>`;
+        });
+        thHtml += '</tr>';
+        thead.innerHTML = thHtml;
+
+        if (rows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${4 + probs.length}" style="text-align:center;color: var(--color-text-muted);padding:2rem;">Chưa có bài nộp nào trong kỳ thi.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = rows.map((r, rankIdx) => {
+          let rowHtml = `<tr>
+            <td style="font-weight:700;">#${rankIdx + 1}</td>
+            <td><strong>${r.user}</strong></td>
+            <td><strong style="color: #34d399;">${r.score}</strong></td>
+            <td>${r.cumtime}s</td>`;
+          probs.forEach(p => {
+            const resP = (r.problem_results && r.problem_results[p.code]) || {};
+            if (resP.result === 'AC') {
+              rowHtml += `<td style="text-align:center;background: rgba(16,185,129,0.1);color: #34d399;font-weight:700;">+${resP.attempts || 1}</td>`;
+            } else if (resP.attempts) {
+              rowHtml += `<td style="text-align:center;background: rgba(239,68,68,0.1);color: #f87171;">-${resP.attempts}</td>`;
+            } else {
+              rowHtml += `<td style="text-align:center;color: var(--color-text-dim);">—</td>`;
+            }
+          });
+          rowHtml += '</tr>';
+          return rowHtml;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color: #ef4444;">Lỗi: ${err.message}</td></tr>`;
+      }
+    }
+
+    function exportScoreboardCSV() {
+      window.open(`/api/v2/contest/${contestKey}/scoreboard?format=csv`, '_blank');
+    }
+
+    // Initialize
+    loadContestData();
+  </script>
+  <script src="/frontend/js/admin/contest-archive.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

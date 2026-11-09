@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt tài khoản & Hồ sơ | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+    .settings-nav {
+      background: var(--color-card);
+      border: 1px solid var(--profile-border);
+      border-radius: 10px;
+      padding: 0.5rem;
+      height: fit-content;
+    }
+    .settings-nav-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+    }
+    .settings-nav-item:hover { color: var(--color-text); background: rgba(255,255,255,0.04); }
+    .settings-nav-item.active { background: var(--color-primary); color: #fff; font-weight: 700; }
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--color-card); border: 1px solid #10b981;
+      color: #34d399; padding: 0.75rem 1.25rem;
+      border-radius: 8px; font-weight: 700; font-size: 0.9rem;
+      display: none; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải cài đặt...</div>
+    </div>
+
+    <!-- Access Denied Alert -->
+    <div id="accessDeniedBox" class="profile-card" style="display: none; text-align: center; padding: 3rem;">
+      <h2 style="color: #ef4444; margin-bottom: 0.5rem;"><cp-icon name="lock" size="sm"></cp-icon> Từ chối truy cập</h2>
+      <p style="color: var(--color-text-muted);">Bạn chỉ có quyền xem và chỉnh sửa cài đặt của chính tài khoản của bạn.</p>
+      <a href="/login" class="btn-profile-act primary" style="display: inline-block; margin-top: 1rem;">Đăng nhập lại</a>
+    </div>
+
+    <!-- Settings Main Panel -->
+    <div id="settingsPanel" class="settings-grid" style="display: none;">
+      <!-- Left subnav -->
+      <aside class="settings-nav">
+        <button class="settings-nav-item active" onclick="switchSection('profile')"><cp-icon name="user" size="sm"></cp-icon> Thông tin cá nhân</button>
+        <button class="settings-nav-item" onclick="switchSection('account')">🔐 Tài khoản & Mật khẩu</button>
+        <button class="settings-nav-item" onclick="switchSection('preferences')"><cp-icon name="settings" size="sm"></cp-icon> Tùy chọn giao diện & Code</button>
+        <button class="settings-nav-item" onclick="switchSection('privacy')"><cp-icon name="shield" size="sm"></cp-icon> Quyền riêng tư</button>
+        <button class="settings-nav-item" onclick="switchSection('notifications')"><cp-icon name="bell" size="sm"></cp-icon> Thông báo</button>
+      </aside>
+
+      <!-- Right Form Content -->
+      <div class="profile-card">
+        <!-- 1. Profile Info -->
+        <div id="sec-profile">
+          <h3 class="settings-section-title"><cp-icon name="user" size="sm"></cp-icon> Thông tin cá nhân (Profile Details)</h3>
+          <div class="settings-form-group">
+            <label>Tên hiển thị (Display Name)</label>
+            <input type="text" id="setDisplayName" class="settings-input" placeholder="Họ và tên hoặc Biệt danh">
+          </div>
+          <div class="settings-form-group">
+            <label>Link ảnh đại diện (Avatar URL)</label>
+            <input type="text" id="setAvatar" class="settings-input" placeholder="https://...">
+          </div>
+          <div class="settings-form-group">
+            <label>Tiểu sử (Bio)</label>
+            <textarea id="setBio" class="settings-textarea" rows="3" placeholder="Giới thiệu bản thân, sở thích thuật toán..."></textarea>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="settings-form-group">
+              <label>Quốc gia</label>
+              <input type="text" id="setCountry" class="settings-input" placeholder="Vietnam">
+            </div>
+            <div class="settings-form-group">
+              <label>Trường học</label>
+              <input type="text" id="setSchool" class="settings-input" placeholder="Đại học / THPT...">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="settings-form-group">
+              <label>Tổ chức / Đơn vị</label>
+              <input type="text" id="setOrg" class="settings-input" placeholder="CodeProOJ / CLB...">
+            </div>
+            <div class="settings-form-group">
+              <label>GitHub Username</label>
+              <input type="text" id="setGithub" class="settings-input" placeholder="username">
+            </div>
+          </div>
+          <div class="settings-form-group">
+            <label>Website cá nhân</label>
+            <input type="text" id="setWebsite" class="settings-input" placeholder="https://mywebsite.com">
+          </div>
+          <button class="settings-btn" onclick="saveProfileInfo()">💾 Lưu thông tin cá nhân</button>
+        </div>
+
+        <!-- 2. Account & Password -->
+        <div id="sec-account" style="display: none;">
+          <h3 class="settings-section-title">🔐 Tài khoản & Bảo mật (Account)</h3>
+          <div class="settings-form-group">
+            <label>Tên người dùng (Username)</label>
+            <input type="text" id="setAccUsername" class="settings-input" disabled style="opacity: 0.6;">
+          </div>
+          <div class="settings-form-group">
+            <label>Địa chỉ Email</label>
+            <input type="email" id="setAccEmail" class="settings-input" placeholder="email@domain.com">
+          </div>
+          <div class="settings-form-group">
+            <label>Mật khẩu mới (để trống nếu không đổi)</label>
+            <input type="password" id="setAccPassword" class="settings-input" placeholder="••••••••">
+          </div>
+          <div class="settings-form-group">
+            <label>Mật khẩu hiện tại (cần nhập khi đổi mật khẩu)</label>
+            <input type="password" id="setAccCurrentPassword" class="settings-input" autocomplete="current-password">
+          </div>
+          <button class="settings-btn" onclick="saveAccountSettings()">💾 Cập nhật tài khoản</button>
+          <div class="settings-form-group" style="margin-top:1rem;">
+            <a href="/my/appeals">Xem quyết định chống gian lận và gửi khiếu nại →</a>
+          </div>
+        </div>
+
+        <!-- 3. Preferences -->
+        <div id="sec-preferences" style="display: none;">
+          <h3 class="settings-section-title"><cp-icon name="settings" size="sm"></cp-icon> Tùy chọn trình soạn thảo & Giao diện</h3>
+          <div class="settings-form-group">
+            <label>Ngôn ngữ lập trình mặc định khi nộp bài</label>
+            <select id="setDefaultLang" class="settings-select">
+              <option value="CPP17">C++17</option>
+              <option value="PYTHON3">Python 3</option>
+              <option value="JAVA21">Java 21</option>
+              <option value="C11">C11</option>
+              <option value="PAS">Pascal</option>
+            </select>
+          </div>
+          <div class="settings-form-group">
+            <label>Chủ đề giao diện (Theme)</label>
+            <select id="setTheme" class="settings-select">
+              <option value="dark">Tối (Dark Theme - Mặc định)</option>
+              <option value="light">Sáng (Light Theme)</option>
+            </select>
+          </div>
+          <div class="settings-form-group">
+            <label>Giao diện Code Editor</label>
+            <select id="setEditorTheme" class="settings-select">
+              <option value="vs-dark">VS Dark</option>
+              <option value="monokai">Monokai</option>
+              <option value="github-dark">GitHub Dark</option>
+            </select>
+          </div>
+          <div class="settings-form-group">
+            <label>Kích thước thụt dòng (Tab Size)</label>
+            <select id="setTabSize" class="settings-select">
+              <option value="2">2 spaces</option>
+              <option value="4">4 spaces</option>
+            </select>
+          </div>
+          <button class="settings-btn" onclick="savePreferences()">💾 Lưu tùy chọn</button>
+        </div>
+
+        <!-- 4. Privacy -->
+        <div id="sec-privacy" style="display: none;">
+          <h3 class="settings-section-title"><cp-icon name="shield" size="sm"></cp-icon> Quyền riêng tư (Privacy)</h3>
+          <div class="settings-form-group">
+            <label>Hiển thị hồ sơ công khai</label>
+            <select id="setPrivProfile" class="settings-select">
+              <option value="public">Công khai (Mọi người đều xem được)</option>
+              <option value="friends">Chỉ bạn bè / Cùng trường</option>
+              <option value="private">Riêng tư</option>
+            </select>
+          </div>
+          <div class="settings-form-group">
+            <label>Hiển thị mã nguồn bài nộp</label>
+            <select id="setPrivSubs" class="settings-select">
+              <option value="public">Công khai sau khi kỳ thi kết thúc</option>
+              <option value="private">Chỉ mình tôi</option>
+            </select>
+          </div>
+          <button class="settings-btn" onclick="savePrivacy()">💾 Lưu cài đặt quyền riêng tư</button>
+        </div>
+
+        <!-- 5. Notifications -->
+        <div id="sec-notifications" style="display: none;">
+          <h3 class="settings-section-title"><cp-icon name="bell" size="sm"></cp-icon> Cài đặt thông báo (Notifications)</h3>
+          <div class="settings-form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="setNotiEmail" checked> Nhận thông báo qua Email
+            </label>
+          </div>
+          <div class="settings-form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="setNotiContest" checked> Nhắc nhở trước khi kỳ thi bắt đầu 1 giờ
+            </label>
+          </div>
+          <div class="settings-form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="setNotiSystem" checked> Nhận thông báo hệ thống và cập nhật tính năng
+            </label>
+          </div>
+          <button class="settings-btn" onclick="saveNotifications()">💾 Lưu cài đặt thông báo</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toastMsg">✓ Cài đặt đã được lưu thành công!</div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    function switchSection(secId) {
+      ['profile', 'account', 'preferences', 'privacy', 'notifications'].forEach(id => {
+        const el = document.getElementById('sec-' + id);
+        if (el) el.style.display = (id === secId) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.settings-nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(secId));
+      });
+    }
+
+    async function init() {
+      try {
+        const overview = await ProfileAPI.getOverview(username);
+        ProfileAPI.renderHeader('profileHeaderContainer', overview, 'settings');
+
+        // Check settings access
+        const settingsRes = await ProfileAPI.getSettings(username);
+        if (settingsRes.error) {
+          document.getElementById('accessDeniedBox').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('settingsPanel').style.display = 'grid';
+        const p = overview.profile || {};
+        const st = settingsRes.settings || {};
+
+        // Populate Profile info
+        document.getElementById('setDisplayName').value = p.display_name || '';
+        document.getElementById('setAvatar').value = p.avatar || '';
+        document.getElementById('setBio').value = p.bio || '';
+        document.getElementById('setCountry').value = p.country || '';
+        document.getElementById('setSchool').value = p.school || '';
+        document.getElementById('setOrg').value = p.organization || '';
+        document.getElementById('setGithub').value = p.github || '';
+        document.getElementById('setWebsite').value = p.website || '';
+
+        // Populate Account
+        const acc = st.account || {};
+        document.getElementById('setAccUsername').value = acc.username || username;
+        document.getElementById('setAccEmail').value = acc.email || '';
+
+        // Populate Preferences
+        const pref = st.preferences || {};
+        if (pref.default_code_language) document.getElementById('setDefaultLang').value = pref.default_code_language;
+        if (pref.theme) document.getElementById('setTheme').value = pref.theme;
+        if (pref.editor_theme) document.getElementById('setEditorTheme').value = pref.editor_theme;
+        if (pref.tab_size) document.getElementById('setTabSize').value = pref.tab_size;
+
+        // Populate Privacy
+        const priv = st.privacy || {};
+        if (priv.privacy_profile) document.getElementById('setPrivProfile').value = priv.privacy_profile;
+        if (priv.privacy_submissions) document.getElementById('setPrivSubs').value = priv.privacy_submissions;
+
+        // Populate Notifications
+        const noti = st.notifications || {};
+        document.getElementById('setNotiEmail').checked = !!noti.email_notifications;
+        document.getElementById('setNotiContest').checked = !!noti.contest_notifications;
+        document.getElementById('setNotiSystem').checked = !!noti.system_notifications;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function saveProfileInfo() {
+      const data = {
+        display_name: document.getElementById('setDisplayName').value.trim(),
+        avatar: document.getElementById('setAvatar').value.trim(),
+        bio: document.getElementById('setBio').value.trim(),
+        country: document.getElementById('setCountry').value.trim(),
+        school: document.getElementById('setSchool').value.trim(),
+        organization: document.getElementById('setOrg').value.trim(),
+        github: document.getElementById('setGithub').value.trim(),
+        website: document.getElementById('setWebsite').value.trim(),
+      };
+      const res = await ProfileAPI.updateProfile(username, data);
+      if (res.status === 'success') {
+        showToast('✓ Đã lưu thông tin hồ sơ thành công!');
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        alert(res.error || 'Lỗi lưu thông tin');
+      }
+    }
+
+    async function saveAccountSettings() {
+      const payload = {
+        account: {
+          email: document.getElementById('setAccEmail').value.trim(),
+          password: document.getElementById('setAccPassword').value,
+          current_password: document.getElementById('setAccCurrentPassword').value
+        }
+      };
+      const res = await ProfileAPI.saveSettings(username, payload);
+      if (res.status === 'success') {
+        showToast('✓ Đã cập nhật tài khoản thành công!');
+      } else {
+        alert(res.error || 'Lỗi lưu tài khoản');
+      }
+    }
+
+    async function savePreferences() {
+      const payload = {
+        preferences: {
+          default_code_language: document.getElementById('setDefaultLang').value,
+          theme: document.getElementById('setTheme').value,
+          editor_theme: document.getElementById('setEditorTheme').value,
+          tab_size: parseInt(document.getElementById('setTabSize').value, 10),
+        }
+      };
+      const res = await ProfileAPI.saveSettings(username, payload);
+      if (res.status === 'success') {
+        showToast('✓ Đã lưu tùy chọn giao diện & code!');
+      } else {
+        alert(res.error || 'Lỗi lưu tùy chọn');
+      }
+    }
+
+    async function savePrivacy() {
+      const payload = {
+        privacy: {
+          privacy_profile: document.getElementById('setPrivProfile').value,
+          privacy_submissions: document.getElementById('setPrivSubs').value
+        }
+      };
+      const res = await ProfileAPI.saveSettings(username, payload);
+      if (res.status === 'success') {
+        showToast('✓ Đã lưu quyền riêng tư!');
+      } else {
+        alert(res.error || 'Lỗi lưu quyền riêng tư');
+      }
+    }
+
+    async function saveNotifications() {
+      const payload = {
+        notifications: {
+          email_notifications: document.getElementById('setNotiEmail').checked,
+          contest_notifications: document.getElementById('setNotiContest').checked,
+          system_notifications: document.getElementById('setNotiSystem').checked,
+        }
+      };
+      const res = await ProfileAPI.saveSettings(username, payload);
+      if (res.status === 'success') {
+        showToast('✓ Đã lưu cài đặt thông báo!');
+      } else {
+        alert(res.error || 'Lỗi lưu thông báo');
+      }
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

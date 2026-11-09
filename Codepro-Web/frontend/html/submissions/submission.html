@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết bài nộp | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/detail.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/submission/all.html" class="active">Bài nộp</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem; min-height: 85vh;">
+    <div class="breadcrumb">
+      <a href="/frontend/html/submission/all.html"><cp-icon name="document" size="sm"></cp-icon> Bài nộp</a>
+      <span>›</span>
+      <span id="breadSubId">Đang tải...</span>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-center" id="loadingState">
+      <div class="loading-spinner"></div>
+      <div style="margin-top:1rem;color:var(--color-text-muted);">Đang tải chi tiết bài nộp...</div>
+    </div>
+
+    <!-- Main content (hidden until loaded) -->
+    <div id="subContent" style="display:none;">
+      <!-- Verdict hero banner -->
+      <div class="verdict-hero" id="verdictHero">
+        <div class="v-icon" id="verdictIcon">⏳</div>
+        <div class="v-text" id="verdictText">Đang chấm...</div>
+        <div class="v-sub" id="verdictSub"></div>
+      </div>
+
+      <!-- Score bar -->
+      <div class="score-bar-wrap" id="scoreBarWrap" style="display:none;">
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:.4rem;">
+          <span style="font-weight:600;color:var(--color-text-muted);">Điểm</span>
+          <span style="font-weight:700;" id="scoreDisplay">0 / 100</span>
+        </div>
+        <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div></div>
+      </div>
+
+      <!-- Top info row -->
+      <div class="detail-grid">
+        <div class="meta-card">
+          <h3><cp-icon name="document" size="sm"></cp-icon> Thông tin bài nộp</h3>
+          <div class="meta-row"><span class="meta-label">ID</span><span class="meta-value" id="subId">—</span></div>
+          <div class="meta-row"><span class="meta-label">Người nộp</span><span class="meta-value"><a id="subUser" href="#" style="color:var(--color-primary);">—</a></span></div>
+          <div class="meta-row"><span class="meta-label">Bài toán</span><span class="meta-value"><a id="subProb" href="#" style="color:var(--color-primary);">—</a></span></div>
+          <div class="meta-row"><span class="meta-label">Ngôn ngữ</span><span class="meta-value" id="subLang">—</span></div>
+          <div class="meta-row"><span class="meta-label">Thời gian nộp</span><span class="meta-value" id="subDate">—</span></div>
+        </div>
+        <div class="meta-card">
+          <h3><cp-icon name="bolt" size="sm"></cp-icon> Hiệu năng</h3>
+          <div class="meta-row"><span class="meta-label">Thời gian chạy</span><span class="meta-value" id="subTime">—</span></div>
+          <div class="meta-row"><span class="meta-label">Bộ nhớ sử dụng</span><span class="meta-value" id="subMem">—</span></div>
+          <div class="meta-row"><span class="meta-label">Điểm đạt được</span><span class="meta-value" id="subPoints">—</span></div>
+          <div class="meta-row"><span class="meta-label">Test qua / Tổng</span><span class="meta-value" id="subTcPass">—</span></div>
+          <div class="meta-row" style="padding-top:.6rem;">
+            <span></span>
+            <button class="rejudge-btn" id="rejudgeBtn" onclick="rejudge()">
+              🔄 Chấm lại
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('tc',this)"><cp-icon name="document" size="sm"></cp-icon> Kết quả từng test</button>
+        <button class="tab-btn" onclick="switchTab('src',this)">💻 Mã nguồn</button>
+        <button class="tab-btn" onclick="switchTab('err',this)" id="tabErr" style="display:none;">🔧 Lỗi biên dịch</button>
+      </div>
+
+      <!-- Tab: Testcase results -->
+      <div class="tab-panel active" id="panel-tc">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="tc-table">
+            <thead><tr><th>Test</th><th>Phán quyết</th><th>Thời gian</th><th>Bộ nhớ</th><th>Điểm</th><th>Ghi chú</th></tr></thead>
+            <tbody id="tcBody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--color-text-muted);">Đang chờ kết quả...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Source code -->
+      <div class="tab-panel" id="panel-src">
+        <div class="card" style="padding: 1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">
+            <span style="font-weight:600;font-size:.9rem;" id="srcLangLabel">Mã nguồn</span>
+            <button onclick="copySource()" style="border:1px solid var(--color-border);background:none;border-radius:6px;padding:.35rem .75rem;cursor:pointer;font-size:.8rem;"><cp-icon name="document" size="sm"></cp-icon> Sao chép</button>
+          </div>
+          <div class="code-block" id="codeBlock">-- chưa có dữ liệu --</div>
+        </div>
+      </div>
+
+      <!-- Tab: Compile error -->
+      <div class="tab-panel" id="panel-err">
+        <div class="card" style="padding: 1rem;">
+          <div style="font-weight:600;font-size:.9rem;margin-bottom:.75rem;color:#f59e0b;">⚠ Lỗi biên dịch:</div>
+          <div class="compiler-block" id="ceBlock">—</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="background:var(--color-surface);border-top:1px solid var(--color-border);padding:1.5rem 0;">
+    <div class="container" style="display:flex;justify-content:space-between;color:var(--color-text-muted);font-size:.875rem;">
+      <div>© 2026 CodeProOJ</div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/submissions/detail.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

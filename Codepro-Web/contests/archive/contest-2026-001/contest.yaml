@@ -1,0 +1,25 @@
+id: contest-2026-001
+name: Weekly Contest #1
+duration: 7200
+start_time: "2026-01-10T19:00:00Z"
+type: ICPC
+rating: true
+virtual: true
+
+problems:
+  - id: A
+    code: SUM_AB
+    name: Tổng hai số
+    points: 100
+  - id: B
+    code: MAX_SUBARRAY
+    name: Đoạn con lớn nhất
+    points: 200
+  - id: C
+    code: KNAPSACK
+    name: Bài toán cái túi
+    points: 300
+  - id: D
+    code: SHORTEST_PATH
+    name: Đường đi ngắn nhất
+    points: 400

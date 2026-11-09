@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác thực Email | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/auth/verify.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card verify-card">
+      <div class="auth-header">
+        <div class="auth-logo-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+        </div>
+        <h1 class="auth-title">Xác thực Email</h1>
+        <p class="auth-subtitle">Mã xác thực OTP gồm 6 chữ số đã được gửi đến</p>
+        <p style="font-weight: 600; color: #38bdf8; margin: 6px 0 0 0;" id="displayEmail">email của bạn</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert"></div>
+
+      <form id="verifyForm" class="auth-form">
+        <div class="otp-inputs-wrapper">
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" autofocus autocomplete="one-time-code" required>
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        </div>
+
+        <button type="submit" id="verifySubmitBtn" class="auth-btn-primary">
+          <span>KÍCH HOẠT TÀI KHOẢN</span>
+        </button>
+      </form>
+
+      <div class="resend-timer-box">
+        Không nhận được mã? 
+        <button type="button" id="resendOtpBtn" class="btn-resend-otp" disabled>
+          Gửi lại mã <span id="countdownSpan">(60s)</span>
+        </button>
+      </div>
+
+      <div class="auth-footer" style="margin-top: 2rem;">
+        Sai địa chỉ email? <a href="/register" class="auth-link">Đăng ký lại</a> hoặc <a href="/login" class="auth-link">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/auth/auth.js"></script>
+  <script src="/frontend/js/auth/verify-email.js"></script>
+</body>
+</html>

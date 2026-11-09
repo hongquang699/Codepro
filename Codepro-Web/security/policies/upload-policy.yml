@@ -1,0 +1,35 @@
+# CODING_OJ File Upload Security Policy
+version: 1.0
+limits:
+  avatar_max_size_mb: 2
+  testcase_archive_max_size_mb: 100
+  single_testcase_max_size_mb: 25
+  solution_code_max_size_kb: 256
+  attachment_max_size_mb: 20
+
+allowed_extensions:
+  avatar:
+    - .png
+    - .jpg
+    - .jpeg
+    - .webp
+  testcases:
+    - .zip
+    - .in
+    - .out
+    - .ans
+  source_code:
+    - .cpp
+    - .c
+    - .py
+    - .java
+    - .rs
+    - .go
+    - .pas
+    - .cs
+    - .kt
+
+filename_sanitization:
+  strip_directory_traversal: true
+  uuid_rename_for_storage: true
+  allow_unicode_in_display: true

@@ -1,0 +1,45 @@
+# CODING_OJ Judge & Sandbox Isolation Policy
+version: 1.0
+sandbox:
+  engine: process_isolation
+  isolate_filesystem: true
+  isolate_network: true
+  drop_privileges: true
+  target_uid: 10001
+  target_gid: 10001
+
+resource_limits:
+  max_cpu_time_seconds: 10.0
+  max_real_time_seconds: 30.0
+  max_memory_mb: 1024
+  max_stack_mb: 64
+  max_processes: 16
+  max_output_file_size_mb: 32
+
+syscall_filter:
+  enabled: true
+  default_action: kill
+  allowed_syscalls:
+    - read
+    - write
+    - exit
+    - exit_group
+    - fstat
+    - mmap
+    - mprotect
+    - munmap
+    - brk
+    - rt_sigaction
+    - rt_sigprocmask
+    - futex
+    - clock_gettime
+  blocked_syscalls:
+    - socket
+    - connect
+    - bind
+    - listen
+    - accept
+    - execveat
+    - clone3
+    - ptrace
+    - kill

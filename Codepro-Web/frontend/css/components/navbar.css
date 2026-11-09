@@ -1,0 +1,285 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ Navigation Bar - Adaptive Light & Dark Theme
+   ══════════════════════════════════════════════════════════════════════ */
+
+.navbar {
+  background: var(--navbar-bg, color-mix(in srgb, var(--color-card) 85%, transparent));
+  border-bottom: 1px solid var(--navbar-border, rgba(255, 255, 255, 0.08));
+  padding: 0.65rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  width: 100%;
+}
+
+.navbar .nav-container,
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0;
+  padding: 0 2rem !important;
+  box-sizing: border-box;
+  gap: 1.5rem;
+}
+
+.nav-left-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  white-space: nowrap !important;
+}
+
+.nav-brand {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-text, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none !important;
+  letter-spacing: 0.02em;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+/* Shared CodeProOJ mark. */
+.brand-badge-code {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: block;
+  object-fit: contain;
+  box-shadow: 0 2px 8px rgba(32, 76, 180, 0.25);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  font-weight: 800;
+  color: var(--color-text, #ffffff);
+  white-space: nowrap !important;
+}
+
+/* Admin Link (right next to brand, visible only to admin role) */
+.nav-admin-link {
+  color: var(--color-primary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(56, 189, 248, 0.12);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+.nav-admin-link:hover {
+  color: var(--color-primary);
+  background: rgba(56, 189, 248, 0.2);
+  text-decoration: none !important;
+}
+
+.nav-right-group {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+  white-space: nowrap !important;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  white-space: nowrap !important;
+}
+
+.nav-links li {
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-secondary, var(--color-text-muted));
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+  transition: all 0.18s ease;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  flex-shrink: 0;
+}
+
+.nav-links a .nav-text {
+  white-space: nowrap !important;
+  display: inline-block;
+}
+
+.nav-links a:hover {
+  color: var(--color-text, #ffffff);
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  text-decoration: none !important;
+}
+
+.nav-links a.active {
+  color: var(--color-primary, var(--color-primary));
+  background: var(--color-primary-subtle, color-mix(in srgb, var(--color-primary) 12%, transparent));
+  font-weight: 700;
+  text-decoration: none !important;
+}
+
+.nav-links a.nav-client-link {
+  color: #b9d4ff;
+  border: 1px solid rgba(115, 157, 238, 0.45);
+  background: rgba(60, 100, 180, 0.18);
+}
+
+.nav-links a.nav-client-link:hover,
+.nav-links a.nav-client-link.active {
+  color: #fff;
+  background: rgba(68, 115, 216, 0.35);
+}
+
+.nav-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+/* Switcher Controls: Theme & Language */
+.nav-switchers {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.25rem;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+.btn-nav-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  min-height: 32px;
+  background: var(--color-surface, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  color: var(--color-text-secondary, var(--color-text-secondary));
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.btn-nav-control:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.12));
+  color: var(--color-text, #ffffff);
+  border-color: var(--color-primary, var(--color-primary));
+}
+
+.nav-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.navbar .nav-account-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.3rem 0.65rem 0.3rem 0.35rem;
+  border: 1px solid var(--color-border, #2a3a56);
+  border-radius: 12px;
+  background: var(--color-surface, #121d31);
+  color: var(--color-text, #f5f8ff);
+  text-decoration: none !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.navbar .nav-account-link:hover {
+  background: var(--color-surface-hover, #1b2a43);
+  border-color: var(--color-primary, #518bff);
+  box-shadow: 0 4px 14px var(--color-primary-glow, rgba(81, 139, 255, 0.24));
+  color: var(--color-text, #f5f8ff);
+}
+
+.nav-account-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(145deg, #3475ef, #1c4ba8);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.nav-account-name {
+  display: block;
+  min-width: 0;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.navbar .nav-logout-button {
+  min-height: 44px;
+  padding-inline: 0.7rem;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .nav-account-name { max-width: min(9rem, 34vw); }
+}
+
+.theme-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 900px) {
+  .nav-links {
+    display: none; /* Mobile menu can toggle */
+  }
+}

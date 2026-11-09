@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nộp Bài Giải | CodeProOJ Contest Submit</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/components/editor.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Top breadcrumb / navigation -->
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+      <a id="btnBackToProblem" href="#" style="color: var(--color-primary); text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+        &larr; Quay lại đề bài: <span id="backProbName">Bài A</span>
+      </a>
+      <span style="font-size: 0.85rem; color: var(--color-text-muted);" id="contestLabel">HSG TIN HỌC 2026</span>
+    </div>
+
+    <!-- Submit Editor Card -->
+    <div class="submit-editor-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+        <div>
+          <span class="badge" style="background: var(--color-card); color: var(--color-primary); font-size: 0.85rem;" id="taskBadge">TASK A</span>
+          <h2 id="taskHeading" style="font-size: 1.5rem; color: var(--color-text); font-weight: 800; margin-top: 0.25rem;">
+            Nộp bài: A - Tổng hai số
+          </h2>
+        </div>
+
+        <!-- Language Selector -->
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: 0.35rem; text-transform: uppercase;">
+            Ngôn ngữ lập trình
+          </label>
+          <select id="langSelect" class="btn btn-secondary" style="height: 42px; font-weight: 600; background: var(--color-bg-secondary); border-color: var(--color-border); color: var(--color-text);">
+            <option value="CPP17" selected>C++17 (GNU G++ 11.2)</option>
+            <option value="CPP20">C++20 (GNU G++ 13)</option>
+            <option value="PY3">Python 3.12 (CPython)</option>
+            <option value="PYPY3">PyPy 3</option>
+            <option value="JAVA17">Java 17 (OpenJDK)</option>
+            <option value="PAS">Free Pascal 3.2</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Code Editor Form -->
+      <form id="contestSubmitForm">
+        <!-- Professional Code IDE Frame -->
+        <div class="ide-frame" style="margin-bottom: 1.5rem;">
+          <!-- IDE Top Toolbar -->
+          <div class="ide-toolbar">
+            <div class="ide-toolbar-left">
+              <span class="ide-lang-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                <span id="activeLangLabel">C++17 (GNU G++)</span>
+              </span>
+
+              <span class="ide-autosave-badge" id="ideAutosaveBadge">
+                <span class="ide-autosave-dot"></span> Đã lưu nháp
+              </span>
+            </div>
+
+            <div class="ide-toolbar-right">
+              <!-- Theme Selector -->
+              <select id="ideThemeSelect" class="ide-select" title="Giao diện IDE">
+                <option value="vs-dark" selected>🌙 VS Dark</option>
+                <option value="vs">☀️ Sáng (Light)</option>
+                <option value="hc-black">🖤 High Contrast</option>
+              </select>
+
+              <!-- Font Size Selector -->
+              <select id="ideFontSizeSelect" class="ide-select" title="Cỡ chữ">
+                <option value="12">12px</option>
+                <option value="13">13px</option>
+                <option value="14" selected>14px</option>
+                <option value="16">16px</option>
+                <option value="18">18px</option>
+              </select>
+
+              <button type="button" class="ide-btn" id="btnIdeFormat" title="Tự động căn lề (Format)">
+                ⚡ Định dạng
+              </button>
+              <button type="button" class="ide-btn" id="btnIdeTemplate" title="Tải lại code mẫu">
+                📋 Mã mẫu
+              </button>
+              <button type="button" class="ide-btn" id="btnIdeCopy" title="Sao chép code">
+                📑 Sao chép
+              </button>
+              <button type="button" class="ide-btn" id="btnIdeClear" title="Xóa code">
+                🗑 Xóa
+              </button>
+              <button type="button" class="ide-btn btn-fullscreen" id="btnIdeFullscreen" title="Mở rộng toàn màn hình (Zen Mode)">
+                ⛶ Toàn màn hình
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Monaco Editor Container -->
+          <div class="ide-editor-container">
+            <div id="monacoEditor"></div>
+
+            <!-- Fallback Gutter + Textarea (active if Monaco is unavailable) -->
+            <div class="ide-fallback-wrapper" id="ideFallbackWrapper" style="display:none;">
+              <div class="ide-fallback-gutter" id="editorGutter">1</div>
+              <textarea id="sourceCodeArea" class="ide-fallback-textarea" spellcheck="false" placeholder="// Viết mã nguồn bài giải tại đây..."></textarea>
+            </div>
+          </div>
+
+          <!-- IDE Bottom Status Bar -->
+          <div class="ide-status-bar">
+            <div class="ide-status-left">
+              <span class="ide-status-item" id="ideCursorPos">Ln 1, Col 1</span>
+              <span class="ide-status-item hide-on-mobile" id="ideStatsStatus">1 dòng, 0 ký tự</span>
+            </div>
+            <div class="ide-status-right">
+              <span class="ide-status-item hide-on-mobile" id="ideStatusLang">C++17</span>
+              <span class="ide-status-item hide-on-mobile">UTF-8</span>
+              <span class="ide-status-item hide-on-mobile">Dấu cách: 4</span>
+              <span class="ide-hotkey-hint">Ctrl + Enter để Nộp bài</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="submitAlert" style="display: none; padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.9rem; text-align: center;"></div>
+
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+          <a id="btnCancel" href="#" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+            Hủy
+          </a>
+          <button type="submit" id="btnSubmitCode" class="btn-contest-submit-cta" style="padding: 0.85rem 2.5rem; font-size: 1.05rem;">
+            🚀 NỘP BÀI
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  <script src="/frontend/js/components/code-ide.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest') || 'hsg-tin-2026';
+    const problemId = urlParams.get('problem') || 'A';
+
+    const probUrl = `/contests/${contestKey}/problems/${problemId}`;
+    document.getElementById('btnBackToProblem').href = probUrl;
+    document.getElementById('btnCancel').href = probUrl;
+
+    const templates = {
+      CPP17: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    long long a, b;
+    if (cin >> a >> b) {
+        cout << a + b << "\\n";
+    }
+
+    return 0;
+}
+`,
+      CPP20: `#include <iostream>
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    long long a, b;
+    if (std::cin >> a >> b) {
+        std::cout << a + b << "\\n";
+    }
+    return 0;
+}
+`,
+      PY3: `import sys
+
+def main():
+    input_data = sys.stdin.read().split()
+    if len(input_data) >= 2:
+        a = int(input_data[0])
+        b = int(input_data[1])
+        print(a + b)
+
+if __name__ == '__main__':
+    main()
+`,
+      JAVA17: `import java.util.Scanner;
+
+public class Solution {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNextLong()) {
+            long a = sc.nextLong();
+            long b = sc.nextLong();
+            System.out.println(a + b);
+        }
+    }
+}
+`,
+      PAS: `program Solution;
+var
+    a, b: int64;
+begin
+    read(a, b);
+    writeln(a + b);
+end.
+`
+    };
+
+    templates.PYPY3 = `a, b = map(int, input().split())
+print(a + b)`;
+
+    const langSelect = document.getElementById('langSelect');
+    const textarea = document.getElementById('sourceCodeArea');
+
+    // Initialize Professional CodeIDE for Contest
+    window.CodeIDE.init({
+      containerId: 'monacoEditor',
+      fallbackTextareaId: 'sourceCodeArea',
+      fallbackGutterId: 'editorGutter',
+      languageSelectId: 'langSelect',
+      problemCode: `${contestKey}_${problemId}`,
+      defaultLang: langSelect.value || 'CPP17',
+      onSubmit: function() {
+        const btn = document.getElementById('btnSubmitCode');
+        if (btn) btn.click();
+      }
+    });
+
+    langSelect.addEventListener('change', () => {
+      window.CodeIDE.setLanguage(langSelect.value);
+    });
+
+    // Fetch Problem Info
+    (async () => {
+      try {
+        const json = await ContestAPI.getProblem(contestKey, problemId);
+        if (json && json.data) {
+          const p = json.data.problem;
+          document.getElementById('taskBadge').textContent = `TASK ${p.letter}`;
+          document.getElementById('taskHeading').textContent = `Nộp bài: ${p.letter} - ${p.name}`;
+          document.getElementById('backProbName').textContent = `Bài ${p.letter} (${p.name})`;
+          document.getElementById('contestLabel').textContent = json.data.contest.name;
+        }
+      } catch (e) {
+        console.error('Error fetching problem details:', e);
+      }
+    })();
+
+    // Handle Submit
+    document.getElementById('contestSubmitForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const code = (window.CodeIDE ? window.CodeIDE.getValue() : textarea.value).trim();
+      const lang = langSelect.value;
+      const alertBox = document.getElementById('submitAlert');
+      const submitBtn = document.getElementById('btnSubmitCode');
+
+      if (!code) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#450a0a';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = 'Vui lòng nhập mã nguồn trước khi nộp bài.';
+        return;
+      }
+
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(59, 130, 246, 0.15)';
+      alertBox.style.color = '#60a5fa';
+      alertBox.style.border = '1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)';
+      alertBox.textContent = 'Đang gửi bài nộp vào hàng đợi máy chấm...';
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Đang nộp...';
+
+      try {
+        const json = await ContestAPI.submitProblem(contestKey, problemId, lang, code);
+        if (json && (json.status === 201 || json.data?.submission_id)) {
+          const subId = json.data.submission_id;
+          alertBox.style.background = 'rgba(16, 185, 129, 0.15)';
+          alertBox.style.color = '#34d399';
+          alertBox.textContent = `Nộp bài thành công! Đang chuyển tới trang kết quả bài nộp #${subId}...`;
+
+          // Seamless redirect directly to Submission Result
+          setTimeout(() => {
+            window.location.href = `/contests/${contestKey}/submissions/${subId}`;
+          }, 400);
+        } else {
+          alertBox.style.background = '#450a0a';
+          alertBox.style.color = '#fca5a5';
+          alertBox.textContent = (json.error && json.error.message) || 'Có lỗi xảy ra khi nộp bài. Vui lòng kiểm tra lại đăng nhập!';
+          submitBtn.disabled = false;
+          submitBtn.innerText = '🚀 NỘP BÀI';
+        }
+      } catch (err) {
+        alertBox.style.background = '#450a0a';
+        alertBox.style.color = '#fca5a5';
+        alertBox.textContent = 'Không thể kết nối máy chủ nộp bài. Vui lòng thử lại!';
+        submitBtn.disabled = false;
+        submitBtn.innerText = '🚀 NỘP BÀI';
+      }
+    });
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

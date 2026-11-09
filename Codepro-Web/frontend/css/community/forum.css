@@ -1,0 +1,114 @@
+/* ==========================================================================
+   Forum CSS - CodeProOJ Community
+   ========================================================================== */
+
+.forum-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.forum-cat-card {
+  background: var(--comm-card-bg);
+  border: 1px solid var(--comm-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.forum-cat-card:hover {
+  border-color: var(--comm-primary);
+  transform: translateY(-2px);
+  background: var(--comm-card-hover);
+}
+
+.forum-cat-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.forum-cat-desc {
+  font-size: 0.84rem;
+  color: var(--comm-text-muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.forum-cat-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+/* Thread List Table */
+.forum-thread-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.forum-thread-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--comm-border);
+}
+
+.forum-thread-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
+}
+
+.forum-thread-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.forum-thread-row td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.forum-thread-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.forum-thread-title:hover {
+  color: var(--comm-primary);
+}
+
+.pinned-badge {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-weight: 700;
+}
+
+.locked-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-weight: 700;
+}

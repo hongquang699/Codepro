@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trung tâm Trợ giúp | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <style>
+    .info-hero {
+      background: linear-gradient(135deg, var(--color-card) 0%, var(--color-bg-secondary) 100%);
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 2.5rem;
+    }
+    .info-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-text);
+      margin-bottom: 0.75rem;
+    }
+    .info-subtitle {
+      color: var(--color-text-muted);
+      font-size: 1.1rem;
+      max-width: 800px;
+      line-height: 1.6;
+    }
+    .content-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .section-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-heading:first-child {
+      margin-top: 0;
+    }
+    .info-text {
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 1.5rem 0;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    .faq-q {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .faq-a {
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+    .badge-verdict {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .badge-ac { background: rgba(34, 197, 94, 0.2); color: var(--color-success); border: 1px solid #22c55e; }
+    .badge-wa { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .badge-tle { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .badge-mle { background: color-mix(in srgb, var(--color-accent) 20%, transparent); color: var(--color-accent); border: 1px solid #a855f7; }
+    .badge-rte { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid var(--color-accent); }
+    .badge-ce { background: rgba(100, 116, 139, 0.2); color: var(--color-text-muted); border: 1px solid #64748b; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary);
+    }
+    .stat-lbl {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/submission/index.html">Bài nộp</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/courses/index.html">Khóa học</a></li>
+        <li><a href="/frontend/html/community/forum/index.html">Thảo luận</a></li>
+        <li><a href="/frontend/html/blog/index.html">Blog</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="info-hero">
+    <div class="container">
+      <h1 class="info-title">Hỏi đáp &amp; Hướng dẫn (FAQ)</h1>
+      <p class="info-subtitle">Giải đáp tất cả các thắc mắc thường gặp về máy chấm, các trạng thái phán quyết, ngôn ngữ lập trình và tài khoản.</p>
+    </div>
+  </div>
+
+  <main class="container" style="padding-bottom: 4rem;">
+    <div class="content-section">
+      <h2 class="section-heading" style="margin-bottom: 1.5rem;"><cp-icon name="document" size="sm"></cp-icon> Ý nghĩa các trạng thái phán quyết (Verdicts)</h2>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-ac">AC</span> Accepted - Đúng toàn bộ testcase</div>
+        <div class="faq-a">Chương trình của bạn đã vượt qua tất cả các bộ dữ liệu kiểm tra trong giới hạn thời gian và bộ nhớ quy định. Xin chúc mừng!</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-wa">WA</span> Wrong Answer - Kết quả sai</div>
+        <div class="faq-a">Chương trình chạy bình thường nhưng kết quả đầu ra (output) không khớp với đáp án mẫu. Hãy kiểm tra các trường hợp biên, tràn số (overflow) hoặc định dạng khoảng trắng.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-tle">TLE</span> Time Limit Exceeded - Chạy quá thời gian</div>
+        <div class="faq-a">Chương trình chạy lâu hơn giới hạn thời gian cho phép (ví dụ &gt; 1.0 giây). Bạn cần tối ưu hóa độ phức tạp thuật toán (ví dụ từ O(N^2) xuống O(N log N)) hoặc dùng kỹ thuật Fast I/O.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-mle">MLE</span> Memory Limit Exceeded - Tràn bộ nhớ</div>
+        <div class="faq-a">Chương trình cấp phát bộ nhớ vượt quá dung lượng cho phép (ví dụ &gt; 256MB). Hãy kiểm tra kích thước mảng tĩnh, đệ quy vô hạn hoặc bộ nhớ động chưa giải phóng.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-rte">RTE</span> Runtime Error - Lỗi thực thi</div>
+        <div class="faq-a">Chương trình bị tắt đột ngột do vi phạm bộ nhớ: chia cho 0, truy cập mảng ngoài giới hạn (out-of-bounds index), stack overflow hoặc lệnh assert thất bại.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q"><span class="badge-verdict badge-ce">CE</span> Compilation Error - Lỗi biên dịch</div>
+        <div class="faq-a">Trình biên dịch không thể dịch mã nguồn của bạn thành file thực thi. Hãy bấm vào biểu tượng lỗi để xem chi tiết log biên dịch từ GCC/Clang/Python.</div>
+      </div>
+
+      <h2 class="section-heading" style="margin-top: 2.5rem; margin-bottom: 1.5rem;">❓ Các câu hỏi thường gặp khác</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">Làm thế nào để tăng tốc vào/ra (Fast I/O) trong C++?</div>
+        <div class="faq-a">
+          Thêm 2 dòng lệnh sau vào đầu hàm <code>main()</code>:
+          <pre style="background: rgba(0,0,0,0.4); padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; color: #a5f3fc;">ios_base::sync_with_stdio(false);
+cin.tie(NULL);</pre>
+          Đồng thời dùng <code>'
+'</code> thay vì <code>endl</code> để tránh flush đệm liên tục.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Độ lớn kiểu dữ liệu nguyên và tránh tràn số như thế nào?</div>
+        <div class="faq-a">
+          Kiểu <code>int</code> trong C++ có phạm vi xấp xỉ [-2×10^9, 2×10^9]. Nếu tổng hoặc tích các số có thể vượt qua 2 tỷ, bạn phải sử dụng kiểu <code>long long</code> (phạm vi xấp xỉ 9×10^18) hoặc <code>__int128_t</code>.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Hệ thống tính điểm xếp hạng Rating như thế nào?</div>
+        <div class="faq-a">
+          Hệ thống áp dụng thuật toán Elo cải tiến tương tự Codeforces. Sau mỗi kỳ thi Rated, rating của thí sinh sẽ được cập nhật dựa trên kỳ vọng thứ hạng và thứ hạng thực tế đạt được trong cuộc thi.
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <footer style="background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 2.5rem 0; margin-top: auto;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; color: var(--color-text-muted); font-size: 0.875rem; flex-wrap: wrap; gap: 1rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng Chấm Lập trình Thi đấu & Đào tạo Thuật toán Hàng đầu Việt Nam.</div>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/frontend/html/about/index.html" style="color: var(--color-text-muted); text-decoration: none;">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html" style="color: var(--color-text-muted); text-decoration: none;">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html" style="color: var(--color-text-muted); text-decoration: none;">Hỏi đáp (FAQ)</a>
+        <a href="/frontend/html/help/contact.html" style="color: var(--color-text-muted); text-decoration: none;">Liên hệ</a>
+        <a href="/frontend/html/about/privacy.html" style="color: var(--color-text-muted); text-decoration: none;">Chính sách bảo mật</a>
+        <a href="/frontend/html/about/terms.html" style="color: var(--color-text-muted); text-decoration: none;">Điều khoản</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

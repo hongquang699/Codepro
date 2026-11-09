@@ -1,0 +1,67 @@
+/* App Sticky Footer Styles */
+html, body {
+  min-height: 100vh;
+}
+
+body.ranking-page, body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.ranking-container, main, .main-content {
+  flex: 1 0 auto;
+}
+
+.app-footer {
+  margin-top: auto;
+  flex-shrink: 0;
+  width: 100%;
+  background: var(--color-surface, var(--color-bg));
+  border-top: 1px solid var(--color-border, var(--color-border-subtle));
+  padding: 1.25rem 0;
+}
+
+.footer-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-copyright {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-primary);
+  text-decoration: none !important;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}

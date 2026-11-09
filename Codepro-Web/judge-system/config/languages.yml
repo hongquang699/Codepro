@@ -1,0 +1,133 @@
+# Supported Language Definitions for Judge System
+languages:
+  cpp:
+    name: "C++17 (GNU G++)"
+    version: "17"
+    source_file: "solution.cpp"
+    binary_file: "solution.exe"
+    compile_cmd: ["g++", "-O3", "-std=c++17", "-DONLINE_JUDGE", "{source}", "-o", "{binary}"]
+    run_cmd: ["{binary}"]
+    time_multiplier: 1.0
+    memory_multiplier: 1.0
+    is_compiled: true
+
+  c:
+    name: "C11 (GNU GCC)"
+    version: "11"
+    source_file: "solution.c"
+    binary_file: "solution.exe"
+    compile_cmd: ["gcc", "-O3", "-std=c11", "-DONLINE_JUDGE", "{source}", "-o", "{binary}"]
+    run_cmd: ["{binary}"]
+    time_multiplier: 1.0
+    memory_multiplier: 1.0
+    is_compiled: true
+
+  python:
+    name: "Python 3.12"
+    version: "3.12"
+    source_file: "solution.py"
+    binary_file: null
+    compile_cmd: ["python", "-m", "py_compile", "{source}"]
+    run_cmd: ["python", "-u", "{source}"]
+    time_multiplier: 2.5
+    memory_multiplier: 2.0
+    is_compiled: false
+
+  pypy:
+    name: "PyPy 3"
+    version: "3"
+    source_file: "solution.py"
+    binary_file: null
+    compile_cmd: ["pypy3", "-m", "py_compile", "{source}"]
+    run_cmd: ["pypy3", "-u", "{source}"]
+    time_multiplier: 2.5
+    memory_multiplier: 2.0
+    is_compiled: false
+
+  java:
+    name: "Java 17 (OpenJDK)"
+    version: "17"
+    source_file: "Solution.java"
+    binary_file: "Solution.class"
+    compile_cmd: ["javac", "-encoding", "UTF-8", "{source}"]
+    run_cmd: ["java", "-Xss64m", "-Xmx{memory_limit_mb}m", "Solution"]
+    time_multiplier: 2.0
+    memory_multiplier: 2.0
+    is_compiled: true
+
+  rust:
+    name: "Rust 2021"
+    version: "1.75"
+    source_file: "solution.rs"
+    binary_file: "solution.exe"
+    compile_cmd: ["rustc", "-O", "{source}", "-o", "{binary}"]
+    run_cmd: ["{binary}"]
+    time_multiplier: 1.0
+    memory_multiplier: 1.0
+    is_compiled: true
+
+  go:
+    name: "Go 1.22"
+    version: "1.22"
+    source_file: "solution.go"
+    binary_file: "solution.exe"
+    compile_cmd: ["go", "build", "-o", "{binary}", "{source}"]
+    run_cmd: ["{binary}"]
+    time_multiplier: 1.2
+    memory_multiplier: 1.5
+    is_compiled: true
+
+  javascript:
+    name: "Node.js (JavaScript ES2023)"
+    version: "20.x"
+    source_file: "solution.js"
+    binary_file: null
+    compile_cmd: ["node", "--check", "{source}"]
+    run_cmd: ["node", "--stack-size=65536", "{source}"]
+    time_multiplier: 2.0
+    memory_multiplier: 2.0
+    is_compiled: false
+
+  typescript:
+    name: "TypeScript (Node.js)"
+    version: "5.x"
+    source_file: "solution.ts"
+    binary_file: "solution.js"
+    compile_cmd: ["tsc", "--target", "es2022", "{source}"]
+    run_cmd: ["node", "{binary}"]
+    time_multiplier: 2.0
+    memory_multiplier: 2.0
+    is_compiled: true
+
+  kotlin:
+    name: "Kotlin 1.9"
+    version: "1.9"
+    source_file: "Solution.kt"
+    binary_file: "Solution.jar"
+    compile_cmd: ["kotlinc", "{source}", "-include-runtime", "-d", "{binary}"]
+    run_cmd: ["java", "-jar", "{binary}"]
+    time_multiplier: 2.0
+    memory_multiplier: 2.0
+    is_compiled: true
+
+  csharp:
+    name: "C# (.NET 8.0)"
+    version: "8.0"
+    source_file: "Solution.cs"
+    binary_file: "Solution.exe"
+    compile_cmd: ["dotnet", "build", "-c", "Release", "-o", "./bin"]
+    run_cmd: ["./bin/Solution.exe"]
+    time_multiplier: 1.5
+    memory_multiplier: 1.5
+    is_compiled: true
+
+  pascal:
+    name: "Free Pascal (FPC)"
+    version: "3.2"
+    source_file: "solution.pas"
+    binary_file: "solution.exe"
+    compile_cmd: ["fpc", "-O2", "{source}"]
+    run_cmd: ["{binary}"]
+    time_multiplier: 1.2
+    memory_multiplier: 1.0
+    is_compiled: true

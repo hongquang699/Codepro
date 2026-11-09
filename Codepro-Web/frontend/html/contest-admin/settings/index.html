@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu Hình &amp; Lịch Thi | Contest Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+
+    <main class="ca-main">
+      <div id="caHeaderTarget"></div>
+
+      <div class="ca-panel">
+        <div class="ca-panel-header">
+          <h3 class="ca-panel-title"><cp-icon name="settings" size="sm"></cp-icon> Thiết Lập Thông Tin Kỳ Thi</h3>
+        </div>
+        <div class="ca-panel-body">
+          <form onsubmit="event.preventDefault(); submitSettings();">
+            <div class="ca-grid-2">
+              <div class="ca-form-group">
+                <label class="ca-form-label">Mã Kỳ Thi (Key / ID)</label>
+                <input type="text" id="set_key" class="ca-input" readonly style="background: #050811;color: var(--color-primary);font-family:monospace;">
+              </div>
+              <div class="ca-form-group">
+                <label class="ca-form-label">Tên Kỳ Thi *</label>
+                <input type="text" id="set_name" required class="ca-input">
+              </div>
+            </div>
+
+            <div class="ca-form-group">
+              <label class="ca-form-label">Mô Tả Kỳ Thi (Description / Rules)</label>
+              <textarea id="set_description" class="ca-textarea" rows="4"></textarea>
+            </div>
+
+            <div class="ca-grid-2">
+              <div class="ca-form-group">
+                <label class="ca-form-label">Thể Thức Chấm Điểm (Format)</label>
+                <select id="set_format" class="ca-select">
+                  <option value="icpc">ICPC (Xếp hạng phạt thời gian)</option>
+                  <option value="ioi">IOI (Điểm từng phần Partial)</option>
+                  <option value="atcoder">AtCoder (Điểm + Phạt theo phút)</option>
+                </select>
+              </div>
+              <div class="ca-form-group">
+                <label class="ca-form-label">Thời Gian Làm Bài (giây)</label>
+                <input type="number" id="set_time_limit" class="ca-input" step="60">
+              </div>
+            </div>
+
+            <div class="ca-grid-2">
+              <div class="ca-form-group">
+                <label class="ca-form-label">Thời Gian Bắt Đầu (Start Time)</label>
+                <input type="datetime-local" id="set_start_time" class="ca-input">
+              </div>
+              <div class="ca-form-group">
+                <label class="ca-form-label">Thời Gian Kết Thúc (End Time)</label>
+                <input type="datetime-local" id="set_end_time" class="ca-input">
+              </div>
+            </div>
+
+            <div class="ca-grid-2">
+              <div class="ca-form-group">
+                <label class="ca-form-label">Thời Điểm Đóng Băng Bảng Điểm (Scoreboard Freeze)</label>
+                <input type="datetime-local" id="set_freeze_time" class="ca-input">
+                <small style="color: var(--color-text-dim);font-size:.72rem;">Để trống nếu không tự động đóng băng</small>
+              </div>
+              <div class="ca-form-group">
+                <label class="ca-form-label">Mã Truy Cập Bí Mật (Access Code)</label>
+                <input type="text" id="set_access_code" class="ca-input" placeholder="Để trống nếu kỳ thi mở">
+              </div>
+            </div>
+
+            <div class="ca-grid-2" style="margin-top:1rem;">
+              <div class="ca-form-group">
+                <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;">
+                  <input type="checkbox" id="set_is_rated" style="width:16px;height:16px;">
+                  <span style="font-size:.88rem;color: var(--color-text);">Tính Điểm Xếp Hạng (Rated Contest)</span>
+                </label>
+              </div>
+              <div class="ca-form-group">
+                <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;">
+                  <input type="checkbox" id="set_is_visible" style="width:16px;height:16px;">
+                  <span style="font-size:.88rem;color: var(--color-text);">Hiển Thị Công Khai (Is Visible)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="ca-form-group" style="margin-top:1rem;">
+              <label class="ca-form-label" for="set_display_target">Nơi hiển thị cuộc thi</label>
+              <select id="set_display_target" class="ca-input">
+                <option value="both">Trên web và client</option>
+                <option value="web">Chỉ trên web</option>
+                <option value="client">Chỉ trên client</option>
+              </select>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;margin-top:1.5rem;gap:.75rem;">
+              <button type="submit" class="ca-btn ca-btn-primary" style="padding:.6rem 1.5rem;">
+                💾 Lưu Cấu Hình Kỳ Thi
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script>
+    const contestKey = ContestAdminAPI.getContestKey();
+    ContestAdminUI.renderSidebar('settings', contestKey);
+    ContestAdminUI.renderHeader('Cấu Hình &amp; Lịch Thi', `Thiết lập thông số cho kỳ thi ${contestKey}`);
+
+    function formatForInput(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      const pad = n => n.toString().padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    async function loadSettings() {
+      const res = await ContestAdminAPI.getSettings(contestKey);
+      if (!res.data) return;
+      const c = res.data;
+
+      document.getElementById('set_key').value = c.key;
+      document.getElementById('set_name').value = c.name;
+      document.getElementById('set_description').value = c.description || '';
+      document.getElementById('set_format').value = c.format;
+      document.getElementById('set_time_limit').value = c.time_limit;
+      document.getElementById('set_start_time').value = formatForInput(c.start_time);
+      document.getElementById('set_end_time').value = formatForInput(c.end_time);
+      document.getElementById('set_freeze_time').value = formatForInput(c.scoreboard_freeze);
+      document.getElementById('set_access_code').value = c.access_code || '';
+      document.getElementById('set_is_rated').checked = Boolean(c.is_rated);
+      document.getElementById('set_is_visible').checked = Boolean(c.is_visible);
+      document.getElementById('set_display_target').value = c.display_target || 'both';
+    }
+
+    async function submitSettings() {
+      const payload = {
+        name: document.getElementById('set_name').value.trim(),
+        description: document.getElementById('set_description').value.trim(),
+        format: document.getElementById('set_format').value,
+        time_limit: parseInt(document.getElementById('set_time_limit').value) || 10800,
+        start_time: document.getElementById('set_start_time').value,
+        end_time: document.getElementById('set_end_time').value,
+        scoreboard_freeze: document.getElementById('set_freeze_time').value || null,
+        access_code: document.getElementById('set_access_code').value.trim(),
+        is_rated: document.getElementById('set_is_rated').checked,
+        is_visible: document.getElementById('set_is_visible').checked,
+        display_target: document.getElementById('set_display_target').value
+      };
+
+      const res = await ContestAdminAPI.updateSettings(contestKey, payload);
+      alert(res.message || res.error);
+      if (res.status === 200) {
+        loadSettings();
+      }
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>

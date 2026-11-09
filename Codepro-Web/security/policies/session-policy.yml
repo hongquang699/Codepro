@@ -1,0 +1,22 @@
+# CODING_OJ Session & Token Policy Configuration
+version: 1.0
+jwt:
+  algorithm: HS256
+  access_token_lifetime_minutes: 60
+  refresh_token_lifetime_days: 30
+  sliding_window: true
+  blacklist_on_logout: true
+
+cookies:
+  http_only: true
+  secure: true
+  same_site: Lax
+  domain: null
+  path: /
+
+sessions:
+  idle_timeout_minutes: 30
+  absolute_timeout_hours: 24
+  enforce_ip_pinning: false
+  enforce_user_agent_pinning: true
+  max_concurrent_sessions_per_user: 5

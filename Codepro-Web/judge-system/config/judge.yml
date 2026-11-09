@@ -1,0 +1,20 @@
+# CodeProOJ Judge System - Master Server Configuration
+server:
+  host: "0.0.0.0"
+  port: 9999
+  workers_count: 2
+  # Set JUDGE_AUTH_TOKEN in the project .env or process environment.
+  backend_api_url: "http://127.0.0.1:8000/api/v2"
+  heartbeat_interval: 10 # seconds
+
+paths:
+  storage: "./storage"
+  # Problem data is loaded from JUDGE_PROBLEM_DATA_DIR outside the source checkout.
+  logs: "./logs"
+  tmp: "./storage/executables"
+
+queue:
+  type: "memory" # "memory" or "redis"
+  redis_url: "redis://127.0.0.1:6379/0"
+  max_retries: 3
+  timeout_per_job: 60 # seconds

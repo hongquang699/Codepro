@@ -1,0 +1,6 @@
+language: javascript
+compiler: compiler.sh
+runner: runner.sh
+file_extension: javascript
+default_time_limit: 2
+default_memory_limit: 256

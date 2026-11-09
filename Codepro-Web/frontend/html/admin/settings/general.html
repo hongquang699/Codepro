@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu Hình Hệ Thống &amp; Bảo Trì | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+      </a>
+      <a href="/admin/security" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+        <span class="nav-badge" id="navShieldBadge" style="background: #10b981;color: #fff;">WAF ON</span>
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+      <a href="/admin/blogs" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Quản lý Blog &amp; Bài viết
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item active">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div class="topbar-title">
+          <h1><cp-icon name="settings" size="sm"></cp-icon> Cấu Hình Hệ Thống &amp; Vận Hành Toàn Sàn</h1>
+          <p>Điều khiển chế độ bảo trì, phát sóng thông báo toàn hệ thống và dọn sạch bộ nhớ đệm cache.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <!-- Global Announcement Setting -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span><cp-icon name="bell" size="sm"></cp-icon> </span> Thông Báo Toàn Sàn (Global Banner)</h3>
+            <span id="annBadge" class="badge-v bv-AC">ĐANG PHÁT</span>
+          </div>
+          <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+            <div>
+              <label style="display:block;font-size:.82rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.4rem;">Nội dung hiển thị trên đầu trang:</label>
+              <textarea id="settAnnounceText" rows="4" style="width:100%;background: var(--color-bg);border: 1px solid var(--color-border);border-radius:8px;color: #fff;padding:.65rem;font-size:.88rem;box-sizing:border-box;outline: none;"></textarea>
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <input type="checkbox" id="settAnnounceActive" checked>
+              <label for="settAnnounceActive" style="font-size:.85rem;color: var(--color-text-secondary);cursor:pointer;">Hiển thị thông báo trên tất cả các trang người dùng</label>
+            </div>
+            <button onclick="saveAnnouncementSetting()" class="btn-top btn-top-primary" style="align-self:flex-start;padding:.5rem 1.25rem;">
+              Lưu &amp; Cập Nhật Thông Báo
+            </button>
+          </div>
+        </div>
+
+        <!-- Maintenance Mode Setting -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><cp-icon name="shield" size="sm"></cp-icon> Chế Độ Bảo Trì Hệ Thống (Maintenance)</h3>
+            <span id="settMaintBadge" class="badge-v bv-AC">HOẠT ĐỘNG</span>
+          </div>
+          <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+            <div style="font-size:.85rem;color: var(--color-text-muted);line-height:1.6;">
+              Khi bật chế độ bảo trì, các thí sinh không có quyền quản trị sẽ thấy thông báo tạm ngưng nộp bài và làm bài thi để hệ thống nâng cấp.
+            </div>
+            <div style="background: #0b1120;border: 1px solid var(--color-border-subtle);border-radius:8px;padding:1rem;">
+              <div style="font-weight:700;color: #fff;margin-bottom:.25rem;">Trạng thái hiện tại:</div>
+              <div id="maintStatusDesc" style="font-size:.85rem;color: #34d399;">✓ Hệ thống đang phục vụ bình thường.</div>
+            </div>
+            <button onclick="toggleSystemMaintenance()" id="maintBtnAction" class="btn-top btn-top-primary" style="background: #ef4444;align-self:flex-start;padding:.5rem 1.25rem;">
+              🛡️ Bật Chế Độ Bảo Trì
+            </button>
+          </div>
+        </div>
+
+        <!-- Cache & Queue Management -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span>🧹</span> Dọn Dẹp Bộ Nhớ Đệm (Cache &amp; Queue)</h3>
+          </div>
+          <div class="panel-bdy" style="display:flex;flex-direction:column;gap:1rem;">
+            <div style="font-size:.85rem;color: var(--color-text-muted);line-height:1.6;">
+              Xóa sạch các khóa lưu cache trong bộ nhớ và làm sạch hàng đợi bài nộp kẹt để đồng bộ lại dữ liệu mới nhất.
+            </div>
+            <div style="display:flex;gap:.75rem;">
+              <button onclick="flushCacheAction()" class="btn-top btn-top-secondary" style="background: var(--color-primary);color: #fff;border-color: var(--color-primary);">
+                🧹 Xóa Cache Hệ Thống
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Infrastructure Diagnostics -->
+        <div class="panel-box">
+          <div class="panel-hdr">
+            <h3><span>📡</span> Chẩn Đoán Dịch Vụ Hạ Tầng (Diagnostics)</h3>
+          </div>
+          <div class="panel-bdy" style="display:flex;flex-direction:column;gap:.75rem;">
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);font-size:.85rem;">
+              <span style="color: var(--color-text-secondary);">Django REST Backend (:8000)</span>
+              <span style="color: #34d399;font-weight:700;">● HOẠT ĐỘNG</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);font-size:.85rem;">
+              <span style="color: var(--color-text-secondary);">Judge Server Cluster (:9999)</span>
+              <span style="color: #34d399;font-weight:700;">● 7 WORKERS ONLINE</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);font-size:.85rem;">
+              <span style="color: var(--color-text-secondary);">Node Web Gateway (:8888)</span>
+              <span style="color: #34d399;font-weight:700;">● HOẠT ĐỘNG</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom: 1px solid var(--color-border-subtle);font-size:.85rem;">
+              <span style="color: var(--color-text-secondary);">Cơ sở dữ liệu SQLite / PostgreSQL</span>
+              <span style="color: #34d399;font-weight:700;">● KẾT NỐI TỐT</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.85rem;">
+              <span style="color: var(--color-text-secondary);">Lá Chắn WAF &amp; Anti-DDoS</span>
+              <a href="/admin/security" style="color: var(--color-primary);text-decoration:none;font-weight:700;"><cp-icon name="shield" size="sm"></cp-icon> VÀO TRUNG TÂM BẢO MẬT &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+    let systemState = {};
+
+    async function loadSettings() {
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/system`);
+        const json = await resp.json();
+        systemState = json?.data || {};
+
+        document.getElementById('settAnnounceText').value = systemState.global_announcement || '';
+        document.getElementById('settAnnounceActive').checked = systemState.announcement_active !== false;
+
+        const isAnn = systemState.announcement_active !== false;
+        document.getElementById('annBadge').className = isAnn ? 'badge-v bv-AC' : 'badge-v bv-WA';
+        document.getElementById('annBadge').textContent = isAnn ? 'ĐANG PHÁT' : 'ĐÃ TẮT';
+
+        const isMaint = !!systemState.maintenance_mode;
+        document.getElementById('settMaintBadge').className = isMaint ? 'badge-v bv-WA' : 'badge-v bv-AC';
+        document.getElementById('settMaintBadge').textContent = isMaint ? 'BẢO TRÌ' : 'HOẠT ĐỘNG';
+        document.getElementById('maintStatusDesc').textContent = isMaint ? '⚠ Đang bật chế độ bảo trì: Người dùng thường không thể nộp bài.' : '✓ Hệ thống đang phục vụ bình thường.';
+        document.getElementById('maintStatusDesc').style.color = isMaint ? '#f87171' : '#34d399';
+
+        const mBtn = document.getElementById('maintBtnAction');
+        mBtn.textContent = isMaint ? '🟢 Tắt Bảo Trì (Mở Lại Sàn)' : '🛡️ Bật Chế Độ Bảo Trì';
+        mBtn.style.background = isMaint ? '#065f46' : '#ef4444';
+      } catch (err) {
+        console.warn('Settings load error:', err);
+      }
+    }
+
+    window.saveAnnouncementSetting = async function() {
+      const text = document.getElementById('settAnnounceText').value.trim();
+      const active = document.getElementById('settAnnounceActive').checked;
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/system`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'set_announcement', message: text, active: active })
+        });
+        if (resp.ok) {
+          alert('✓ Đã cập nhật thông báo toàn sàn thành công!');
+          loadSettings();
+        }
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    };
+
+    window.toggleSystemMaintenance = async function() {
+      const nextState = !systemState.maintenance_mode;
+      const act = nextState ? 'BẬT bảo trì' : 'TẮT bảo trì';
+      if (!confirm(`Bạn có chắc chắn muốn ${act}?`)) return;
+
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/system`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'toggle_maintenance', enabled: nextState })
+        });
+        if (resp.ok) {
+          alert(`✓ Đã ${act} thành công!`);
+          loadSettings();
+        }
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    };
+
+    window.flushCacheAction = async function() {
+      if (!confirm('Bạn có chắc muốn dọn sạch cache hệ thống?')) return;
+      try {
+        const resp = await fetch(`${API}/api/v2/admin/system`, {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'flush_cache' })
+        });
+        const json = await resp.json();
+        alert(json?.data?.message || 'Đã dọn sạch cache!');
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    };
+
+    loadSettings();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

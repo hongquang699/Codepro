@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch sử kỳ thi | CodeProOJ</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/profile/profile.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="profile-container">
+    <div id="profileHeaderContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 3rem;">Đang tải thông tin hồ sơ...</div>
+    </div>
+
+    <div class="profile-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 class="profile-card-title" style="margin: 0;"><cp-icon name="trophy" size="sm"></cp-icon> Lịch sử tham gia kỳ thi (Contest History)</h3>
+        <span id="contestsBadge" style="font-size: 0.85rem; color: #f59e0b; font-weight: 700;"></span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="profile-table">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">#</th>
+              <th>Tên cuộc thi</th>
+              <th style="width: 120px; text-align: center;">Thứ hạng</th>
+              <th style="width: 120px; text-align: center;">Điểm số</th>
+              <th style="width: 140px; text-align: center;">Biến động Rating</th>
+              <th style="width: 180px;">Thời gian thi</th>
+            </tr>
+          </thead>
+          <tbody id="contestsTableBody">
+            <tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 2.5rem;">Đang tải lịch sử thi đấu...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/profile/profile-api.js"></script>
+  <script>
+    const username = ProfileAPI.getUsernameFromUrl();
+
+    async function init() {
+      let profileLoaded = false;
+      try {
+        const data = await ProfileAPI.getOverview(username);
+        document.title = `Kỳ thi - ${data.profile.display_name || username} (@${username})`;
+        ProfileAPI.renderHeader('profileHeaderContainer', data, 'contests');
+        profileLoaded = true;
+        const res = await ProfileAPI.getContests(username);
+        const list = res.results || [];
+        document.getElementById('contestsBadge').textContent = `Đã tham gia: ${list.length} cuộc thi`;
+
+        const tbody = document.getElementById('contestsTableBody');
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 2.5rem;">Thành viên này chưa tham gia cuộc thi nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map((c, i) => {
+          const ch = c.rating_change || '0';
+          const isPos = ch.startsWith('+');
+          const isNeg = ch.startsWith('-');
+          const chColor = isPos ? '#10b981' : (isNeg ? '#ef4444' : '#94a3b8');
+
+          return `
+            <tr>
+              <td style="text-align: center; color: var(--color-text-muted);">${i + 1}</td>
+              <td>
+                <a href="/contests/${c.contest_id}" style="color: var(--color-text); font-weight: 700; text-decoration: none;">
+                  ${c.contest_name}
+                </a>
+              </td>
+              <td style="text-align: center; font-weight: 700; color: #f59e0b;">
+                ${c.rank ? `#${c.rank}` : '—'}
+              </td>
+              <td style="text-align: center; font-weight: 700; color: #34d399;">
+                ${c.score}
+              </td>
+              <td style="text-align: center; font-weight: 800; color: ${chColor}; font-family: monospace; font-size: 0.95rem;">
+                ${ch}
+              </td>
+              <td style="color: var(--color-text-muted); font-size: 0.85rem;">
+                ${c.start_time || '—'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+        if (!profileLoaded) document.getElementById('profileHeaderContainer').textContent = `Không tải được hồ sơ: ${err.message}`;
+        const tbody = document.getElementById('contestsTableBody');
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;"></td></tr>';
+        tbody.querySelector('td').textContent = `Lỗi tải lịch sử thi: ${err.message}`;
+      }
+    }
+
+    init();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

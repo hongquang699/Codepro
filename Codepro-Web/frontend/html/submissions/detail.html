@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="docTitle">Chi tiết bài nộp | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/footer.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/submissions/detail.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="page-wrapper">
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <!-- Detail Main Container -->
+  <main class="detail-container">
+    <!-- Breadcrumb Bar -->
+    <div class="breadcrumb-bar">
+      <a href="/"><cp-icon name="home" size="xs"></cp-icon> Trang chủ</a>
+      <span class="sep">/</span>
+      <a href="/frontend/html/problem/index.html">Bài tập</a>
+      <span class="sep">/</span>
+      <a href="#" id="breadProbLink"><span id="breadProbText">Đang tải bài tập...</span></a>
+      <span class="sep">/</span>
+      <span style="color: var(--color-text, var(--color-text));font-weight:600;">Bài nộp #<span id="breadSubId">--</span></span>
+    </div>
+
+    <!-- Header & Action Row -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h1 style="font-size:1.85rem;font-weight:800;color: var(--color-text);margin:0;display:flex;align-items:center;gap:.6rem;letter-spacing:-0.02em;">
+          <cp-icon name="document" size="md"></cp-icon> Bài Nộp #<span id="headerSubId">--</span>
+        </h1>
+        <div style="color: var(--color-text-muted);font-size:0.92rem;margin-top:6px;">
+          Bài toán: <a id="headerProbLink" href="#" style="color: var(--color-primary);font-weight:700;text-decoration:none;">--</a> • 
+          Thí sinh: <strong id="headerUsername" style="color: var(--color-text);">--</strong>
+        </div>
+      </div>
+
+      <div class="submission-actions-bar" style="margin-bottom:0;">
+        <button id="btnRejudge" class="btn-action btn-action-secondary" onclick="triggerRejudge()">
+          <cp-icon name="refresh" size="xs"></cp-icon> Chấm lại
+        </button>
+        <a id="btnResubmit" href="#" class="btn-action btn-action-primary">
+          <cp-icon name="rocket" size="xs"></cp-icon> Nộp lại bài này
+        </a>
+        <a id="btnViewProblem" href="#" class="btn-action btn-action-secondary">
+          <cp-icon name="code" size="xs"></cp-icon> Xem đề bài
+        </a>
+      </div>
+    </div>
+
+    <!-- Verdict Hero Banner (TMath Coding Style) -->
+    <div class="verdict-hero-card verdict-hero-judging" id="verdictHero">
+      <div class="verdict-title" id="verdictTitle">
+        ⏳ ĐANG CHẤM BÀI...
+      </div>
+      <div class="verdict-subtitle" id="verdictSubtitle">
+        Bài nộp đang được hệ thống Sandbox xử lý qua các bộ dữ liệu test...
+      </div>
+    </div>
+
+    <!-- Metrics Stats Grid (TMath 5-Boxes) -->
+    <div class="sub-stats-grid">
+      <div class="sub-stat-box">
+        <div class="sub-stat-label">Điểm số</div>
+        <div class="sub-stat-val" id="statScore" style="color: #10b981;">-- / 100</div>
+      </div>
+      <div class="sub-stat-box">
+        <div class="sub-stat-label">Thời gian chạy</div>
+        <div class="sub-stat-val" id="statTime" style="color: #f59e0b;">-- ms</div>
+      </div>
+      <div class="sub-stat-box">
+        <div class="sub-stat-label">Bộ nhớ sử dụng</div>
+        <div class="sub-stat-val" id="statMemory" style="color: var(--color-accent);">-- MB</div>
+      </div>
+      <div class="sub-stat-box">
+        <div class="sub-stat-label">Ngôn ngữ</div>
+        <div class="sub-stat-val" id="statLang" style="color: var(--color-primary);font-size:1.05rem;padding-top:4px;">--</div>
+      </div>
+      <div class="sub-stat-box">
+        <div class="sub-stat-label">Thời điểm nộp</div>
+        <div class="sub-stat-val" id="statDate" style="color: var(--color-text-secondary);font-size:0.88rem;padding-top:6px;font-weight:600;">--</div>
+      </div>
+    </div>
+
+    <!-- Compiler Box (if compilation error or warning) -->
+    <pre id="compilerBox" class="compiler-box"></pre>
+
+    <!-- Testcases Breakdown Card -->
+    <div class="detail-card" style="margin-bottom:1.5rem;">
+      <div class="section-header">
+        <h3 class="section-title" style="display:flex;align-items:center;">
+          <cp-icon name="list" size="sm"></cp-icon> Chi tiết từng bộ test
+          <span id="testcaseCountBadge" style="font-size:0.8rem;padding:2px 8px;border-radius:9999px;background: rgba(255,255,255,0.08);color: var(--color-text-muted);margin-left:8px;font-weight:600;">--</span>
+        </h3>
+        <span style="font-size: 0.82rem; color: var(--color-text-muted);">
+          🔒 Dữ liệu test ẩn được bảo mật tự động
+        </span>
+      </div>
+      <div class="table-responsive">
+        <table class="testcase-table">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Test #</th>
+              <th style="width: 180px;">Trạng thái</th>
+              <th style="width: 130px;">Thời gian</th>
+              <th style="width: 130px;">Bộ nhớ</th>
+              <th style="width: 120px;">Điểm số</th>
+              <th>Chi tiết / Phản hồi</th>
+            </tr>
+          </thead>
+          <tbody id="testcaseTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 28px; color: var(--color-text-muted);">
+                Đang nạp kết quả testcases...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Source Code Card -->
+    <div class="detail-card">
+      <div class="code-viewer-header">
+        <span style="font-size: 0.95rem; font-weight: 700; color: var(--color-text); display:flex; align-items:center; gap:0.5rem;">
+          <cp-icon name="code" size="sm"></cp-icon> Mã nguồn đã nộp (<span id="sourceLangTag">--</span>)
+        </span>
+        <button id="btnCopyCode" class="btn-action btn-action-secondary" style="padding:0.35rem 0.85rem;font-size:0.82rem;">
+          <cp-icon name="document" size="xs"></cp-icon> Sao chép mã
+        </button>
+      </div>
+      <pre id="sourceCodeViewer" class="code-pre">// Đang nạp mã nguồn...</pre>
+    </div>
+  </main>
+
+  <!-- Sticky Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-copyright">
+        &copy; 2026 CodeProOJ. All rights reserved. Competitive Programming &amp; Learning Hub.
+      </div>
+      <div class="footer-links">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/submissions/detail.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

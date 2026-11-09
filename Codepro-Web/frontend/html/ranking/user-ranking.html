@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ Xếp hạng Cá nhân - CodeProOJ</title>
+  <!-- Flaticon Uicons Vector Icons -->
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/ranking-table.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/rating.css">
+  <link rel="stylesheet" href="/frontend/css/ranking/footer.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body class="ranking-page">
+  <!-- Reusable CodeProOJ Top Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container"></div>
+  </nav>
+
+  <div class="ranking-container">
+    <div class="ranking-nav-actions" style="margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <a href="/" class="ranking-back-link" title="Quay về Trang chủ CodeProOJ">
+        <i class="fi fi-rr-arrow-left"></i>
+        <i class="fi fi-rr-home"></i>
+        <span>Quay về Trang chủ</span>
+      </a>
+      <div class="ranking-breadcrumb" style="font-size: 0.88rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 6px;">
+        <a href="/" style="color: var(--color-text-muted); text-decoration: none;"><i class="fi fi-rr-home"></i> Trang chủ</a>
+        <span>/</span>
+        <a href="/frontend/html/ranking/index.html" style="color: var(--color-text-muted); text-decoration: none;">Bảng xếp hạng</a>
+      </div>
+    </div>
+
+    <header class="ranking-header">
+      <div class="ranking-title-group">
+        <h1><i class="fi fi-rr-user"></i> Hồ sơ Thứ hạng Thành viên</h1>
+        <p>Chi tiết thứ hạng tổng thể, điểm rating, số bài giải và thành tích thi đấu.</p>
+      </div>
+
+      <nav class="ranking-tabs">
+        <a href="/frontend/html/ranking/index.html" class="ranking-tab"><i class="fi fi-rr-trophy"></i> Tổng thể</a>
+        <a href="/frontend/html/ranking/rating.html" class="ranking-tab"><i class="fi fi-rr-bolt"></i> Rating</a>
+      </nav>
+    </header>
+
+    <main class="ranking-card" id="userCardContainer">
+      <div style="text-align: center; color: var(--color-text-muted); padding: 40px;">Đang tải hồ sơ...</div>
+    </main>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-copyright">
+        &copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.
+      </div>
+      <div class="footer-links">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/rules.html">Quy chế thi</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/about/privacy.html">Bảo mật</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/frontend/js/core/rating.js"></script>
+
+  <script src="/frontend/js/ranking/ranking-api.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/ranking/ranking-table.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/ranking/user-ranking.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+  <script src="/frontend/js/core/rating.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+</body>
+</html>

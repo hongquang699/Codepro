@@ -1,0 +1,326 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CodeProOJ Professional IDE Code Editor Component
+   Monaco Editor & VS Code Styling, Status Bar & Zen Mode
+   ═══════════════════════════════════════════════════════════════════ */
+
+.ide-frame {
+  background: #1e1e1e;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ide-frame:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+/* ── IDE Top Toolbar ────────────────────────────────────────── */
+.ide-toolbar {
+  background: #252526;
+  border-bottom: 1px solid #333333;
+  padding: 0.55rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  user-select: none;
+}
+
+.ide-toolbar-left,
+.ide-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.ide-lang-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.ide-lang-pill svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ide-autosave-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.ide-autosave-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* Toolbar Control Dropdowns & Buttons */
+.ide-select {
+  background: #1e1e1e;
+  border: 1px solid #3f3f46;
+  color: #e4e4e7;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ide-select:hover {
+  border-color: #71717a;
+}
+
+.ide-btn {
+  background: #2d2d30;
+  border: 1px solid #3e3e42;
+  color: #cccccc;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.32rem 0.65rem;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.ide-btn:hover {
+  background: #3e3e42;
+  color: #ffffff;
+  border-color: #555555;
+}
+
+.ide-btn:active {
+  transform: translateY(1px);
+}
+
+.ide-btn.btn-fullscreen {
+  color: var(--color-primary);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.ide-btn.btn-fullscreen:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+}
+
+/* ── IDE Main Editor Area ─────────────────────────────────────── */
+.ide-editor-container {
+  width: 100%;
+  height: 520px;
+  position: relative;
+  background: #1e1e1e;
+}
+
+#monacoEditor {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Textarea Fallback (if Monaco fails to load or offline) */
+.ide-fallback-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #1e1e1e;
+}
+
+.ide-fallback-gutter {
+  width: 48px;
+  background: #181818;
+  border-right: 1px solid #2d2d30;
+  color: #6e7681;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  text-align: right;
+  padding: 0.85rem 0.5rem;
+  user-select: none;
+  overflow: hidden;
+}
+
+.ide-fallback-textarea {
+  flex: 1;
+  background: transparent;
+  color: #d4d4d4;
+  border: none;
+  outline: none;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 0.85rem 1rem;
+  resize: none;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* ── IDE Bottom Status Bar (VS Code style) ────────────────────── */
+.ide-status-bar {
+  background: #007acc;
+  color: #ffffff;
+  padding: 0.25rem 0.85rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  letter-spacing: 0.01em;
+}
+
+.ide-status-left,
+.ide-status-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ide-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: default;
+}
+
+.ide-status-item.clickable {
+  cursor: pointer;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.ide-status-item.clickable:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ide-hotkey-hint {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+/* ── Fullscreen Zen Mode IDE ──────────────────────────────────── */
+body.ide-fullscreen-active {
+  overflow: hidden !important;
+}
+
+.ide-frame.fullscreen-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.ide-frame.fullscreen-mode .ide-editor-container {
+  flex: 1 1 auto !important;
+  height: calc(100vh - 72px) !important;
+}
+
+.ide-frame.fullscreen-mode .ide-toolbar {
+  padding: 0.65rem 1.5rem;
+  background: #1b1b1d;
+  border-bottom: 1px solid #2e2e32;
+}
+
+.ide-frame.fullscreen-mode .ide-status-bar {
+  padding: 0.35rem 1.5rem;
+}
+
+.ide-fullscreen-exit-btn {
+  background: #dc2626 !important;
+  color: #fff !important;
+  border-color: #ef4444 !important;
+  font-weight: 700 !important;
+}
+
+.ide-fullscreen-exit-btn:hover {
+  background: #b91c1c !important;
+}
+
+/* ── Theme Overrides (Light vs High Contrast) ─────────────────── */
+.ide-frame.theme-light {
+  background: #fffffe;
+  border-color: #e4e4e7;
+}
+
+.ide-frame.theme-light .ide-toolbar {
+  background: #f4f4f5;
+  border-color: #e4e4e7;
+  color: #18181b;
+}
+
+.ide-frame.theme-light .ide-select,
+.ide-frame.theme-light .ide-btn {
+  background: #ffffff;
+  border-color: #d4d4d8;
+  color: #27272a;
+}
+
+.ide-frame.theme-light .ide-btn:hover {
+  background: #e4e4e7;
+}
+
+.ide-frame.theme-hc-black {
+  background: #000000;
+  border: 2px solid #6fc3df;
+}
+
+.ide-frame.theme-hc-black .ide-status-bar {
+  background: #000000;
+  border-top: 1px solid #6fc3df;
+  color: #6fc3df;
+}
+
+/* ── Mobile & Tablet Responsiveness ──────────────────────────── */
+@media (max-width: 768px) {
+  .ide-editor-container {
+    height: 400px;
+  }
+  .ide-toolbar {
+    padding: 0.4rem 0.6rem;
+  }
+  .ide-status-bar {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .ide-status-right .hide-on-mobile {
+    display: none;
+  }
+}

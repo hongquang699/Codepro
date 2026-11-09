@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Bài Tập Thuật Toán | CodeProOJ</title>
+  
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <!-- Global & Component Stylesheets -->
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <script src="/frontend/js/core/icons.js"></script>
+  
+  <!-- Separated Page Stylesheet -->
+  <link rel="stylesheet" href="/frontend/css/problems/list.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Global Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html" class="active">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/submission/all.html">Bài nộp</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container problems-list-container" style="padding-top: 1.25rem; padding-bottom: 3.5rem;">
+    <!-- Page Header -->
+    <div class="page-hdr">
+      <div>
+        <h1 style="display:flex; align-items:center; gap:0.6rem;"><cp-icon name="code" size="lg" style="color: var(--color-primary);"></cp-icon> Kho Bài Tập Lập Trình</h1>
+        <p>Luyện tập thuật toán chuẩn Olympic Tin học và ICPC với hệ thống máy chấm CodeProOJ tự động.</p>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statTotalProbs" style="color:var(--color-primary);">—</div>
+        <div class="stat-lbl">Tổng số bài tập</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statSolvedProbs" style="color:#34d399;">—</div>
+        <div class="stat-lbl">Bài bạn đã giải (AC)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statAvgRate" style="color:#fbbf24;">—%</div>
+        <div class="stat-lbl">Tỷ lệ AC trung bình</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statPointsEarned" style="color:var(--color-accent);">—</div>
+        <div class="stat-lbl">Tổng điểm tích lũy</div>
+      </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <input type="text" class="search-input" id="searchInput" placeholder="Tìm kiếm theo mã bài (SUMA, MAXSUM...), tên bài..." oninput="filterAndRender()">
+        
+        <select class="filter-select" id="diffSelect" onchange="filterAndRender()">
+          <option value="">Tất cả độ khó</option>
+          <option value="easy">🟢 Dễ (&le; 50 điểm)</option>
+          <option value="medium">🟡 Trung bình (51 - 100 điểm)</option>
+          <option value="hard">🔴 Khó (&gt; 100 điểm)</option>
+        </select>
+
+        <select class="filter-select" id="statusSelect" onchange="filterAndRender()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="solved">✅ Đã giải (AC)</option>
+          <option value="attempted">❌ Đã thử nhưng chưa AC</option>
+          <option value="unsolved">⚪ Chưa thử</option>
+        </select>
+
+        <select class="filter-select" id="sortSelect" onchange="filterAndRender()">
+          <option value="code-asc">Mã bài (A-Z)</option>
+          <option value="pts-desc">Điểm giảm dần</option>
+          <option value="pts-asc">Điểm tăng dần</option>
+          <option value="rate-desc">Tỷ lệ giải cao nhất</option>
+        </select>
+      </div>
+
+      <!-- Tag Filters -->
+      <div class="tag-container" id="tagList">
+        <span class="tag-label">Chủ đề:</span>
+        <button class="tag-btn active" onclick="selectTag('', this)">Tất cả</button>
+        <button class="tag-btn" onclick="selectTag('Cơ bản', this)">Cơ bản</button>
+        <button class="tag-btn" onclick="selectTag('Toán học', this)">Toán học</button>
+        <button class="tag-btn" onclick="selectTag('Quy hoạch động', this)">Quy hoạch động</button>
+        <button class="tag-btn" onclick="selectTag('Đồ thị', this)">Đồ thị</button>
+        <button class="tag-btn" onclick="selectTag('Cấu trúc dữ liệu', this)">Cấu trúc dữ liệu</button>
+      </div>
+    </div>
+
+    <!-- Problems Table -->
+    <div class="table-card">
+      <div style="overflow-x:auto;">
+        <table class="prob-tbl">
+          <thead>
+            <tr>
+              <th style="width:50px;text-align:center;">TT</th>
+              <th style="width:110px;">Mã bài</th>
+              <th>Tên bài toán &amp; Phân loại</th>
+              <th style="width:100px;">Độ khó</th>
+              <th style="width:80px;">Điểm</th>
+              <th style="width:130px;">Tỷ lệ AC</th>
+              <th style="width:130px;">Giới hạn</th>
+              <th style="width:90px;text-align:center;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="problemsTbody">
+            <tr><td colspan="8" style="text-align:center;padding:3rem;color:var(--color-text-muted);">Đang tải dữ liệu bài tập từ máy chủ...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer style="background:var(--color-surface);border-top:1px solid var(--color-border);padding:1.5rem 0;">
+    <div class="container" style="display:flex;justify-content:space-between;color:var(--color-text-muted);font-size:.875rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.</div>
+    </div>
+  </footer>
+
+  <!-- Separated JavaScript Modules -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/problems/main.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

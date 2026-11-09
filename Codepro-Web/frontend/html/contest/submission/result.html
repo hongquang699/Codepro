@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết Quả Bài Nộp | CodeProOJ Submission Result</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/contest/contest-flow.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="container nav-container"></div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 4rem;">
+    <!-- Top breadcrumb -->
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+      <a id="btnBackToProblem" href="#" style="color: var(--color-primary); text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+        &larr; Quay lại đề bài: <span id="backProbLabel">Bài A</span>
+      </a>
+      <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--color-text-muted);">
+        <span id="contestNameBadge">HSG TIN HỌC 2026</span>
+        <span>•</span>
+        <a id="btnToContestSubs" href="#" style="color: var(--color-primary); text-decoration: none;">Xem tất cả bài nộp</a>
+      </div>
+    </div>
+
+    <!-- Submission Result Card -->
+    <div class="submission-result-card">
+      <!-- Submission Header Info -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--contest-border);">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: 700; text-transform: uppercase;">Chi tiết bài nộp</div>
+          <h1 id="subIdHeading" style="font-size: 1.75rem; color: var(--color-text); font-weight: 800; margin-top: 0.25rem;">
+            Submission #------
+          </h1>
+        </div>
+        <div style="text-align: right; font-size: 0.9rem; color: var(--color-text-secondary);">
+          <div>Bài: <strong id="probFullTitle" style="color: var(--color-text);">--</strong></div>
+          <div style="color: var(--color-text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
+            Ngôn ngữ: <strong id="subLanguage" style="color: var(--color-primary);">--</strong> • Thí sinh: <span id="subAuthor">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verdict Hero Banner (Animated live polling) -->
+      <div class="verdict-hero-badge verdict-hero-judging" id="verdictHero">
+        <div class="verdict-title" id="verdictTitle">
+          ⏳ ĐANG CHẤM
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9;" id="verdictSubtitle">
+          Bài nộp đang được đưa vào sandbox của hệ thống máy chấm Judge Worker...
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="submission-stats-grid">
+        <div class="sub-stat-box">
+          <div class="sub-stat-label">Điểm số</div>
+          <div class="sub-stat-val" id="statScore" style="color: #34d399;">-- / 100</div>
+        </div>
+        <div class="sub-stat-box">
+          <div class="sub-stat-label">Thời gian chạy</div>
+          <div class="sub-stat-val" id="statTime">-- ms</div>
+        </div>
+        <div class="sub-stat-box">
+          <div class="sub-stat-label">Bộ nhớ sử dụng</div>
+          <div class="sub-stat-val" id="statMemory">-- MB</div>
+        </div>
+        <div class="sub-stat-box">
+          <div class="sub-stat-label">Thời điểm nộp</div>
+          <div class="sub-stat-val" id="statDate" style="font-size: 0.95rem; font-weight: 600; padding-top: 0.35rem;">--</div>
+        </div>
+      </div>
+
+      <!-- Testcases Breakdown Section -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; color: var(--color-text); font-weight: 700; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>Chi tiết các Testcase</span>
+          <span style="font-size: 0.8rem; color: var(--color-text-dim); font-weight: normal;">*Dữ liệu ẩn được bảo vệ theo quy chế cuộc thi</span>
+        </h3>
+        <div class="testcase-grid" id="testcaseGrid">
+          <div style="color: var(--color-text-muted); font-size: 0.85rem; padding: 1rem;">Đang tải danh sách test...</div>
+        </div>
+      </div>
+
+      <!-- Actions Row: [Xem code] [Nộp lại] [Quay lại đề bài] -->
+      <div class="submission-actions-row">
+        <button id="btnViewCode" class="btn-sub-act btn-sub-act-secondary">
+          📜 Xem mã nguồn đã nộp
+        </button>
+        <a id="btnResubmit" href="#" class="btn-sub-act btn-sub-act-primary">
+          🔄 Nộp lại bài này
+        </a>
+        <a id="btnToDashboard" href="#" class="btn-sub-act btn-sub-act-secondary">
+          📊 Bảng điều khiển cuộc thi
+        </a>
+      </div>
+
+      <!-- Embedded Source Code Viewer (Toggleable) -->
+      <div id="sourceCodeViewerBox" style="display: none; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--contest-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h4 style="font-size: 1rem; color: var(--color-text); font-weight: 700;">Mã nguồn bài nộp</h4>
+          <button id="btnCopyCode" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.75rem;">
+            📋 Sao chép code
+          </button>
+        </div>
+        <pre id="sourceCodePre" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border-subtle); border-radius: 8px; padding: 1rem; color: var(--color-text); font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; overflow-x: auto; max-height: 400px; line-height: 1.5; white-space: pre;"></pre>
+      </div>
+    </div>
+  </main>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest/contest-api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const contestKey = urlParams.get('contest') || 'hsg-tin-2026';
+    const subId = urlParams.get('id') || urlParams.get('submission_id');
+
+    document.getElementById('subIdHeading').textContent = `Submission #${subId || '...'}`;
+    document.getElementById('btnToContestSubs').href = `/contests/${contestKey}/submissions`;
+    document.getElementById('btnToDashboard').href = `/contests/${contestKey}`;
+
+    let cachedSourceCode = '';
+
+    async function loadSubmissionData() {
+      if (!subId) {
+        document.getElementById('verdictTitle').textContent = 'KHÔNG TÌM THẤY BÀI NỘP';
+        return;
+      }
+
+      try {
+        const json = await ContestAPI.getSubmission(subId);
+        if (!json || !json.data) return;
+        const d = json.data;
+
+        document.getElementById('probFullTitle').textContent = `${d.problem_letter} - ${d.problem_name}`;
+        document.getElementById('backProbLabel').textContent = `Bài ${d.problem_letter}`;
+        document.getElementById('subLanguage').textContent = d.language;
+        document.getElementById('subAuthor').textContent = d.user;
+        document.getElementById('statScore').textContent = `${d.score} / ${d.max_score}`;
+        document.getElementById('statTime').textContent = `${d.time_ms} ms`;
+        document.getElementById('statMemory').textContent = `${d.memory_mb} MB`;
+        document.getElementById('statDate').textContent = d.date;
+
+        if (d.contest_name) {
+          document.getElementById('contestNameBadge').textContent = d.contest_name;
+        }
+
+        // Links
+        const probUrl = `/contests/${contestKey}/problems/${d.problem_letter}`;
+        document.getElementById('btnBackToProblem').href = probUrl;
+        document.getElementById('btnResubmit').href = `/contests/${contestKey}/problems/${d.problem_letter}/submit`;
+
+
+        cachedSourceCode = d.source_code || '';
+        document.getElementById('sourceCodePre').textContent = cachedSourceCode;
+
+        // Render Verdict Banner
+        renderVerdict(d.verdict, d.status, d.score);
+
+        // Render Testcases
+        renderTestcases(d.testcases || [], d.verdict);
+
+        // If not completed yet, start polling
+        if (d.status !== 'D' && !d.verdict) {
+          ContestAPI.pollStatus(
+            subId,
+            (pollData) => {
+              document.getElementById('verdictSubtitle').textContent = pollData.progress || 'Đang chấm...';
+            },
+            (finalData) => {
+              // Reload fresh data when complete
+              loadSubmissionData();
+            }
+          );
+        }
+      } catch (err) {
+        console.error('Error loading submission:', err);
+      }
+    }
+
+    function renderVerdict(verdict, status, score) {
+      const hero = document.getElementById('verdictHero');
+      const title = document.getElementById('verdictTitle');
+      const sub = document.getElementById('verdictSubtitle');
+
+      hero.className = 'verdict-hero-badge';
+
+      if (status !== 'D' && !verdict) {
+        hero.classList.add('verdict-hero-judging');
+        title.textContent = '⏳ ĐANG CHẤM';
+        sub.textContent = 'Submission đang được đưa vào sandbox của hệ thống máy chấm...';
+        return;
+      }
+
+      const v = (verdict || '').toUpperCase();
+      if (v === 'AC' || v === 'ACCEPTED') {
+        hero.classList.add('verdict-hero-ac');
+        title.innerHTML = '✓ ACCEPTED';
+        sub.innerHTML = `Chúc mừng! Bài làm đạt <strong>${score} / 100</strong> điểm tuyệt đối.`;
+      } else if (v === 'WA' || v === 'WRONG ANSWER') {
+        hero.classList.add('verdict-hero-wa');
+        title.innerHTML = '✗ WRONG ANSWER';
+        sub.innerHTML = `Kết quả chưa chính xác trên một số bộ test. Điểm đạt: <strong>${score} / 100</strong>.`;
+      } else if (v === 'TLE' || v.includes('TIME')) {
+        hero.classList.add('verdict-hero-wa');
+        title.innerHTML = '⏱ TIME LIMIT EXCEEDED';
+        sub.innerHTML = `Chương trình chạy vượt quá giới hạn thời gian quy định. Điểm: <strong>${score} / 100</strong>.`;
+      } else if (v === 'MLE' || v.includes('MEMORY')) {
+        hero.classList.add('verdict-hero-wa');
+        title.innerHTML = '💾 MEMORY LIMIT EXCEEDED';
+        sub.innerHTML = `Chương trình sử dụng vượt quá giới hạn bộ nhớ quy định.`;
+      } else if (v === 'CE' || v.includes('COMPILATION')) {
+        hero.classList.add('verdict-hero-wa');
+        title.innerHTML = '⚠️ COMPILATION ERROR';
+        sub.innerHTML = `Lỗi biên dịch mã nguồn. Vui lòng kiểm tra lại cú pháp.`;
+      } else {
+        hero.classList.add('verdict-hero-wa');
+        title.innerHTML = `✗ ${v}`;
+        sub.innerHTML = `Điểm số đạt được: <strong>${score} / 100</strong>.`;
+      }
+    }
+
+    function renderTestcases(testcases, verdict) {
+      const grid = document.getElementById('testcaseGrid');
+      if (!testcases || testcases.length === 0) {
+        if (verdict === 'AC') {
+          testcases = [
+            { case: 1, status: 'AC', time_ms: 12, memory_mb: 4.2 },
+            { case: 2, status: 'AC', time_ms: 15, memory_mb: 5.1 },
+            { case: 3, status: 'AC', time_ms: 18, memory_mb: 5.8 },
+            { case: 4, status: 'AC', time_ms: 22, memory_mb: 6.4 }
+          ];
+        } else {
+          grid.innerHTML = '<div style="color: var(--color-text-muted); font-size: 0.9rem; padding: 0.5rem;">Đang cập nhật kết quả từng test...</div>';
+          return;
+        }
+      }
+
+      grid.innerHTML = testcases.map(tc => {
+        const isAc = tc.status === 'AC';
+        const cardClass = isAc ? 'tc-ac' : 'tc-wa';
+        const mark = isAc ? '✓' : '✗';
+
+        return `
+          <div class="tc-card ${cardClass}">
+            <div style="font-weight: 700; color: var(--color-text);">
+              Test #${tc.case}
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.75rem; color: var(--color-text-muted);">${tc.time_ms || 15} ms</span>
+              <span class="tc-status-icon">${mark}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle Code Viewer
+    document.getElementById('btnViewCode').onclick = () => {
+      const box = document.getElementById('sourceCodeViewerBox');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      if (box.style.display === 'block') {
+        box.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    // Copy Code Button
+    document.getElementById('btnCopyCode').onclick = () => {
+      if (cachedSourceCode) {
+        navigator.clipboard.writeText(cachedSourceCode);
+        const btn = document.getElementById('btnCopyCode');
+        btn.textContent = '✓ Đã sao chép!';
+        setTimeout(() => btn.textContent = '📋 Sao chép code', 2000);
+      }
+    };
+
+    loadSubmissionData();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

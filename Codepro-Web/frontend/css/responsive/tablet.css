@@ -1,0 +1,4 @@
+@media (min-width: 768px) and (max-width: 1024px) {
+  .hide-on-tablet { display: none !important; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+}

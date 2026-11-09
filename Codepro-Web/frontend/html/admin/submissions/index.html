@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch Sử Bài Nộp (Submissions Log) | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item">
+        <cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan
+      </a>
+      <a href="/admin/judge" class="admin-nav-item">
+        <cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm
+      </a>
+      <a href="/admin/security" class="admin-nav-item">
+        <cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF
+        <span class="nav-badge" id="navShieldBadge" style="background: #10b981;color: #fff;">WAF ON</span>
+      </a>
+
+      <div class="nav-group-title">Nội dung thi &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item">
+        <cp-icon name="edit" size="sm"></cp-icon> Kho bài tập (Problems)
+      </a>
+      <a href="/admin/problems/create" class="admin-nav-item">
+        <cp-icon name="plus" size="sm"></cp-icon> Thêm bài tập mới
+      </a>
+      <a href="/admin/contests" class="admin-nav-item">
+        <cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi (Contests)
+      </a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item">
+        <cp-icon name="users" size="sm"></cp-icon> Người dùng &amp; Phân quyền
+      </a>
+      <a href="/admin/submissions" class="admin-nav-item active">
+        <cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp
+      </a>
+      <a href="/admin/settings" class="admin-nav-item">
+        <cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div class="topbar-title">
+          <h1><cp-icon name="document" size="sm"></cp-icon> Toàn Bộ Lịch Sử Bài Nộp (Submissions Log)</h1>
+          <p>Xem luồng bài nộp, kiểm tra mã nguồn thí sinh và thực hiện chấm lại (rejudge) trực tiếp.</p>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div style="background: var(--color-card);border: 1px solid var(--color-border-subtle);border-radius:12px;padding:1rem;margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <div>
+          <label style="display:block;font-size:.75rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.25rem;">KẾT QUẢ:</label>
+          <select id="filterVerdict" onchange="renderSubs()" style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.4rem .6rem;font-size:.82rem;outline: none;">
+            <option value="all">Tất cả phán quyết</option>
+            <option value="AC">Accepted (AC)</option>
+            <option value="WA">Wrong Answer (WA)</option>
+            <option value="TLE">Time Limit Exceeded (TLE)</option>
+            <option value="MLE">Memory Limit Exceeded (MLE)</option>
+            <option value="RTE">Runtime Error (RTE)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:.75rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.25rem;">MÃ BÀI TOÁN:</label>
+          <input type="text" id="filterProb" placeholder="ví dụ: SUMA" oninput="renderSubs()" style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.4rem .6rem;font-size:.82rem;text-transform:uppercase;outline: none;width:130px;">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:.75rem;font-weight:700;color: var(--color-text-muted);margin-bottom:.25rem;">THÍ SINH:</label>
+          <input type="text" id="filterUser" placeholder="username..." oninput="renderSubs()" style="background: var(--color-bg);border: 1px solid var(--color-border);border-radius:6px;color: #fff;padding:.4rem .6rem;font-size:.82rem;outline: none;width:130px;">
+        </div>
+
+        <div style="margin-left:auto;display:flex;align-items:flex-end;">
+          <button onclick="loadAllSubs()" class="btn-top btn-top-secondary" style="padding:.45rem .85rem;font-size:.82rem;">🔄 Tải lại dữ liệu</button>
+        </div>
+      </div>
+
+      <!-- Submissions Table -->
+      <div class="panel-box">
+        <div style="overflow-x:auto;">
+          <table class="admin-tbl">
+            <thead>
+              <tr>
+                <th style="width:70px;">Mã #</th>
+                <th>Thí sinh</th>
+                <th>Bài toán</th>
+                <th>Phán quyết</th>
+                <th>Điểm</th>
+                <th>Thời gian</th>
+                <th>Bộ nhớ</th>
+                <th>Ngôn ngữ</th>
+                <th>Thời điểm</th>
+                <th style="text-align:center;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="allSubsTbody">
+              <tr><td colspan="10" style="text-align:center;padding:3rem;color: var(--color-text-dim);">Đang tải danh sách bài nộp...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script>
+    const API = (typeof window.API_BASE === 'string') ? window.API_BASE : '';
+    let subsList = [];
+
+    async function loadAllSubs() {
+      try {
+        const resp = await fetch(`${API}/api/v2/submissions?page_size=100`);
+        const json = await resp.json();
+        subsList = json?.data?.objects || [];
+        renderSubs();
+      } catch (e) {
+        document.getElementById('allSubsTbody').innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color: #f87171;">Lỗi tải bài nộp: ${e.message}</td></tr>`;
+      }
+    }
+
+    function renderSubs() {
+      const fVer = document.getElementById('filterVerdict').value;
+      const fProb = (document.getElementById('filterProb').value || '').trim().toUpperCase();
+      const fUser = (document.getElementById('filterUser').value || '').trim().toLowerCase();
+
+      const filtered = subsList.filter(s => {
+        const matchV = fVer === 'all' || s.result === fVer;
+        const matchP = !fProb || (s.problem || '').toUpperCase().includes(fProb);
+        const matchU = !fUser || (s.user || '').toLowerCase().includes(fUser);
+        return matchV && matchP && matchU;
+      });
+
+      const tbody = document.getElementById('allSubsTbody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:3rem;color: var(--color-text-dim);">Không tìm thấy bài nộp nào phù hợp với bộ lọc.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const isAC = s.result === 'AC';
+        const vClass = isAC ? 'bv-AC' : (s.result === 'WA' ? 'bv-WA' : 'bv-other');
+        const timeMs = s.time != null ? Math.round(parseFloat(s.time) * 1000) + ' ms' : '—';
+        const memMB = s.memory != null ? parseFloat(s.memory).toFixed(1) + ' MB' : '—';
+        const dateStr = s.date ? new Date(s.date).toLocaleString('vi-VN', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'}) : '—';
+
+        return `
+          <tr>
+            <td><a href="/submissions/${s.id}" target="_blank" style="color: var(--color-primary);font-family:monospace;font-weight:700;">#${s.id}</a></td>
+            <td><a href="/profile/${s.user}" target="_blank" style="color: #fff;font-weight:600;text-decoration:none;">${s.user}</a></td>
+            <td><a href="/problems/${s.problem}" target="_blank" style="color: var(--color-primary);text-decoration:none;">${s.problem}</a></td>
+            <td><span class="badge-v ${vClass}">${s.result || 'Pending'}</span></td>
+            <td style="font-weight:700;color: ${isAC ? '#34d399' : '#f87171'};">${s.points != null ? s.points : '—'}</td>
+            <td style="font-family:monospace;color: var(--color-text-muted);">${timeMs}</td>
+            <td style="font-family:monospace;color: var(--color-text-muted);">${memMB}</td>
+            <td><span style="font-family:monospace;font-size:.78rem;background: rgba(255,255,255,.05);padding:.15rem .45rem;border-radius:4px;">${s.language}</span></td>
+            <td style="color: var(--color-text-dim);font-size:.78rem;">${dateStr}</td>
+            <td style="text-align:center;display:flex;gap:.35rem;justify-content:center;">
+              <button onclick="rejudgeSingle(${s.id})" class="btn-act" title="Chấm lại">🔄</button>
+              <a href="/submissions/${s.id}" target="_blank" class="btn-act" title="Xem code">👁️</a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.rejudgeSingle = async function(id) {
+      try {
+        const resp = await fetch(`${API}/api/v2/rejudge/${id}`, { method: 'POST' });
+        const json = await resp.json();
+        alert(json?.data?.message || `Đã rejudge bài #${id}!`);
+        loadAllSubs();
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    };
+
+    loadAllSubs();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

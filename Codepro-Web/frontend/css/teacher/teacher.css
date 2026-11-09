@@ -1,0 +1,40 @@
+/* ══════════════════════════════════════════════════════════════════════
+   CodeProOJ - TEACHER CLASSROOM PORTAL STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+
+.teacher-dashboard-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .teacher-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gradebook-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gradebook-table th {
+  background: var(--color-bg);
+  padding: 0.85rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border-subtle);
+  text-align: left;
+}
+
+.gradebook-table td {
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.9rem;
+}
+
+.grade-badge-score {
+  font-weight: 800;
+  color: #34d399;
+}

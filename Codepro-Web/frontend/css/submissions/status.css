@@ -1,0 +1,85 @@
+/* Submissions Status, Verdict Badges & Progress Animations */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-badge i {
+  font-size: 0.95rem;
+}
+
+/* Verdict Styles */
+.status-badge.verdict-ac {
+  background: rgba(22, 163, 74, 0.18);
+  color: var(--color-success);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+}
+
+.status-badge.verdict-wa {
+  background: rgba(220, 38, 38, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.status-badge.verdict-tle {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.status-badge.verdict-mle {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+}
+
+.status-badge.verdict-rte {
+  background: rgba(236, 72, 153, 0.18);
+  color: #f472b6;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+}
+
+.status-badge.verdict-ce {
+  background: rgba(234, 179, 8, 0.18);
+  color: #fde047;
+  border: 1px solid rgba(253, 224, 71, 0.35);
+}
+
+.status-badge.verdict-queued {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.status-badge.verdict-judging,
+.status-badge.verdict-running,
+.status-badge.verdict-compiling {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  color: var(--color-primary);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(96, 165, 250, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

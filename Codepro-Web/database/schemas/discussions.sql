@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS discussions (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id BIGINT REFERENCES users(id),
+    category VARCHAR(50) DEFAULT 'general',
+    votes INT DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGSERIAL PRIMARY KEY,
+    discussion_id BIGINT REFERENCES discussions(id) ON DELETE CASCADE,
+    author_id BIGINT REFERENCES users(id),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

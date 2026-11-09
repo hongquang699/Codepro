@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tình Trạng Toàn Hệ Thống (System Status) | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .metric-card { background: var(--color-card); border: 1px solid var(--color-border-subtle); border-radius: 12px; padding: 1.5rem; }
+    .table-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+    .table-stat-box { background: rgba(255,255,255,0.02); border: 1px solid var(--color-border-subtle); border-radius: 8px; padding: 1rem; }
+    .table-stat-lbl { font-size: 0.75rem; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; }
+    .table-stat-val { font-size: 1.8rem; font-weight: 800; color: var(--color-primary); margin-top: 0.25rem; }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/judge" class="admin-nav-item"><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</a>
+      <a href="/admin/security" class="admin-nav-item"><cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF</a>
+      <a href="/admin/system/status" class="admin-nav-item active"><cp-icon name="bolt" size="sm"></cp-icon> Tình trạng máy chủ</a>
+
+      <div class="nav-group-title">Nội dung thi</div>
+      <a href="/admin/problems" class="admin-nav-item"><cp-icon name="edit" size="sm"></cp-icon> Kho bài tập</a>
+      <a href="/admin/contests" class="admin-nav-item"><cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi</a>
+
+      <div class="nav-group-title">Người dùng &amp; Vận hành</div>
+      <a href="/admin/users" class="admin-nav-item"><cp-icon name="users" size="sm"></cp-icon> Người dùng</a>
+      <a href="/admin/submissions" class="admin-nav-item"><cp-icon name="document" size="sm"></cp-icon> Lịch sử bài nộp</a>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình &amp; Bảo trì</a>
+
+      <div class="sidebar-footer">
+        <div>CodeProOJ Admin v2.4</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1>Tình Trạng Máy Chủ &amp; Cơ Sở Dữ Liệu</h1>
+          <p>Báo cáo thông số môi trường, dung lượng cơ sở dữ liệu SQLite và tình trạng kết nối dịch vụ.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn-top btn-top-secondary" onclick="fetchMetrics()">🔄 Làm mới dữ liệu</button>
+        </div>
+      </div>
+
+      <!-- Telemetry Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="sc-hdr"><span>Hệ Điều Hành &amp; Nền Tảng</span><span>💻</span></div>
+          <div class="sc-val" id="valOS" style="font-size:1.4rem;margin-top:0.75rem;">Windows Server</div>
+          <div class="sc-sub" id="valPython">Python 3.12</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="sc-hdr"><span>Cơ Sở Dữ Liệu Chính</span><span>🗄️</span></div>
+          <div class="sc-val" id="valDbSize" style="font-size:1.8rem;margin-top:0.75rem;">... MB</div>
+          <div class="sc-sub">File: <code>database/codeprooj_db.sqlite3</code></div>
+        </div>
+
+        <div class="metric-card">
+          <div class="sc-hdr"><span>Cụm Máy Chấm (Judge Cluster)</span><cp-icon name="judge" size="sm"></cp-icon></div>
+          <div class="sc-val" style="font-size:1.5rem;color: #34d399;margin-top:0.75rem;" id="valJudgeStatus">PORT 9999 ONLINE</div>
+          <div class="sc-sub">7 Worker Nodes SECCOMP</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="sc-hdr"><span>Bảo Vệ WAF &amp; Anti-DDoS</span><cp-icon name="shield" size="sm"></cp-icon></div>
+          <div class="sc-val" style="font-size:1.5rem;color: var(--color-primary);margin-top:0.75rem;">WAF ACTIVE</div>
+          <div class="sc-sub">Chống Flood, Bot &amp; IP Spoofing</div>
+        </div>
+      </div>
+
+      <!-- Table Breakdown -->
+      <div class="panel-box" style="margin-bottom:1.75rem;">
+        <div class="panel-hdr">
+          <h3><cp-icon name="chart" size="sm"></cp-icon> Thống Kê Số Bản Ghi Cơ Sở Dữ Liệu (Table Statistics)</h3>
+        </div>
+        <div class="panel-bdy">
+          <div class="table-stat-grid" id="tableStatsGrid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Maintenance Tools -->
+      <div class="panel-box">
+        <div class="panel-hdr">
+          <h3>🛠️ Công Cụ Bảo Trì Cơ Sở Dữ Liệu &amp; Bộ Nhớ</h3>
+        </div>
+        <div class="panel-bdy">
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            <div style="flex:1;min-width:280px;background: rgba(255,255,255,0.02);padding:1.25rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+              <h4 style="margin:0 0 0.5rem 0;color: var(--color-text);">Tối ưu hóa SQLite (VACUUM)</h4>
+              <p style="font-size:0.85rem;color: var(--color-text-muted);margin-bottom:1rem;">
+                Dọn dẹp các phân mảnh, giải phóng dung lượng đĩa trống sau khi xóa dữ liệu test case hoặc bài nộp cũ.
+              </p>
+              <button class="btn-top btn-top-primary" onclick="runVacuum()"><cp-icon name="bolt" size="sm"></cp-icon> Thực hiện VACUUM</button>
+            </div>
+
+            <div style="flex:1;min-width:280px;background: rgba(255,255,255,0.02);padding:1.25rem;border-radius:10px;border: 1px solid var(--color-border-subtle);">
+              <h4 style="margin:0 0 0.5rem 0;color: var(--color-text);">Dọn sạch Bộ nhớ đệm (Flush Cache)</h4>
+              <p style="font-size:0.85rem;color: var(--color-text-muted);margin-bottom:1rem;">
+                Xóa sạch bộ nhớ đệm bảng xếp hạng, đề bài và dữ liệu tạm thời để đồng bộ hóa ngay lập tức.
+              </p>
+              <button class="btn-top btn-top-secondary" onclick="runFlushCache()">🧹 Xóa toàn bộ Cache</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    async function fetchMetrics() {
+      try {
+        const res = await fetch('/api/v2/admin/system/metrics');
+        const json = await res.json();
+        if (json.status !== 200 || !json.data) return;
+        const d = json.data;
+
+        document.getElementById('valOS').textContent = d.os || 'Windows';
+        document.getElementById('valPython').textContent = 'Python ' + (d.python_version || '3.12');
+        document.getElementById('valDbSize').textContent = d.db_size_mb + ' MB';
+        document.getElementById('valJudgeStatus').textContent = d.judge_status || 'ONLINE';
+
+        const grid = document.getElementById('tableStatsGrid');
+        const counts = d.counts || {};
+        const labels = {
+          problems: "Kho bài tập",
+          submissions: "Tổng bài nộp",
+          users: "Tài khoản người dùng",
+          profiles: "Hồ sơ cá nhân",
+          contests: "Kỳ thi thi đấu",
+          blog_posts: "Bài viết kỹ thuật",
+          comments: "Bình luận thảo luận",
+          clarifications: "Câu hỏi làm rõ đề"
+        };
+
+        grid.innerHTML = Object.keys(counts).map(k => `
+          <div class="table-stat-box">
+            <div class="table-stat-lbl">${labels[k] || k}</div>
+            <div class="table-stat-val">${counts[k].toLocaleString('vi-VN')}</div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function runVacuum() {
+      if (!confirm('Chạy lệnh SQLite VACUUM để tối ưu dung lượng? Thao tác có thể mất vài giây.')) return;
+      try {
+        const res = await fetch('/api/v2/admin/system/metrics', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'vacuum' })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã hoàn tất');
+        fetchMetrics();
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    async function runFlushCache() {
+      if (!confirm('Dọn dẹp sạch toàn bộ cache hệ thống?')) return;
+      try {
+        const res = await fetch('/api/v2/admin/system', {
+          method: 'POST',
+          headers: window.adminApiHeaders('application/json'),
+          body: JSON.stringify({ action: 'flush_cache' })
+        });
+        const json = await res.json();
+        alert(json.data?.message || 'Đã dọn dẹp cache');
+      } catch (e) {
+        alert('Lỗi: ' + e.message);
+      }
+    }
+
+    fetchMetrics();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

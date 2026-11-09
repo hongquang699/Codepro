@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu hình Máy Chấm (Judge) | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <style>
+    .settings-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .settings-tab {
+      padding: 0.75rem 1.25rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .settings-tab:hover {
+      color: #fff;
+    }
+    .settings-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: #38bdf8;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .form-hint {
+      color: var(--color-text-dim);
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+    }
+    .btn-save {
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-save:hover {
+      background: var(--color-primary-hover);
+    }
+  </style>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/judge" class="admin-nav-item"><cp-icon name="judge" size="sm"></cp-icon> Cụm máy chấm</a>
+      <a href="/admin/security" class="admin-nav-item"><cp-icon name="shield" size="sm"></cp-icon> Bảo mật &amp; WAF</a>
+
+      <div class="nav-group-title">Nội dung &amp; Đề bài</div>
+      <a href="/admin/problems" class="admin-nav-item"><cp-icon name="edit" size="sm"></cp-icon> Kho bài tập</a>
+      <a href="/admin/contests" class="admin-nav-item"><cp-icon name="trophy" size="sm"></cp-icon> Quản lý kỳ thi</a>
+
+      <div class="nav-group-title">Cấu hình Hệ thống</div>
+      <a href="/admin/settings" class="admin-nav-item active"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình chung</a>
+      <a href="/admin/announcements" class="admin-nav-item"><span><cp-icon name="bell" size="sm"></cp-icon> </span> Thông báo toàn sàn</a>
+      <a href="/" class="admin-nav-item" style="margin-top:auto;"><span><cp-icon name="globe" size="sm"></cp-icon> </span> Trở về Website</a>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <h1>Cấu hình Máy Chấm (Judge)</h1>
+        <div style="display:flex;gap:1rem;align-items:center;">
+          <span style="color: var(--color-text-muted);font-size:0.9rem;">Quyền: <strong>System Superuser</strong></span>
+        </div>
+      </div>
+
+      <nav class="settings-nav">
+        <a href="/admin/settings" class="settings-tab ">Tổng quan</a>
+        <a href="/admin/settings/security" class="settings-tab ">Bảo mật &amp; WAF</a>
+        <a href="/frontend/html/admin/settings/judge.html" class="settings-tab active">Máy chấm (Judge)</a>
+        <a href="/frontend/html/admin/settings/email.html" class="settings-tab ">Cấu hình Email (SMTP)</a>
+        <a href="/frontend/html/admin/settings/maintenance.html" class="settings-tab ">Bảo trì &amp; Backup</a>
+        <a href="/frontend/html/admin/settings/system.html" class="settings-tab ">Hệ thống &amp; Telemetry</a>
+      </nav>
+
+      
+<div class="card" style="padding: 2rem; max-width: 850px;">
+  <form onsubmit="event.preventDefault(); alert('Cấu hình máy chấm đã được đồng bộ đến toàn bộ 7 Worker Nodes!');">
+    <h3 style="color: var(--color-primary); margin-bottom: 1.5rem; font-size:1.25rem;"><cp-icon name="judge" size="sm"></cp-icon> Giới hạn &amp; Thông số Máy Chấm (Judge Cluster Limits)</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div class="form-group">
+        <label class="form-label">Thời gian tối đa mặc định (Max Time Limit)</label>
+        <input type="number" step="0.1" class="form-control" value="5.0" required>
+        <div class="form-hint">Giới hạn thời gian tối đa cho 1 testcase (giây)</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bộ nhớ tối đa mặc định (Max Memory Limit)</label>
+        <input type="number" class="form-control" value="1024" required>
+        <div class="form-hint">Giới hạn RAM tối đa cho phép cấp phát (MB)</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div class="form-group">
+        <label class="form-label">Số bài nộp đồng thời / Thí sinh (Rate Limit)</label>
+        <input type="number" class="form-control" value="3" required>
+        <div class="form-hint">Số bài tối đa trong hàng đợi PENDING cho mỗi tài khoản</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Khoảng cách giữa 2 lần nộp (Cooldown)</label>
+        <input type="number" class="form-control" value="5" required>
+        <div class="form-hint">Thời gian chờ tối thiểu giữa 2 lần bấm Submit (giây)</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cờ biên dịch C++ mặc định (Default C++ Flags)</label>
+      <input type="text" class="form-control" value="-O3 -std=c++17 -Wall -Wextra -DONLINE_JUDGE">
+      <div class="form-hint">Các tham số truyền trực tiếp vào lệnh gọi g++</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Thời gian biên dịch tối đa (Compilation Timeout)</label>
+      <input type="number" class="form-control" value="15" required>
+      <div class="form-hint">Hủy tiến trình biên dịch nếu kéo dài quá số giây này (phòng chống template recursion bomb)</div>
+    </div>
+    <div style="margin-top:2rem;">
+      <button type="submit" class="btn-save">💾 Cập nhật Thông số Máy chấm</button>
+    </div>
+  </form>
+</div>
+
+    </main>
+  </div>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

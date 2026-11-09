@@ -1,0 +1,21 @@
+# System Limits and Safety Quotas
+limits:
+  compile:
+    time_limit_sec: 15
+    memory_limit_mb: 1024
+    output_limit_bytes: 65536 # 64 KB of compiler stderr/stdout
+
+  execution:
+    default_time_limit_sec: 1.0
+    max_time_limit_sec: 10.0
+    min_time_limit_sec: 0.1
+    default_memory_limit_mb: 256
+    max_memory_limit_mb: 1024
+    min_memory_limit_mb: 16
+    output_limit_bytes: 33554432 # 32 MB maximum submission output
+    stack_limit_mb: 128 # Stack size limit
+
+  storage:
+    max_source_size_bytes: 262144 # 256 KB max code size
+    max_testcase_size_bytes: 104857600 # 100 MB max input/output per testcase
+    clean_executables_after_sec: 3600

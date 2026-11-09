@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script>
+    if (window.location.protocol === 'file:') {
+      const key = new URLSearchParams(window.location.search).get('contest');
+      const destination = key
+        ? `/admin/contests/${encodeURIComponent(key)}/anti-cheat`
+        : '/admin/anti-cheat';
+      window.location.replace(`http://localhost:8888${destination}`);
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chống gian lận kỳ thi | CodeProOJ</title>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/contest-admin.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+  <link rel="stylesheet" href="/frontend/css/contest-admin/anti-cheat.css">
+  <script src="/frontend/js/core/icons.js"></script>
+</head>
+<body>
+  <header class="navbar"><div class="container nav-container"></div></header>
+  <div class="ca-layout">
+    <aside class="ca-sidebar" id="caSidebarTarget"></aside>
+    <main class="ca-main ac-page">
+      <div id="caHeaderTarget"></div>
+      <div class="ac-hero">
+        <div><span class="ac-eyebrow">OJ ANTI-CHEAT ENGINE</span><h2>Trung tâm kiểm tra gian lận</h2><p>Bot tìm tín hiệu tương đồng, lưu bằng chứng và chuyển hồ sơ cho người quản trị. Không có quyết định kỷ luật tự động.</p></div>
+        <div class="ac-hero-actions"><span id="acEngineState" class="ac-state">Đang tải...</span><button id="acRefresh" class="ca-btn ca-btn-secondary" type="button">Làm mới</button><button id="acStartScan" class="ca-btn ca-btn-primary" type="button">Quét kỳ thi</button></div>
+      </div>
+      <div id="acNotice" class="ac-notice" role="status" aria-live="polite"></div>
+      <nav class="ac-nav" aria-label="Các mục chống gian lận">
+        <button type="button" class="ac-nav-item active" data-ac-tab="dashboard" aria-selected="true">Tổng quan</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="scans" aria-selected="false">Lượt quét</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="similarity" aria-selected="false">Tương đồng</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="groups" aria-selected="false">Nhóm nghi vấn</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="cases" aria-selected="false">Hồ sơ & bằng chứng</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="ai-risk" aria-selected="false">AI Risk</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="penalties" aria-selected="false">Xử lý</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="appeals" aria-selected="false">Kháng nghị</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="settings" aria-selected="false">Cấu hình</button>
+        <button type="button" class="ac-nav-item" data-ac-tab="audit" aria-selected="false">Nhật ký</button>
+      </nav>
+
+      <section class="ac-view" data-ac-view="dashboard">
+        <div class="ac-stats" aria-label="Tổng quan chống gian lận">
+          <div class="ac-card"><span>Bài đã quét</span><strong id="acScanned">—</strong><small>Ước tính từ lượt quét hoàn tất</small></div>
+          <div class="ac-card"><span>Bài bị đánh dấu</span><strong id="acFlagged">—</strong><small>Chưa đồng nghĩa với vi phạm</small></div>
+          <div class="ac-card"><span>Hồ sơ cần duyệt</span><strong id="acOpen">—</strong><small id="acHighRisk">— hồ sơ ưu tiên cao</small></div>
+          <div class="ac-card"><span>Đã xác nhận</span><strong id="acConfirmed">—</strong><small>Sau khi người có quyền xem xét</small></div>
+        </div>
+        <div class="ac-overview-grid">
+          <div class="ac-panel"><div class="ac-panel-head"><div><h2>Hoạt động bot</h2><p id="acScanStatus">Đang tải trạng thái...</p></div></div><div class="ac-overview-body"><div><span>Lượt quét</span><strong id="acScans">—</strong></div><div><span>Đang chờ / đang chạy</span><strong id="acPending">—</strong></div><p>Bot phân tích bản nộp sau khi máy chấm nhận bài. Việc chấm điểm hoạt động độc lập.</p></div></div>
+          <div class="ac-panel"><div class="ac-panel-head"><div><h2>Cặp cần xem trước</h2><p>Ưu tiên theo điểm tương đồng hiện có.</p></div><button type="button" class="ac-text-button" data-ac-go="similarity">Xem tất cả →</button></div><div id="acTopMatches" class="ac-top-matches">Đang tải...</div></div>
+        </div>
+        <div class="ac-principle"><strong>Quy tắc xử lý</strong><span>Điểm từ ngưỡng cấu hình chỉ tạo hồ sơ. Người có quyền phải kiểm tra mã nguồn, bối cảnh bài toán và quy chế cuộc thi trước khi cảnh cáo hoặc loại thí sinh.</span></div>
+      </section>
+
+      <section class="ac-view" data-ac-view="scans" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Lượt quét</h2><p>Tiến độ quét mã nguồn và lỗi cần thử lại.</p></div></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Mã quét</th><th>Phạm vi</th><th>Trạng thái</th><th>Tiến độ</th><th>Cặp nghi vấn</th><th>Thời điểm</th><th></th></tr></thead><tbody id="acScanRows"><tr><td colspan="7">Đang tải...</td></tr></tbody></table></div></div></section>
+
+      <section class="ac-view" data-ac-view="similarity" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Cặp mã nguồn tương đồng</h2><p>Điểm là Jaccard trên dấu vân tay token đã chuẩn hóa, không phải xác suất gian lận.</p></div></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Thí sinh</th><th>Bài</th><th>Bài nộp</th><th>Tương đồng</th><th>Thuật toán</th><th></th></tr></thead><tbody id="acSimilarityRows"><tr><td colspan="6">Đang tải...</td></tr></tbody></table></div></div></section>
+
+      <section class="ac-view" data-ac-view="groups" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Nhóm nghi vấn</h2><p>Nhóm từ ba thí sinh trở lên được nối bởi các cặp vượt ngưỡng. Đây là gợi ý điều tra.</p></div></div><div id="acGroupList" class="ac-group-list">Đang tải...</div></div></section>
+
+      <section class="ac-view" data-ac-view="cases" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Hồ sơ & bằng chứng</h2><p>Xem mã nguồn đối chiếu, ghi lý do rồi quyết định xử lý.</p></div><label class="ac-filter">Trạng thái <select id="acCaseFilter"><option value="">Tất cả</option><option value="OPEN">Mới</option><option value="UNDER_REVIEW">Đang duyệt</option><option value="CONFIRMED">Đã xác nhận</option><option value="DISMISSED">Bác bỏ</option><option value="APPEALED">Kháng nghị</option><option value="CLOSED">Đã đóng</option></select></label></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Hồ sơ</th><th>Bài</th><th>Thí sinh</th><th>Tương đồng</th><th>Trạng thái</th><th>Ngày tạo</th><th></th></tr></thead><tbody id="acCaseRows"><tr><td colspan="7">Đang tải...</td></tr></tbody></table></div></div></section>
+
+      <section class="ac-view" data-ac-view="ai-risk" hidden><div class="ac-panel ac-explainer"><span class="ac-eyebrow">ADVANCED DETECTION</span><h2>AI Risk chưa được kích hoạt</h2><p>Hiện chưa có mô hình được hiệu chỉnh và kiểm định trên dữ liệu của CodeProOJ. Hệ thống không gán điểm AI hoặc tự động kết luận thí sinh dùng AI chỉ từ mã nguồn.</p><div class="ac-principle"><strong>Khi cần xác minh</strong><span>Ban tổ chức có thể yêu cầu thí sinh giải thích thuật toán, lịch sử làm bài và đối chiếu với quy chế đã công bố trước kỳ thi.</span></div></div></section>
+
+      <section class="ac-view" data-ac-view="penalties" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Quyết định xử lý</h2><p>Chỉ được tạo từ hồ sơ đã xác nhận; mọi quyết định đều có lý do và nhật ký.</p></div></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Mã</th><th>Hồ sơ</th><th>Thí sinh</th><th>Hình thức</th><th>Người xử lý</th><th>Trạng thái</th><th>Ngày tạo</th></tr></thead><tbody id="acPenaltyRows"><tr><td colspan="7">Đang tải...</td></tr></tbody></table></div></div></section>
+
+      <section class="ac-view" data-ac-view="appeals" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Kháng nghị</h2><p>Người ban hành quyết định không được tự xét kháng nghị của chính mình.</p></div></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Mã</th><th>Hồ sơ</th><th>Thí sinh</th><th>Lý do</th><th>Trạng thái</th><th></th></tr></thead><tbody id="acAppealRows"><tr><td colspan="6">Đang tải...</td></tr></tbody></table></div></div></section>
+
+      <section class="ac-view" data-ac-view="settings" hidden><div class="ac-panel ac-settings"><div class="ac-panel-head"><div><h2>Chính sách quét</h2><p>Ngưỡng mặc định là 89%; mã ngắn và lời giải khuôn mẫu dễ trùng khớp giả.</p></div></div><form id="acSettingsForm" class="ac-form"><label class="ac-toggle"><span>Bật quét tự động</span><input id="acEnabled" type="checkbox"></label><label><span>Ngưỡng tạo hồ sơ (%)</span><input id="acThreshold" type="number" min="50" max="100" required></label><label><span>Số token tối thiểu</span><input id="acMinTokens" type="number" min="20" max="500" required></label><label><span>Chế độ quét</span><select id="acScanMode"><option value="realtime">Sau khi nộp bài</option><option value="scheduled">Theo lịch mỗi giờ</option><option value="manual">Thủ công</option></select></label><div class="ac-form-footer"><p>Vượt ngưỡng sẽ tạo hồ sơ chờ duyệt, không tự động ban.</p><button class="ca-btn ca-btn-primary" type="submit">Lưu chính sách</button></div></form></div></section>
+
+      <section class="ac-view" data-ac-view="audit" hidden><div class="ac-panel"><div class="ac-panel-head"><div><h2>Nhật ký kiểm toán</h2><p>Lịch sử thay đổi chính sách, quét, xác nhận, xử lý và kháng nghị.</p></div></div><div class="ac-scroll"><table class="ac-table"><thead><tr><th>Thời điểm</th><th>Thao tác</th><th>Người thực hiện</th><th>Đối tượng</th><th>Chi tiết</th></tr></thead><tbody id="acAuditRows"><tr><td colspan="5">Đang tải...</td></tr></tbody></table></div></div></section>
+    </main>
+  </div>
+
+  <dialog id="acEvidenceDialog" class="ac-dialog" aria-labelledby="acEvidenceTitle">
+    <div class="ac-dialog-head"><h2 id="acEvidenceTitle">Bằng chứng mã nguồn</h2><button id="acCloseDialog" type="button" aria-label="Đóng">×</button></div>
+    <div id="acEvidenceMeta" class="ac-evidence-meta"></div>
+    <div class="ac-code-grid"><div><h3 id="acSourceAHeading">Bài A</h3><pre id="acSourceA"></pre></div><div><h3 id="acSourceBHeading">Bài B</h3><pre id="acSourceB"></pre></div></div>
+    <div class="ac-decision"><label for="acDecisionReason">Lý do quyết định</label><textarea id="acDecisionReason" rows="3" maxlength="4000" placeholder="Ghi rõ bằng chứng và căn cứ theo quy chế..."></textarea><div class="ac-actions"><button id="acConfirm" type="button" class="ca-btn ca-btn-primary">Xác nhận nghi vấn</button><button id="acDismiss" type="button" class="ca-btn ca-btn-secondary">Bác bỏ</button></div></div>
+    <div id="acPenaltySection" class="ac-decision" hidden><h3>Xử lý sau khi xác nhận</h3><div class="ac-actions"><select id="acPenaltyUser"></select><select id="acPenaltyKind"><option value="WARNING">Cảnh cáo</option><option value="DISQUALIFY">Loại khỏi kỳ thi</option></select><button id="acIssuePenalty" type="button" class="ca-btn ca-btn-primary">Ghi quyết định xử lý</button></div><p>Quyết định được ghi vào nhật ký; thí sinh có quyền khiếu nại.</p></div>
+  </dialog>
+
+  <dialog id="acAppealDialog" class="ac-dialog ac-appeal-dialog" aria-labelledby="acAppealTitle">
+    <div class="ac-dialog-head"><h2 id="acAppealTitle">Xét kháng nghị</h2><button id="acCloseAppeal" type="button" aria-label="Đóng">×</button></div>
+    <div class="ac-decision"><p id="acAppealContext"></p><label for="acAppealExplanation">Giải thích quyết định</label><textarea id="acAppealExplanation" rows="5" minlength="10" maxlength="4000" placeholder="Nêu căn cứ xem xét và lý do chấp nhận hoặc bác bỏ..."></textarea><p id="acAppealError" class="ac-inline-error" role="alert"></p><div class="ac-actions"><button id="acAppealApprove" type="button" class="ca-btn ca-btn-primary">Chấp nhận</button><button id="acAppealReject" type="button" class="ca-btn ca-btn-secondary">Bác bỏ</button></div><p>Người ban hành quyết định xử lý không thể tự xét kháng nghị này.</p></div>
+  </dialog>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/js/components/navbar.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin-api.js"></script>
+  <script src="/frontend/js/contest-admin/contest-admin.js"></script>
+  <script src="/frontend/js/contest-admin/anti-cheat.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+</body>
+</html>

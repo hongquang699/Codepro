@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết Bài toán | CodeProOJ</title>
+  
+  <!-- Global & Component Stylesheets -->
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/components/table.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  
+  <!-- Separated Page Stylesheet -->
+  <link rel="stylesheet" href="/frontend/css/problems/detail.css">
+  
+  <!-- External Libraries -->
+  <script src="/frontend/vendor/marked/marked.umd.js"></script>
+  <script src="/frontend/js/core/mathjax-config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Global Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="/frontend/html/home/index.html" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#2563EB"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/frontend/html/home/index.html">Trang chủ</a></li>
+        <li><a href="/frontend/html/problem/index.html" class="active">Bài tập</a></li>
+        <li><a href="/frontend/html/contest/index.html">Cuộc thi</a></li>
+        <li><a href="/frontend/html/ranking/index.html">Xếp hạng</a></li>
+        <li><a href="/frontend/html/submission/all.html">Bài nộp</a></li>
+      </ul>
+      <div class="nav-actions" id="navAuth">
+        <a href="/frontend/html/auth/login.html" class="btn btn-secondary">Đăng nhập</a>
+        <a href="/frontend/html/auth/register.html" class="btn btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="container" style="padding-top: 1.25rem; padding-bottom: 3.5rem;">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb">
+      <a href="/frontend/html/problem/index.html"><cp-icon name="book" size="sm"></cp-icon> Kho bài tập</a>
+      <span class="sep">›</span>
+      <span id="bcCode" style="font-weight:700;color: var(--color-primary);">...</span>
+      <span class="sep">›</span>
+      <span id="bcTitle" style="color: var(--color-text-muted);">Đang tải thông tin...</span>
+    </div>
+
+    <div class="prob-layout">
+      <!-- ══════════════ LEFT COLUMN: Problem Presentation ══════════════ -->
+      <div>
+        <!-- Problem Header Card -->
+        <div class="prob-header">
+          <div class="prob-code" id="probCode">
+            <span>...</span>
+            <span class="copy-icon" onclick="copyCodeText()" title="Sao chép mã bài"><cp-icon name="document" size="sm"></cp-icon> </span>
+          </div>
+          <h1 class="prob-title" id="probTitle">Đang tải đề bài...</h1>
+          
+          <div class="meta-pills" id="metaPills">
+            <span class="meta-pill pill-time" id="pillTime">⏱ 1.0s</span>
+            <span class="meta-pill pill-mem" id="pillMem">💾 256 MB</span>
+            <span class="meta-pill pill-io"><cp-icon name="inbox" size="sm"></cp-icon> Standard I/O</span>
+            <span class="meta-pill pill-pts" id="pillPts"><cp-icon name="award" size="sm"></cp-icon> 100 điểm</span>
+            <span class="meta-pill pill-diff easy" id="pillDiff">🟢 Dễ</span>
+            <span class="ac-badge solved-no" id="solvedBadge">⚪ Chưa nộp</span>
+          </div>
+        </div>
+
+        <!-- Problem Navigation Tabs -->
+        <div class="prob-tabs">
+          <button class="prob-tab active" onclick="switchTab('statement', this)">
+            📄 Đề bài
+          </button>
+          <button class="prob-tab" onclick="switchTab('editorial', this)">
+            💡 Lời giải &amp; Hướng dẫn
+          </button>
+          <button class="prob-tab" onclick="switchTab('mysubs', this)">
+            📋 Bài nộp của tôi <span class="tab-badge" id="mySubsCount">0</span>
+          </button>
+          <button class="prob-tab" onclick="switchTab('allsubs', this)">
+            👥 Tất cả bài nộp <span class="tab-badge" id="allSubsCount">0</span>
+          </button>
+          <button class="prob-tab" onclick="switchTab('stats', this)">
+            📊 Thống kê
+          </button>
+        </div>
+
+        <!-- Tab 1: Đề bài (Statement) -->
+        <div class="prob-tab-panel active" id="panel-statement">
+          <div class="statement-content" id="statementBody">
+            <div style="text-align:center;padding:4rem 1rem;color: var(--color-text-muted);">
+              <div class="spinner-sm" style="width:32px;height:32px;border-width:3px;border-top-color: #38bdf8;"></div>
+              <div style="margin-top:1rem;font-size:.95rem;">Đang tải nội dung đề bài chuẩn CodeProOJ...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Lời giải & Editorial -->
+        <div class="prob-tab-panel" id="panel-editorial">
+          <div class="statement-content">
+            <div style="text-align:center;padding:4rem 1rem;color: var(--color-text-muted);">
+              <div style="font-size:3rem;margin-bottom:1rem;"><cp-icon name="lock" size="sm"></cp-icon> </div>
+              <h3 style="font-size:1.2rem;color: var(--color-text);margin-bottom:.5rem;">Hướng dẫn giải (Editorial)</h3>
+              <p style="max-width:500px;margin:0 auto;line-height:1.6;">
+                Lời giải chi tiết và mã nguồn mẫu sẽ được công bố sau khi bạn giải thành công bài toán này hoặc khi ban tổ chức kết thúc kỳ thi.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Bài nộp của tôi (My Submissions) -->
+        <div class="prob-tab-panel" id="panel-mysubs">
+          <div style="overflow-x:auto;">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th style="width:70px;">Mã #</th>
+                  <th>Phán quyết</th>
+                  <th>Điểm</th>
+                  <th>Thời gian</th>
+                  <th>Bộ nhớ</th>
+                  <th>Ngôn ngữ</th>
+                  <th>Nộp lúc</th>
+                </tr>
+              </thead>
+              <tbody id="mySubsTbody">
+                <tr><td colspan="7" style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải lịch sử bài nộp...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 4: Tất cả bài nộp (All Submissions) -->
+        <div class="prob-tab-panel" id="panel-allsubs">
+          <div style="overflow-x:auto;">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th style="width:70px;">Mã #</th>
+                  <th>Thí sinh</th>
+                  <th>Phán quyết</th>
+                  <th>Điểm</th>
+                  <th>Thời gian</th>
+                  <th>Bộ nhớ</th>
+                  <th>Ngôn ngữ</th>
+                  <th>Nộp lúc</th>
+                </tr>
+              </thead>
+              <tbody id="allSubsTbody">
+                <tr><td colspan="8" style="text-align:center;padding:3rem;color: var(--color-text-muted);">Đang tải danh sách bài nộp...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 5: Thống kê (Statistics) -->
+        <div class="prob-tab-panel" id="panel-stats">
+          <div style="padding:1.75rem 2rem;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:1rem;margin-bottom:1.5rem;">
+              <div style="background: rgba(255,255,255,.04);border: 1px solid var(--color-border);border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color: var(--color-primary);" id="statTotal">0</div>
+                <div style="font-size:.78rem;color: var(--color-text-muted);margin-top:.25rem;">Tổng lượt nộp</div>
+              </div>
+              <div style="background: rgba(255,255,255,.04);border: 1px solid var(--color-border);border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color: #34d399;" id="statAC">0</div>
+                <div style="font-size:.78rem;color: var(--color-text-muted);margin-top:.25rem;">Accepted (AC)</div>
+              </div>
+              <div style="background: rgba(255,255,255,.04);border: 1px solid var(--color-border);border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color: #fbbf24;" id="statRate">0%</div>
+                <div style="font-size:.78rem;color: var(--color-text-muted);margin-top:.25rem;">Tỷ lệ AC</div>
+              </div>
+              <div style="background: rgba(255,255,255,.04);border: 1px solid var(--color-border);border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;font-weight:800;color: var(--color-accent);" id="statUsers">0</div>
+                <div style="font-size:.78rem;color: var(--color-text-muted);margin-top:.25rem;">Người đã giải</div>
+              </div>
+            </div>
+
+            <h3 style="font-size:1rem;color: var(--color-text);margin-bottom:.8rem;">Phân bố theo ngôn ngữ</h3>
+            <div id="statLangs" style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;">
+              <!-- Populated by JS -->
+            </div>
+
+            <h3 style="font-size:1rem;color: var(--color-text);margin-bottom:.8rem;">Phân bố theo phán quyết</h3>
+            <div id="statVerdicts" style="display:flex;flex-wrap:wrap;gap:.5rem;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ RIGHT COLUMN: Code Editor & Submission ══════════════ -->
+      <aside>
+        <div class="sidebar-card">
+          <!-- Submission Area -->
+          <div class="sb-section">
+            <div class="sb-title">
+              <span><cp-icon name="rocket" size="sm"></cp-icon> NỘP BÀI TRỰC TIẾP</span>
+              <span style="font-size:.72rem;color: #10b981;font-weight:600;">Judge Online ●</span>
+            </div>
+
+            <!-- Language selection -->
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color: var(--color-text-muted);display:block;margin-bottom:.35rem;">
+                NGÔN NGỮ LẬP TRÌNH:
+              </label>
+              <select class="lang-dropdown" id="langSelect">
+                <option value="CPP17">C++17 (GCC 11.2)</option>
+                <option value="CPP14">C++14 (GCC 9.4)</option>
+                <option value="PY3">Python 3.12</option>
+                <option value="JAVA">Java 17 (OpenJDK)</option>
+                <option value="RUST">Rust 2021</option>
+                <option value="GO">Go 1.22</option>
+                <option value="PAS">Free Pascal 3.2</option>
+              </select>
+            </div>
+
+            <!-- Code editor area -->
+            <div class="editor-wrapper">
+              <div class="editor-bar">
+                <span style="font-weight:700;color: var(--color-text-muted);" id="editorLangLabel">C++17</span>
+                <div class="editor-bar-actions">
+                  <button class="editor-action-btn" onclick="clearCode()" title="Xóa code">🗑</button>
+                  <button class="editor-action-btn" onclick="copyCurrentCode()" title="Sao chép"><cp-icon name="document" size="sm"></cp-icon> </button>
+                  <span id="charCount" style="color: var(--color-text-dim);font-size:.7rem;">0 ký tự</span>
+                </div>
+              </div>
+              <textarea id="codeArea" placeholder="// Viết code giải bài toán ở đây...
+// Nhấn Tab để thụt dòng, Ctrl + Enter để nộp bài nhanh
+" spellcheck="false"></textarea>
+            </div>
+
+            <button class="btn-submit" id="btnSubmit" onclick="submitSolution()">
+              🚀 Nộp bài (Submit)
+            </button>
+            <button class="btn-custom-test" onclick="openTestModal()">
+              🧪 Chạy thử đầu vào tùy chỉnh (Custom Test)
+            </button>
+
+            <!-- Real-time verdict result box -->
+            <div class="verdict-card" id="verdictBox">
+              <div class="v-icon" id="vbIcon"></div>
+              <div class="v-title" id="vbTitle"></div>
+              <div class="v-details" id="vbDetails"></div>
+              <a href="#" class="v-link" id="vbLink" style="display:none;">Xem chi tiết bài nộp →</a>
+            </div>
+          </div>
+
+          <!-- Quick Info & Limits -->
+          <div class="sb-section">
+            <div class="sb-title"><span><cp-icon name="bolt" size="sm"></cp-icon> THÔNG SỐ KỸ THUẬT</span></div>
+            <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.84rem;">
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color: var(--color-text-muted);">Thời gian chạy:</span>
+                <strong style="color: #f59e0b;" id="sbTime">1.0s</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color: var(--color-text-muted);">Bộ nhớ tối đa:</span>
+                <strong style="color: var(--color-accent);" id="sbMem">256 MB</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color: var(--color-text-muted);">Kiểu vào/ra:</span>
+                <strong style="color: var(--color-primary);">Standard I/O</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color: var(--color-text-muted);">Kích thước code:</span>
+                <strong style="color: var(--color-text-secondary);">&lt; 64 KB</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color: var(--color-text-muted);">Máy chấm:</span>
+                <strong style="color: #10b981;">codeprooj-judge-worker (Port 9999)</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Author Info -->
+          <div class="sb-section">
+            <div class="sb-title"><span><cp-icon name="user" size="sm"></cp-icon> TÁC GIẢ &amp; BẢN QUYỀN</span></div>
+            <div style="font-size:.85rem;color: var(--color-text-secondary);" id="sbAuthor">
+              Tác giả: <strong>Admin / CodeProOJ Team</strong>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Custom Test Modal -->
+  <div class="modal-overlay" id="customTestModal" style="display:none;" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-hdr">
+        <h3>🧪 Chạy thử với đầu vào tùy chỉnh</h3>
+        <button class="modal-x" onclick="closeTestModal()">✕</button>
+      </div>
+      <div class="modal-bdy">
+        <label style="font-size:.8rem;font-weight:700;color: var(--color-text-muted);display:block;margin-bottom:.4rem;">
+          DỮ LIỆU ĐẦU VÀO (STDIN):
+        </label>
+        <textarea class="custom-in" id="customStdin" placeholder="Nhập dữ liệu test vào đây..."></textarea>
+        
+        <button class="btn-submit" id="btnRunTest" style="margin-top:.8rem;width:auto;padding:.6rem 1.25rem;" onclick="runCustomInvocation()">
+          ▶ Chạy thử nghiệm
+        </button>
+
+        <label style="font-size:.8rem;font-weight:700;color: var(--color-text-muted);display:block;margin-top:1rem;margin-bottom:.4rem;">
+          KẾT QUẢ ĐẦU RA (STDOUT):
+        </label>
+        <div class="custom-out" id="customStdout">Nhấn "Chạy thử nghiệm" để xem kết quả...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: var(--color-surface);border-top: 1px solid var(--color-border);padding:1.5rem 0;margin-top:2rem;">
+    <div class="container" style="display:flex;justify-content:space-between;color: var(--color-text-muted);font-size:.875rem;flex-wrap:wrap;gap:.5rem;">
+      <div>&copy; 2026 CodeProOJ. Nền tảng luyện thi lập trình thi đấu chuẩn CodeProOJ.</div>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="/frontend/html/about/index.html">Giới thiệu</a>
+        <a href="/frontend/html/help/faq.html">Trợ giúp</a>
+        <a href="/frontend/html/help/rules.html">Quy chế</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Separated JavaScript Modules -->
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/core/api.js"></script>
+  <script src="/frontend/js/core/auth.js"></script>
+  <script src="/frontend/vendor/dompurify/purify.min.js"></script>
+  <script src="/frontend/js/problems/detail.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

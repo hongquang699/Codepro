@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo Chủ Đề Thảo Luận | CodeProOJ Community</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/components/navbar.css">
+  <link rel="stylesheet" href="/frontend/css/components/card.css">
+  <link rel="stylesheet" href="/frontend/css/responsive/mobile.css">
+  <link rel="stylesheet" href="/frontend/css/community/community.css">
+  <link rel="stylesheet" href="/frontend/css/community/forum.css">
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>CodeProOJ</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Trang chủ</a>
+        <a href="/frontend/html/problem/index.html" class="nav-link">Bài tập</a>
+        <a href="/frontend/html/contest/index.html" class="nav-link">Cuộc thi</a>
+        <a href="/frontend/html/ranking/index.html" class="nav-link">Xếp hạng</a>
+        <a href="/frontend/html/submission/index.html" class="nav-link">Bài nộp</a>
+        <a href="/frontend/html/community/home/index.html" class="nav-link active">Cộng đồng</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/frontend/html/admin/dashboard.html" class="btn-nav btn-admin">Quản trị</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="comm-layout" style="grid-template-columns: 240px 1fr;">
+    <aside class="comm-left-sidebar">
+      <div class="comm-sidebar-card">
+        <div class="comm-sidebar-title">Menu</div>
+        <nav class="comm-nav-list">
+          <a href="/frontend/html/community/forum/index.html" class="comm-nav-link">
+            <span>&larr;</span> Về Diễn đàn
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="comm-main">
+      <div class="comm-card">
+        <h1 style="font-size:1.5rem;color: var(--color-text);font-weight:800;margin-bottom:1.25rem;"><cp-icon name="plus" size="sm"></cp-icon> Mở Chủ Đề Thảo Luận Mới</h1>
+
+        <div style="margin-bottom:1.2rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Chuyên mục diễn đàn:</label>
+          <select id="threadCategorySelect" class="comm-composer-input" style="min-height:auto;padding:0.6rem;">
+            <option value="competitive-programming">Competitive Programming</option>
+            <option value="algorithms">Thuật toán &amp; Cấu trúc dữ liệu</option>
+            <option value="cpp">C++ &amp; Modern C++</option>
+            <option value="python">Python for CP</option>
+            <option value="problem-discussion">Thảo luận Đề bài &amp; Editorial</option>
+            <option value="contests">Kỳ thi &amp; Cuộc thi sắp tới</option>
+            <option value="general">Công nghệ &amp; Đời sống Lập trình</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:1.2rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Tiêu đề chủ đề:</label>
+          <input type="text" id="threadTitleInput" placeholder="Ví dụ: Xin tài liệu học Dynamic Programming Tree..." class="comm-composer-input" style="min-height:auto;">
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block;color: var(--color-text-secondary);font-size:0.88rem;font-weight:600;margin-bottom:0.4rem;">Nội dung chi tiết &amp; câu hỏi:</label>
+          <textarea id="threadContentInput" placeholder="Mô tả chi tiết thắc mắc của bạn, đoạn code gặp lỗi..." class="comm-composer-input" style="min-height:220px;"></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+          <a href="/frontend/html/community/forum/index.html" class="comm-btn-act" style="text-decoration:none;padding:0.6rem 1rem;">Hủy</a>
+          <button id="btnCreateThread" class="comm-btn-primary">Đăng chủ đề</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/core/config.js"></script>
+  <script src="/frontend/js/community/api.js"></script>
+  <script src="/frontend/js/community/create-thread.js"></script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/frontend/assets/icons/favicon.svg">
+  <link rel="stylesheet" href="/frontend/css/global/icons.css">
+  <script src="/frontend/js/core/icons.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Chống Gian Lận | CodeProOJ Admin</title>
+  <link rel="stylesheet" href="/frontend/css/global/reset.css">
+  <link rel="stylesheet" href="/frontend/css/global/variables.css">
+  <link rel="stylesheet" href="/frontend/css/global/typography.css">
+  <link rel="stylesheet" href="/frontend/css/global/common.css">
+  <link rel="stylesheet" href="/frontend/css/admin/dashboard.css">
+  <script src="/frontend/js/core/admin-guard.js"></script>
+  <link rel="stylesheet" href="/frontend/css/global/theme.css">
+  <link rel="stylesheet" href="/frontend/css/global/site-refresh.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="8" fill="#DC2626"/><path d="M12 12L7 20L12 28M24 12L29 20L24 28M19 10L17 30" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div>
+          <div class="brand-title">CodeProOJ <span class="brand-badge">ADMIN</span></div>
+          <div style="font-size:.7rem;color: var(--color-text-muted);">CodeProOJ Control Center</div>
+        </div>
+      </a>
+
+      <div class="nav-group-title">Hệ thống &amp; Giám sát</div>
+      <a href="/admin" class="admin-nav-item"><cp-icon name="chart" size="sm"></cp-icon> Bảng tổng quan</a>
+      <a href="/admin/announcements" class="admin-nav-item"><span><cp-icon name="bell" size="sm"></cp-icon> </span> Quản lý thông báo</a>
+      <a href="/admin/anti-cheat" class="admin-nav-item active"><cp-icon name="shield" size="sm"></cp-icon> Bot chống gian lận</a>
+      <a href="/admin/settings" class="admin-nav-item"><cp-icon name="settings" size="sm"></cp-icon> Cấu hình hệ thống</a>
+
+      <div class="sidebar-footer">
+        <div>CodeProOJ Admin v2.4</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title">
+          <h1>Bot chống gian lận kỳ thi</h1>
+          <p>Chọn kỳ thi để xem lượt quét, bằng chứng mã nguồn và hồ sơ đang chờ duyệt.</p>
+        </div>
+        <div class="topbar-actions">
+          <a class="btn-top btn-top-primary" href="/admin/contests">Danh sách kỳ thi</a>
+        </div>
+      </div>
+
+      <!-- Reports Table -->
+      <div class="panel-box">
+        <div class="panel-hdr">
+          <h3>Các kỳ thi có thể quản trị</h3>
+          <span class="badge-v bv-other" id="pendingCountBadge">Đang tải...</span>
+        </div>
+        <div class="panel-bdy" style="padding:0;">
+          <table class="admin-tbl">
+            <thead>
+              <tr>
+                <th>Mã kỳ thi</th>
+                <th>Tên kỳ thi</th>
+                <th>Trạng thái</th>
+                <th>Bài nộp</th>
+                <th>Chống gian lận</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    async function renderReports() {
+      const tbody = document.getElementById('reportsTbody');
+      tbody.replaceChildren();
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+        const response = await fetch('/api/v1/contest-admin/contests', {
+          credentials: 'same-origin',
+          headers: token ? { Authorization: `Token ${token}` } : {}
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        const contests = payload.data || [];
+        document.getElementById('pendingCountBadge').textContent = `${contests.length} kỳ thi`;
+        if (!contests.length) {
+          const row = tbody.insertRow();
+          const cell = row.insertCell();
+          cell.colSpan = 5;
+          cell.textContent = 'Chưa có kỳ thi được phân quyền.';
+          return;
+        }
+        for (const contest of contests) {
+          const row = tbody.insertRow();
+          for (const value of [contest.key, contest.name, contest.status, contest.submissions_count]) {
+            row.insertCell().textContent = String(value);
+          }
+          const link = document.createElement('a');
+          link.href = `/admin/contests/${encodeURIComponent(contest.key)}/anti-cheat`;
+          link.className = 'btn-act';
+          link.textContent = 'Mở hồ sơ';
+          row.insertCell().appendChild(link);
+        }
+      } catch (error) {
+        const row = tbody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 5;
+        cell.textContent = `Không tải được kỳ thi: ${error.message}`;
+        document.getElementById('pendingCountBadge').textContent = 'Lỗi tải dữ liệu';
+      }
+    }
+
+    renderReports();
+  </script>
+  <script src="/frontend/js/core/theme.js"></script>
+  <script src="/frontend/js/core/i18n.js"></script>
+</body>
+</html>

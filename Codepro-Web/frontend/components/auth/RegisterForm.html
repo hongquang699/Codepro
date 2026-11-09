@@ -1,0 +1,48 @@
+<form id="registerForm" class="auth-form">
+  <div class="auth-form-group">
+    <label class="auth-label" for="username">Username</label>
+    <div class="auth-input-wrap">
+      <input type="text" id="username" class="auth-input" placeholder="Ví dụ: coder2026" required autocomplete="username" autofocus>
+    </div>
+    <span class="auth-field-error" id="usernameError"></span>
+  </div>
+
+  <div class="auth-form-group">
+    <label class="auth-label" for="email">Email</label>
+    <div class="auth-input-wrap">
+      <input type="email" id="email" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+    </div>
+    <span class="auth-field-error" id="emailError"></span>
+  </div>
+
+  <div class="auth-form-group">
+    <label class="auth-label" for="password">Mật khẩu</label>
+    <div class="auth-input-wrap">
+      <input type="password" id="password" class="auth-input" placeholder="••••••••••••••" required autocomplete="new-password">
+      <button type="button" id="togglePasswordBtn" class="auth-input-icon" aria-label="Hiện mật khẩu">
+        <i data-icon="eye"></i>
+      </button>
+    </div>
+    <span class="auth-field-error" id="passwordError"></span>
+  </div>
+
+  <div class="auth-form-group">
+    <label class="auth-label" for="passwordConfirm">Xác nhận mật khẩu</label>
+    <div class="auth-input-wrap">
+      <input type="password" id="passwordConfirm" class="auth-input" placeholder="••••••••••••••" required autocomplete="new-password">
+      <button type="button" id="toggleConfirmPasswordBtn" class="auth-input-icon" aria-label="Hiện mật khẩu">
+        <i data-icon="eye"></i>
+      </button>
+    </div>
+    <span class="auth-field-error" id="passwordConfirmError"></span>
+  </div>
+
+  <label class="auth-checkbox-group">
+    <input type="checkbox" id="termsAgreed" checked required>
+    <span>Tôi đồng ý với <a href="/frontend/html/help/rules.html" target="_blank" class="auth-link">Điều khoản dịch vụ</a> và Chính sách bảo mật</span>
+  </label>
+
+  <button type="submit" id="registerSubmitBtn" class="auth-btn-primary">
+    <span>ĐĂNG KÝ</span>
+  </button>
+</form>
